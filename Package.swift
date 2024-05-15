@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftPicker",
+    platforms: [
+        .macOS(.v10_14),
+    ],
     products: [
         .library(
             name: "SwiftPicker",
@@ -16,11 +19,13 @@ let package = Package(
         ),
     ],
     dependencies: [
+        .package(url: "https://github.com/nikolainobadi/ANSITerminalModified", from: "0.5.0")
     ],
     targets: [
         .target(
             name: "SwiftPicker",
             dependencies: [
+                .product(name: "ANSITerminal", package: "ANSITerminalModified")
             ]
         ),
         .executableTarget(
