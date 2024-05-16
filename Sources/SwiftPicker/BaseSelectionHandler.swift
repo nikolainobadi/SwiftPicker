@@ -53,6 +53,12 @@ extension BaseSelectionHandler {
             print("\nSwiftPicker SingleSelection result:\n  \("✔".green) \(selection)\n")
         }
     }
+    
+    func printResults(_ selections: [String]) {
+        print("\nSwiftPicker MultiSelection results:\n")
+        selections.forEach({ print("  \("✔".green) \($0)") })
+        print("\n")
+    }
 }
 
 
