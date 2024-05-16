@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/nikolainobadi/ANSITerminalModified",
       "state" : {
-        "revision" : "0eedbc2bbf75e6513190274f8246a851fae6d015",
-        "version" : "0.5.0"
+        "revision" : "fd1443a5369693ddac5c8ef8dc6128af4011ff42",
+        "version" : "0.6.0"
       }
     }
   ],
