@@ -18,6 +18,13 @@ extension PickerComposer {
         
         return .init(padding: info.padding, state: state, inputHandler: inputHandler)
     }
+    
+    static func makeMultiSelectionPicker<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
+        configureScreen(newScreen)
+        let state = makeState(info: info)
+        
+        return .init(padding: info.padding, state: state, inputHandler: inputHandler)
+    }
 }
 
 
