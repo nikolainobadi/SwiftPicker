@@ -1,6 +1,6 @@
 //
 //  MultiSelectionHandler.swift
-//  
+//
 //
 //  Created by Nikolai Nobadi on 5/16/24.
 //
@@ -24,5 +24,11 @@ internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSel
                 handleArrowKeys()
             }
         }
+    }
+    
+    func printResults(_ selections: [String]) {
+        print("\nSwiftPicker MultiSelection results:\n")
+        selections.forEach({ print("  \("✔".green) \($0)") })
+        print("\n")
     }
 }

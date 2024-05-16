@@ -46,19 +46,6 @@ extension BaseSelectionHandler {
             handleScrolling(direction: 1)
         }
     }
-    
-    // TODO: - maybe move to single selection
-    func printResult(_ selection: String?) {
-        if let selection {
-            print("\nSwiftPicker SingleSelection result:\n  \("✔".green) \(selection)\n")
-        }
-    }
-    
-    func printResults(_ selections: [String]) {
-        print("\nSwiftPicker MultiSelection results:\n")
-        selections.forEach({ print("  \("✔".green) \($0)") })
-        print("\n")
-    }
 }
 
 
@@ -80,12 +67,12 @@ private extension BaseSelectionHandler {
         inputHandler.clearScreen()
         inputHandler.moveToHome()
         inputHandler.write(state.title + String(repeating: "\n", count: topPadding))
+        
         for i in start..<end {
             let option = state.options[i]
             renderOption(option: option, isActive: option.line == state.activeLine, row: i - start + (topPadding + 1), col: 0)
-            inputHandler.moveRight()
-            inputHandler.write("row: \(i - start + (topPadding + 1)), end: \(end)")
         }
+        
         inputHandler.write("\(String(repeating: "\n", count: bottomPadding))start: \(start + 1), activeLine: \(state.activeLine), otherStart: (\(state.activeLine - (displayableOptionsCount + topPadding))) end: \(end)")
     }
     
