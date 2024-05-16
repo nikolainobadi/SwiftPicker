@@ -49,7 +49,7 @@ private extension SwiftPicker {
     }
     
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
-        let handler = PickerComposer.makeSingleSelectionPicker(info: info, newScreen: showNewScreen)
+        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: showNewScreen)
         let selection = handler.captureUserInput()
         
         handler.endSelection()

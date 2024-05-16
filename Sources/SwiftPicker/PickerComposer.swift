@@ -12,14 +12,14 @@ enum PickerComposer {
 
 // MARK: - Composer
 extension PickerComposer {
-    static func makeSingleSelectionPicker<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
+    static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
         configureScreen(newScreen)
         let state = makeState(info: info)
         
         return .init(padding: info.padding, state: state, inputHandler: inputHandler)
     }
     
-    static func makeMultiSelectionPicker<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
+    static func makeMultiSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
         configureScreen(newScreen)
         let state = makeState(info: info)
         
