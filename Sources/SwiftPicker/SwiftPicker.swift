@@ -38,13 +38,12 @@ private extension SwiftPicker {
         return .init(title: title, items: items, padding: padding)
     }
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
-//        let handler = PickerComposer.makeSingleSelectionPicker(info: info, newScreen: showNewScreen)
-//        let selection = handler.captureUserInput()
-//        
-//        handler.endSelection()
-//        printResult(selection?.displayName)
-//        
-//        return selection
-        return nil
+        let handler = PickerComposer.makeSingleSelectionPicker(info: info, newScreen: showNewScreen)
+        let selection = handler.captureUserInput()
+        
+        handler.endSelection()
+        handler.printResult(selection?.displayName)
+        
+        return selection
     }
 }

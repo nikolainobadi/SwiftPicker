@@ -46,6 +46,13 @@ extension BaseSelectionHandler {
             handleScrolling(direction: 1)
         }
     }
+    
+    // TODO: - maybe move to single selection
+    func printResult(_ selection: String?) {
+        if let selection {
+            print("\nSwiftPicker SingleSelection result:\n  \("✔".green) \(selection)\n")
+        }
+    }
 }
 
 
