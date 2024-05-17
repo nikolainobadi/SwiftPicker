@@ -77,6 +77,7 @@ extension IntegrationTests {
         for _ in 0..<selectionCount {
             input.enqueueSpecialChar(specialChar: .space)
         }
+        
         input.enqueueSpecialChar(specialChar: .enter)
         
         let result = handler.captureUserInput()

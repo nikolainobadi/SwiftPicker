@@ -8,7 +8,7 @@
 import XCTest
 @testable import SwiftPicker
 
-class BaseSelectionHandlerTests: XCTestCase {
+final class BaseSelectionHandlerTests: XCTestCase {
     func test_init_startingValues() {
         let (_, input) = makeSUT(state: makeState())
         
@@ -63,14 +63,6 @@ class BaseSelectionHandlerTests: XCTestCase {
 }
 
 
-// MARK: - Helper Methods
-extension BaseSelectionHandlerTests {
-    func makeItems() -> [String] {
-        return (1...25).map({ "Item \($0)" })
-    }
-}
-
-
 // MARK: - SUT
 fileprivate extension BaseSelectionHandlerTests {
     func makeSUT(state: SelectionState<String>, screenSize: (Int, Int) = (26, 100), directionKey: Direction? = nil) -> (sut: BaseSelectionHandler<String>, input: MockInput) {
@@ -88,6 +80,10 @@ fileprivate extension BaseSelectionHandlerTests {
         let options = makeOptions(items: makeItems())
         
         return .init(options: options, topLine: PickerPadding.top, title: "This is my title", isSingleSelection: true)
+    }
+    
+    func makeItems() -> [String] {
+        return (1...25).map({ "Item \($0)" })
     }
 }
 
@@ -116,5 +112,3 @@ extension BaseSelectionHandlerTests {
         }
     }
 }
-
-
