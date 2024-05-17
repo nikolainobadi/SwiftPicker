@@ -8,5 +8,4 @@
 internal struct PickerInfo<Item: DisplayablePickerItem> {
     let title: String
     let items: [Item]
-    let padding: PickerPadding
 }

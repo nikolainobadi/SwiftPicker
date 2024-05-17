@@ -15,13 +15,13 @@ extension PickerComposer {
     static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
         let state = makeState(info: info, newScreen: newScreen)
         
-        return .init(padding: info.padding, state: state, inputHandler: inputHandler)
+        return .init(state: state, inputHandler: inputHandler)
     }
     
     static func makeMultiSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
         let state = makeState(info: info, newScreen: newScreen)
         
-        return .init(padding: info.padding, state: state, inputHandler: inputHandler)
+        return .init(state: state, inputHandler: inputHandler)
     }
 }
 
@@ -30,7 +30,7 @@ extension PickerComposer {
 private extension PickerComposer {
     static func makeState<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SelectionState<Item> {
         configureScreen(newScreen)
-        let topLine = inputHandler.readCursorPos().row + info.padding.top
+        let topLine = inputHandler.readCursorPos().row + PickerPadding.top
         let options = makeOptions(items: info.items, topLine: topLine)
         
         return .init(options: options, topLine: topLine, title: info.title)

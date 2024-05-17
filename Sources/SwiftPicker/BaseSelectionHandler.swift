@@ -7,14 +7,17 @@
 
 import ANSITerminal
 
+enum PickerPadding {
+    static let top = 4
+    static let bottom = 2
+}
+
 internal class BaseSelectionHandler<Item: DisplayablePickerItem> {
-    let padding: PickerPadding
     let inputHandler: PickerInput
     let state: SelectionState<Item>
     
-    init(padding: PickerPadding, state: SelectionState<Item>, inputHandler: PickerInput) {
+    init(state: SelectionState<Item>, inputHandler: PickerInput) {
         self.state = state
-        self.padding = padding
         self.inputHandler = inputHandler
     }
 }
@@ -51,8 +54,8 @@ extension BaseSelectionHandler {
 
 // MARK: - Private Methods
 private extension BaseSelectionHandler {
-    var topPadding: Int { padding.top }
-    var bottomPadding: Int { padding.bottom }
+    var topPadding: Int { PickerPadding.top }
+    var bottomPadding: Int { PickerPadding.bottom }
     var verticalPadding: Int { topPadding + bottomPadding }
     
     func handleScrolling(direction: Int) {
@@ -63,17 +66,26 @@ private extension BaseSelectionHandler {
     func renderScrollableOptions(displayableOptionsCount: Int) {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
-        
+        let (_, columns) = inputHandler.readScreenSize()
+        let title = "\(centerText("SwiftPicker", inWidth: columns))\n\n\(state.title)\n"
+    
         inputHandler.clearScreen()
         inputHandler.moveToHome()
-        inputHandler.write(state.title + String(repeating: "\n", count: topPadding))
+        inputHandler.write(title)
         
         for i in start..<end {
             let option = state.options[i]
             renderOption(option: option, isActive: option.line == state.activeLine, row: i - start + (topPadding + 1), col: 0)
         }
         
-        inputHandler.write("\(String(repeating: "\n", count: bottomPadding))start: \(start + 1), activeLine: \(state.activeLine), otherStart: (\(state.activeLine - (displayableOptionsCount + topPadding))) end: \(end)")
+        inputHandler.write("\n\nTap 'enter' to select. Type 'q' to quit")
+    }
+    
+    func centerText(_ text: String, inWidth width: Int) -> String {
+        let textLength = text.count
+        let spaces = (width - textLength) / 2
+        let padding = String(repeating: " ", count: max(0, spaces))
+        return padding + text
     }
     
     func renderOption(option: Option<Item>, isActive: Bool, row: Int, col: Int = 0) {

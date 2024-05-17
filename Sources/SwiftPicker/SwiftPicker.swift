@@ -6,11 +6,7 @@
 //
 
 public struct SwiftPicker {
-    public let padding: PickerPadding
-    
-    public init(padding: PickerPadding = .init()) {
-        self.padding = padding
-    }
+    public init() { }
 }
 
 
@@ -45,7 +41,7 @@ public extension SwiftPicker {
 // MARK: - Private Methods
 private extension SwiftPicker {
     func makeInfo<Item: DisplayablePickerItem>(title: String, items: [Item]) -> PickerInfo<Item> {
-        return .init(title: title, items: items, padding: padding)
+        return .init(title: title, items: items)
     }
     
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
