@@ -67,30 +67,45 @@ private extension BaseSelectionHandler {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
         let (_, columns) = inputHandler.readScreenSize()
-        let title = "\(centerText("SwiftPicker", inWidth: columns))\n\n\(state.title)\n"
     
         inputHandler.clearScreen()
         inputHandler.moveToHome()
-        inputHandler.write(title)
+        inputHandler.write(centerText(state.topLineText, inWidth: columns))
+        inputHandler.write("\n")
+        inputHandler.write("\n")
+        inputHandler.write(state.title)
+        inputHandler.write("\n")
+        
+        if start > 0 {
+            inputHandler.write("↑".lightGreen)
+        }
         
         for i in start..<end {
             let option = state.options[i]
             renderOption(option: option, isActive: option.line == state.activeLine, row: i - start + (topPadding + 1), col: 0)
         }
         
-        inputHandler.write("\n\n\(state.bottomLine)")
+        inputHandler.write("\n")
+        if state.options.count > displayableOptionsCount {
+            if end < state.options.count {
+                inputHandler.write("↓".lightGreen)
+            }
+            
+        }
+        inputHandler.write("\n")
+        inputHandler.write(state.bottomLineText)
     }
     
     func centerText(_ text: String, inWidth width: Int) -> String {
         let textLength = text.count
         let spaces = (width - textLength) / 2
         let padding = String(repeating: " ", count: max(0, spaces))
+        
         return padding + text
     }
     
     func renderOption(option: Option<Item>, isActive: Bool, row: Int, col: Int = 0) {
         inputHandler.moveTo(row, col)
-        inputHandler.write("│".foreColor(81))
         inputHandler.moveRight()
         inputHandler.write(option.isSelected ? "●".lightGreen : "○".foreColor(250))
         inputHandler.moveRight()

@@ -32,11 +32,15 @@ extension SelectionState {
         return (topLine, topLine + options.count - 1)
     }
     
-    var bottomLine: String {
+    var topLineText: String {
+        return "SwiftPicker (\(isSingleSelection ? "single" : "multi")-selection)"
+    }
+    
+    var bottomLineText: String {
         if isSingleSelection {
             return "Tap 'enter' to select. Type 'q' to quit."
         } else {
-            return "Use spacebar to select multiple items. Tap 'enter' to finish."
+            return "Select multiple items with 'spacebar'. Tap 'enter' to finish."
         }
     }
     
