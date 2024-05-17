@@ -31,10 +31,10 @@ extension BaseSelectionHandler {
     }
     
     func scrollAndRenderOptions() {
-        let (rows, _) = inputHandler.readScreenSize()
+        let (rows, cols) = inputHandler.readScreenSize()
         let displayableOptionsCount = rows - verticalPadding
         
-        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount)
+        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount, columns: cols)
     }
     
     func handleArrowKeys() {
@@ -46,6 +46,7 @@ extension BaseSelectionHandler {
                 handleScrolling(direction: -1)
             }
         case .down:
+            print("handling scrolling down")
             handleScrolling(direction: 1)
         }
     }
@@ -63,10 +64,9 @@ private extension BaseSelectionHandler {
         scrollAndRenderOptions()
     }
     
-    func renderScrollableOptions(displayableOptionsCount: Int) {
+    func renderScrollableOptions(displayableOptionsCount: Int, columns: Int) {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
-        let (_, columns) = inputHandler.readScreenSize()
     
         inputHandler.clearScreen()
         inputHandler.moveToHome()

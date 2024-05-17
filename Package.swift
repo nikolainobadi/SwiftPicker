@@ -28,6 +28,10 @@ let package = Package(
                 .product(name: "ANSITerminal", package: "ANSITerminalModified")
             ]
         ),
+        .testTarget(
+            name: "SwiftPickerTests",
+            dependencies: ["SwiftPicker"]
+        ),
         .executableTarget(
             name: "SwiftPickerExecutable",
             dependencies: ["SwiftPicker"]
