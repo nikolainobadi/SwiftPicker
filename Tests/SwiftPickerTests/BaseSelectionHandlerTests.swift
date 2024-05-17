@@ -55,7 +55,6 @@ final class BaseSelectionHandlerTests: XCTestCase {
         
         var count = 0
         for _ in 0..<20 {
-            
             XCTAssertEqual(state.activeLine, count + PickerPadding.top)
             sut.handleArrowKeys()
             count += 1
@@ -117,63 +116,5 @@ extension BaseSelectionHandlerTests {
     
     func makeOptions(items: [String]) -> [Option<String>] {
         return items.enumerated().map { .init(item: $1, line: PickerPadding.top + $0) }
-    }
-}
-
-
-// MARK: - Helper Classes
-extension BaseSelectionHandlerTests {
-    class MockInput: PickerInput {
-        var screenSize: (Int, Int)
-        var directionKey: Direction?
-        
-        private(set) var writtenText: [String] = []
-        private(set) var didEnableNormalInput = false
-        private(set) var didExitAlternateScreen = false
-        
-        init(screenSize: (Int, Int), directionKey: Direction?) {
-            self.screenSize = screenSize
-            self.directionKey = directionKey
-        }
-        
-        func moveRight() { }
-        func moveToHome() { }
-        func clearBuffer() { }
-        func clearScreen() { }
-        
-        func enableNormalInput() {
-            didEnableNormalInput = true
-        }
-        
-        func keyPressed() -> Bool {
-            return false
-        }
-        
-        func write(_ text: String) {
-            writtenText.append(text)
-        }
-        
-        func exitAlternativeScreen() {
-            didExitAlternateScreen = true
-        }
-        
-        func enterAlternativeScreen() { }
-        func moveTo(_ row: Int, _ col: Int) { }
-        
-        func readDirectionKey() -> Direction? {
-            return directionKey
-        }
-        
-        func readSpecialChar() -> SpecialChar? {
-            return nil
-        }
-        
-        func readCursorPos() -> (row: Int, col: Int) {
-            return (0, 0)
-        }
-        
-        func readScreenSize() -> (rows: Int, cols: Int) {
-            return screenSize
-        }
     }
 }

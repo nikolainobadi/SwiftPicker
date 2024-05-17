@@ -46,7 +46,6 @@ extension BaseSelectionHandler {
                 handleScrolling(direction: -1)
             }
         case .down:
-            print("handling scrolling down")
             handleScrolling(direction: 1)
         }
     }
