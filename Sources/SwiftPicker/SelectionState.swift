@@ -8,14 +8,16 @@
 internal final class SelectionState<Item: DisplayablePickerItem> {
     let topLine: Int
     let title: String
+    let isSingleSelection: Bool
     var activeLine: Int
     var options: [Option<Item>]
     
-    init(options: [Option<Item>], topLine: Int, title: String) {
+    init(options: [Option<Item>], topLine: Int, title: String, isSingleSelection: Bool) {
         self.title = title
         self.options = options
         self.topLine = topLine
         self.activeLine = topLine
+        self.isSingleSelection = isSingleSelection
     }
 }
 
@@ -28,6 +30,14 @@ extension SelectionState {
     
     var rangeOfLines: (minimum: Int, maximum: Int) {
         return (topLine, topLine + options.count - 1)
+    }
+    
+    var bottomLine: String {
+        if isSingleSelection {
+            return "Tap 'enter' to select. Type 'q' to quit."
+        } else {
+            return "Use spacebar to select multiple items. Tap 'enter' to finish."
+        }
     }
     
     func toggleSelection(at line: Int) {

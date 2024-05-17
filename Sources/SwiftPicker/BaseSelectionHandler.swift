@@ -78,7 +78,7 @@ private extension BaseSelectionHandler {
             renderOption(option: option, isActive: option.line == state.activeLine, row: i - start + (topPadding + 1), col: 0)
         }
         
-        inputHandler.write("\n\nTap 'enter' to select. Type 'q' to quit")
+        inputHandler.write("\n\n\(state.bottomLine)")
     }
     
     func centerText(_ text: String, inWidth width: Int) -> String {

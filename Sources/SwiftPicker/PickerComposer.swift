@@ -13,13 +13,13 @@ enum PickerComposer {
 // MARK: - Composer
 extension PickerComposer {
     static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
-        let state = makeState(info: info, newScreen: newScreen)
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: true)
         
         return .init(state: state, inputHandler: inputHandler)
     }
     
     static func makeMultiSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
-        let state = makeState(info: info, newScreen: newScreen)
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: false)
         
         return .init(state: state, inputHandler: inputHandler)
     }
@@ -28,12 +28,12 @@ extension PickerComposer {
 
 // MARK: - Private Methods
 private extension PickerComposer {
-    static func makeState<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SelectionState<Item> {
+    static func makeState<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool, isSingleSelection: Bool) -> SelectionState<Item> {
         configureScreen(newScreen)
         let topLine = inputHandler.readCursorPos().row + PickerPadding.top
         let options = makeOptions(items: info.items, topLine: topLine)
         
-        return .init(options: options, topLine: topLine, title: info.title)
+        return .init(options: options, topLine: topLine, title: info.title, isSingleSelection: isSingleSelection)
     }
     
     static func configureScreen(_ newScreen: Bool) {
