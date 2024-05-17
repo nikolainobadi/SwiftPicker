@@ -7,11 +7,6 @@
 
 import ANSITerminal
 
-enum PickerPadding {
-    static let top = 4
-    static let bottom = 2
-}
-
 internal class BaseSelectionHandler<Item: DisplayablePickerItem> {
     let inputHandler: PickerInput
     let state: SelectionState<Item>
@@ -109,13 +104,5 @@ private extension BaseSelectionHandler {
         inputHandler.write(option.isSelected ? "●".lightGreen : "○".foreColor(250))
         inputHandler.moveRight()
         inputHandler.write(isActive ? option.title.underline : option.title.foreColor(250))
-    }
-}
-
-
-// MARK: - Extension Dependencies
-extension Option {
-    var title: String {
-        return item.displayName
     }
 }

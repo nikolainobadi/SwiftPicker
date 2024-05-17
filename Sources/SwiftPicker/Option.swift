@@ -9,4 +9,7 @@ internal struct Option<Item: DisplayablePickerItem> {
     let item: Item
     let line: Int
     var isSelected: Bool = false
+    var title: String {
+        return item.displayName
+    }
 }

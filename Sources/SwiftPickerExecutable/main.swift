@@ -10,5 +10,5 @@ import SwiftPicker
 let title = "Select the items that you would like to use."
 let sampleList = (1...25).map { "Item \($0)" }
 let picker = SwiftPicker()
-//let _ = picker.singleSelection(title: title, items: sampleList)
+let _ = picker.singleSelection(title: title, items: sampleList)
 let _ = picker.multiSelection(title: title, items: sampleList)
