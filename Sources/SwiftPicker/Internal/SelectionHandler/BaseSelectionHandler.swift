@@ -7,11 +7,6 @@
 
 import ANSITerminal
 
-enum PickerPadding {
-    static let top = 4
-    static let bottom = 2
-}
-
 internal class BaseSelectionHandler<Item: DisplayablePickerItem> {
     let inputHandler: PickerInput
     let state: SelectionState<Item>
@@ -31,10 +26,10 @@ extension BaseSelectionHandler {
     }
     
     func scrollAndRenderOptions() {
-        let (rows, _) = inputHandler.readScreenSize()
+        let (rows, cols) = inputHandler.readScreenSize()
         let displayableOptionsCount = rows - verticalPadding
         
-        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount)
+        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount, columns: cols)
     }
     
     func handleArrowKeys() {
@@ -63,10 +58,9 @@ private extension BaseSelectionHandler {
         scrollAndRenderOptions()
     }
     
-    func renderScrollableOptions(displayableOptionsCount: Int) {
+    func renderScrollableOptions(displayableOptionsCount: Int, columns: Int) {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
-        let (_, columns) = inputHandler.readScreenSize()
     
         inputHandler.clearScreen()
         inputHandler.moveToHome()
@@ -110,13 +104,5 @@ private extension BaseSelectionHandler {
         inputHandler.write(option.isSelected ? "●".lightGreen : "○".foreColor(250))
         inputHandler.moveRight()
         inputHandler.write(isActive ? option.title.underline : option.title.foreColor(250))
-    }
-}
-
-
-// MARK: - Extension Dependencies
-extension Option {
-    var title: String {
-        return item.displayName
     }
 }
