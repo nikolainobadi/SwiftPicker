@@ -5,13 +5,13 @@
 //  Created by Nikolai Nobadi on 5/16/24.
 //
 
-enum PickerComposer {
+internal enum PickerComposer {
     static var inputHandler: PickerInput = PickerInputAdapter()
 }
 
 
 // MARK: - Composer
-extension PickerComposer {
+internal extension PickerComposer {
     static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
         let state = makeState(info: info, newScreen: newScreen, isSingleSelection: true)
         
