@@ -112,8 +112,10 @@ private extension SwiftPicker {
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
         let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: showNewScreen)
         let selection = handler.captureUserInput()
+        
         handler.endSelection()
         handler.printResult(selection?.displayName)
+        
         return selection
     }
     
@@ -125,8 +127,10 @@ private extension SwiftPicker {
     func captureMultiInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> [Item] {
         let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
         let selections = handler.captureUserInput()
+        
         handler.endSelection()
         handler.printResults(selections.map({ $0.displayName }))
+        
         return selections
     }
 }
