@@ -5,7 +5,11 @@
 //  Created by Nikolai Nobadi on 5/16/24.
 //
 
+/// A class for handling multi-selection logic in `SwiftPicker`.
+/// It captures the user's multiple selections from the list of options.
 internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHandler<Item> {
+    /// Captures the user's input for multiple selections.
+    /// - Returns: An array of selected items.
     func captureUserInput() -> [Item] {
         scrollAndRenderOptions()
         while true {
@@ -28,9 +32,12 @@ internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSel
         }
     }
     
+    /// Prints the results of the multi-selection.
+    /// - Parameter selections: An array of selected item display names.
     func printResults(_ selections: [String]) {
+        guard !selections.isEmpty else { return }
         print("\nSwiftPicker MultiSelection results:\n")
-        selections.forEach({ print("  \("✔".green) \($0)") })
+        selections.forEach({ print(" \("✔".green) \($0)") })
         print("")
     }
 }
