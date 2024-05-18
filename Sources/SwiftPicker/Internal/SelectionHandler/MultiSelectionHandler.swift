@@ -35,6 +35,7 @@ internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSel
     /// Prints the results of the multi-selection.
     /// - Parameter selections: An array of selected item display names.
     func printResults(_ selections: [String]) {
+        guard !selections.isEmpty else { return }
         print("\nSwiftPicker MultiSelection results:\n")
         selections.forEach({ print(" \("✔".green) \($0)") })
         print("")
