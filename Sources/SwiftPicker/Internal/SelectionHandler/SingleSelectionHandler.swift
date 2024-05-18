@@ -22,7 +22,8 @@ internal final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSe
     
     func printResult(_ selection: String?) {
         if let selection {
-            print("\nSwiftPicker SingleSelection result:\n  \("✔".green) \(selection)\n")
+            print("\nSwiftPicker SingleSelection result:\n  \("✔".green) \(selection)")
+            print("")
         }
     }
 }

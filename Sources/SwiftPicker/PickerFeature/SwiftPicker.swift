@@ -10,20 +10,34 @@ public struct SwiftPicker {
 }
 
 
+// MARK: - Permission
+public extension SwiftPicker {
+    func getPermission(prompt: String) -> Bool {
+        return PermissionHandler.getPermission(prompt)
+    }
+    
+    func requiredPermission(prompt: String) throws {
+        guard getPermission(prompt: prompt) else {
+            throw SwiftPickerError.selectionCancelled
+        }
+    }
+}
+
+
 // MARK: - SingleSelection
 public extension SwiftPicker {
+    func singleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> Item? {
+        let info = makeInfo(title: title, items: items)
+        
+        return captureSingleInput(info: info, showNewScreen: true)
+    }
+    
     func requiredSingleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) throws -> Item {
         guard let selection = singleSelection(title: title, items: items) else {
             throw SwiftPickerError.selectionCancelled
         }
         
         return selection
-    }
-    
-    func singleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> Item? {
-        let info = makeInfo(title: title, items: items)
-        
-        return captureSingleInput(info: info, showNewScreen: true)
     }
 }
 

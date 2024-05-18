@@ -29,6 +29,6 @@ internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSel
     func printResults(_ selections: [String]) {
         print("\nSwiftPicker MultiSelection results:\n")
         selections.forEach({ print("  \("✔".green) \($0)") })
-        print("\n")
+        print("")
     }
 }
