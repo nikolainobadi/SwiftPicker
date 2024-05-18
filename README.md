@@ -42,15 +42,9 @@ let picker = SwiftPicker()
 let title = "Choose Your Favorite Programming Language"
 let sampleList = ["Swift", "Python", "JavaScript", "C#", "Java", "Go", "Ruby", "Kotlin"]
 
-if let selection = picker.singleSelection(title: title, items: sampleList) {        print("You selected: \(selection.displayName)")
-} else {
-    print("No selection made.")
+if let selection = picker.singleSelection(title: title, items: sampleList) {
+    // do what you want with the selction
 }
-
-let selections = picker.multiSelection(title: title, items: sampleList)
-
-print("You selected: \(selections.map { $0.displayName })")
-
 ```
 
 ### Multi-Selection
@@ -97,10 +91,17 @@ do {
     print("An unknown error occurred.")
 }
 ```
+## Backstory
+I think programming is one of the few fields where 'specialized laziness' is actually a superpower. While building custom command line tools may seem like a daunting task to some, I see it as a way to never have to waste time on the boring portions of my workflow ever again. But I'm an iOS developer. When I write code, I prefer to do it in Swift. Unfortunately, there aren't many Swift libraries for command line tools. And I feel like it's a catch-22 because nobody wants to write libraries for the command line using Swift because there aren't many libraries out there to help them, and there aren't many libraries out there because nobody wants to write them, and round and round we go.
+
+SwiftPicker is simply my contribution to the (hopefully growing) ecosystem of Swift command line tools. It's easy to use, relatively lightweight, and best of all, it helps me write more command line tools to feed my 'specialized laziness'.
 
 ## Acknowledgements
 
 This project was inspired by [How to Make an Interactive Picker for a Swift Command-Line Tool](https://www.polpiella.dev/how-to-make-an-interactive-picker-for-a-swift-command-line-tool/) by Pol Piella Abadia. Special thanks for the great tutorial.
+
+## Contributing
+Any feedback or ideas to enhance SwiftPicker would be well received. Please feel free to [open an issue](https://github.com/nikolainobadi/SwiftPicker/issues/new) if you'd like to help improve this swift package.
 
 ## License
 
