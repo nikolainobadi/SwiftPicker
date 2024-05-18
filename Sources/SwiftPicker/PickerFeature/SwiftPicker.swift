@@ -9,13 +9,12 @@
 /// It supports both single and multiple selection modes.
 public struct SwiftPicker {
     
-    /// Initializes a new instance of SwiftPicker.
+    /// Initializes a new instance of `SwiftPicker`.
     public init() { }
 }
 
 // MARK: - Input
 public extension SwiftPicker {
-    
     /// Prompts the user for input with the given prompt string.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: The user's input as a String.
@@ -38,7 +37,6 @@ public extension SwiftPicker {
 
 // MARK: - Permission
 public extension SwiftPicker {
-    
     /// Prompts the user for permission with a yes/no question.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: `true` if the user grants permission, `false` otherwise.
@@ -58,7 +56,6 @@ public extension SwiftPicker {
 
 // MARK: - SingleSelection
 public extension SwiftPicker {
-    
     /// Prompts the user to make a single selection from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
@@ -85,7 +82,6 @@ public extension SwiftPicker {
 
 // MARK: - MultiSelection
 public extension SwiftPicker {
-    
     /// Prompts the user to make multiple selections from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
@@ -99,8 +95,7 @@ public extension SwiftPicker {
 
 // MARK: - Private Methods
 private extension SwiftPicker {
-    
-    /// Creates a PickerInfo object with the given title and items.
+    /// Creates a `PickerInfo` object with the given title and items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
     ///   - items: The list of items to select from.
@@ -111,7 +106,7 @@ private extension SwiftPicker {
     
     /// Captures user input for a single selection.
     /// - Parameters:
-    ///   - info: The PickerInfo object containing the title and items.
+    ///   - info: The `PickerInfo` object containing the title and items.
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: The selected item, or `nil` if no selection was made.
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
@@ -124,7 +119,7 @@ private extension SwiftPicker {
     
     /// Captures user input for multiple selections.
     /// - Parameters:
-    ///   - info: The PickerInfo object containing the title and items.
+    ///   - info: The `PickerInfo` object containing the title and items.
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: An array of selected items.
     func captureMultiInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> [Item] {
