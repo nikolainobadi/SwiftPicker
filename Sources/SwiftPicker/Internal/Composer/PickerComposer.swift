@@ -5,11 +5,6 @@
 //  Created by Nikolai Nobadi on 5/16/24.
 //
 
-
-
-//// PickerComposer.swift
-////// Created by Nikolai Nobadi on 5/16/24.
-
 /// An enumeration that composes various handlers for SwiftPicker.
 /// Provides methods to create single and multi-selection handlers.
 internal enum PickerComposer {
