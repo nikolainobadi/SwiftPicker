@@ -51,9 +51,9 @@ print("You selected: \(selections.map { $0.displayName })")
 ```
 
 ### Multi-Selection
-![Multiple Selection Demo](media/multi-select-demo.gif)
-
 To use custom items in SwiftPicker, conform your type to the `DisplayablePickerItem` protocol. And don't worry about long lists, SwiftPicker can handle scrolling!
+
+![Multiple Selection Demo](Media/multi-select-demo.gif)
 
 ```swift
 struct Movie {
