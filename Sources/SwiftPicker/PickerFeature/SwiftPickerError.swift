@@ -6,5 +6,5 @@
 //
 
 public enum SwiftPickerError: Error {
-    case selectionCancelled
+    case selectionCancelled, inputRequired
 }

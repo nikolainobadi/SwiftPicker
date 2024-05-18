@@ -10,10 +10,28 @@ public struct SwiftPicker {
 }
 
 
+// MARK: - Input
+public extension SwiftPicker {
+    func getInput(_ prompt: String) -> String {
+        return InputHandler.getInput(prompt)
+    }
+    
+    func getRequiredInput(_ prompt: String) throws -> String {
+        let input = getInput(prompt)
+        
+        if input.isEmpty {
+            throw SwiftPickerError.inputRequired
+        }
+        
+        return input
+    }
+}
+
+
 // MARK: - Permission
 public extension SwiftPicker {
     func getPermission(prompt: String) -> Bool {
-        return PermissionHandler.getPermission(prompt)
+        return InputHandler.getPermission(prompt)
     }
     
     func requiredPermission(prompt: String) throws {
@@ -71,9 +89,6 @@ private extension SwiftPicker {
     func captureMultiInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> [Item] {
         let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
         let selections = handler.captureUserInput()
-        
-        
-        
         
         handler.endSelection()
         handler.printResults(selections.map({ $0.displayName }))
