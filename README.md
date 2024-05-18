@@ -28,14 +28,16 @@ import SwiftPicker
 
 ## Usage
 
-### Basic Example
+
+### Single Selection
+![Single Selection Demo](Media/single-select-demo.gif)
 
 ```swift
 import SwiftPicker
 
 let picker = SwiftPicker()
-let title = "Select the items that you would like to use."
-let sampleList = (1...25).map { "Item \($0)" }
+let title = "Choose Your Favorite Programming Language"
+let sampleList = ["Swift", "Python", "JavaScript", "C#", "Java", "Go", "Ruby", "Kotlin"]
 
 if let selection = picker.singleSelection(title: title, items: sampleList) {        print("You selected: \(selection.displayName)")
 } else {
@@ -48,28 +50,27 @@ print("You selected: \(selections.map { $0.displayName })")
 
 ```
 
-### Custom Items
+### Multi-Selection
+![Multiple Selection Demo](media/multi-select-demo.gif)
 
-To use custom items in SwiftPicker, conform your type to the `DisplayablePickerItem` protocol:
+To use custom items in SwiftPicker, conform your type to the `DisplayablePickerItem` protocol. And don't worry about long lists, SwiftPicker can handle scrolling!
 
 ```swift
-struct CustomItem {
-    let itemName: String
+struct Movie {
+    let title: String
+    let director: String
 }
 
 // customize the 'displayName' 
-extension CustomItem: DisplayablePickerItem {
+extension Movie: DisplayablePickerItem {
     var displayName: String {
-        return itemName
+        return title
     }
 }
 
-let customItems = [CustomItem(displayName: "Custom 1"), CustomItem(displayName: "Custom 2")]
-let title = "Select a custom item."
-
-if let customSelection = picker.singleSelection(title: title, items: customItems) {
-    print("You selected: \(customSelection.displayName)")
-}
+let marvelMovies = Movie.marvelList
+let title = "Select Your Favorite Marvel Movies."
+let results = picker.multiSelection(title: title, items: marvelMovies)
 ```
 
 ### Error Handling
