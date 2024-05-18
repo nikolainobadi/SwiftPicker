@@ -7,7 +7,7 @@
 
 internal enum PermissionHandler {
     static func getPermission(_ prompt: String, retryCount: Int = 0) -> Bool {
-        print(prompt, terminator: " (\("y".green)/\("n".red)) ")
+        print("\n\(prompt)", terminator: " (\("y".green)/\("n".red)) ")
         guard let answer = readLine(), !answer.isEmpty else {
             if retryCount > 2 {
                 print("Fine, I'll take that as a no!".red)
