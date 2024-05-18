@@ -72,6 +72,9 @@ private extension SwiftPicker {
         let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
         let selections = handler.captureUserInput()
         
+        
+        
+        
         handler.endSelection()
         handler.printResults(selections.map({ $0.displayName }))
         

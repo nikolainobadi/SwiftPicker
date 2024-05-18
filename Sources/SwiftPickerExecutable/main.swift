@@ -8,7 +8,7 @@
 import SwiftPicker
 
 let title = "Select the items that you would like to use."
-let sampleList = (1...25).map { "Item \($0)" }
+let sampleList = (1...2).map { "Item \($0)" }
 let picker = SwiftPicker()
 
 if picker.getPermission(prompt: "Wanna single select?") {

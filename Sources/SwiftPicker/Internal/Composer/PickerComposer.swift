@@ -41,6 +41,7 @@ private extension PickerComposer {
             inputHandler.enterAlternativeScreen()
         }
         
+        inputHandler.cursorOff()
         inputHandler.clearScreen()
         inputHandler.moveToHome()
     }

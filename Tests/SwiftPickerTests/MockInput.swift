@@ -28,6 +28,7 @@ class MockInput: PickerInput {
 }
 
 extension MockInput {
+    func cursorOff() { }
     func moveRight() { }
     func moveToHome() { }
     func clearBuffer() { }

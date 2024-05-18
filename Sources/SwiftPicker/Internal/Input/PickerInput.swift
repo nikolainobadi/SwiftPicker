@@ -6,6 +6,7 @@
 //
 
 internal protocol PickerInput {
+    func cursorOff()
     func moveRight()
     func moveToHome()
     func clearBuffer()

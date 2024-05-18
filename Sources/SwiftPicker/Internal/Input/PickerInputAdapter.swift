@@ -8,6 +8,10 @@
 import ANSITerminal
 
 internal final class PickerInputAdapter: PickerInput {
+    func cursorOff() {
+        ANSITerminal.cursorOff()
+    }
+    
     func moveRight() {
         ANSITerminal.moveRight()
     }
@@ -25,7 +29,7 @@ internal final class PickerInputAdapter: PickerInput {
     }
     
     func enableNormalInput() {
-        ANSITerminal.cursorOff()
+        ANSITerminal.cursorOn()
         ANSITerminal.restoreDefaultTerminal()
     }
     
