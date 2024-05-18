@@ -75,6 +75,10 @@ internal final class PickerInputAdapter: PickerInput {
             return .space
         }
         
+        if char == "q" || char == "Q" {
+            return .quit
+        }
+        
         return nil
     }
     

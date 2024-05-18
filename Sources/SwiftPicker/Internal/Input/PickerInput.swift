@@ -30,6 +30,6 @@ internal enum Direction {
 }
 
 internal enum SpecialChar {
-    case enter, space
+    case enter, space, quit
 }
 

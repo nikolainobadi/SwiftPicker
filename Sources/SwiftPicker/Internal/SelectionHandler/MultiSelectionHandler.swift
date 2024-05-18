@@ -18,6 +18,8 @@ internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSel
                     case .space:
                         state.toggleSelection(at: state.activeLine)
                         scrollAndRenderOptions()
+                    case .quit:
+                        return []
                     }
                 }
                 

@@ -11,8 +11,15 @@ internal final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSe
         while true {
             inputHandler.clearBuffer()
             if inputHandler.keyPressed() {
-                if let char = inputHandler.readSpecialChar(), char == .enter {
-                    return state.options.first(where: { $0.line == state.activeLine })?.item
+                if let char = inputHandler.readSpecialChar() {
+                    switch char {
+                    case .enter:
+                        return state.options.first(where: { $0.line == state.activeLine })?.item
+                    case .quit:
+                        return nil
+                    case .space:
+                        continue
+                    }
                 }
                 
                 handleArrowKeys()
