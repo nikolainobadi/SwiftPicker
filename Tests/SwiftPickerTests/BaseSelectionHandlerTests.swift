@@ -30,7 +30,7 @@ final class BaseSelectionHandlerTests: XCTestCase {
         let state = makeState()
         let (sut, input) = makeSUT(state: state)
         
-        assertWrittenText(sut: sut, input: input, expectedActiveLine: PickerPadding.top)
+        assertWrittenText(sut: sut, input: input)
     }
     
     func test_handleArrowKeys_activeLineUpdates() {
@@ -53,12 +53,13 @@ final class BaseSelectionHandlerTests: XCTestCase {
     }
     
     func test_handleArrowKeys() {
+        let activeIndex = 1
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
         
         sut.handleArrowKeys()
         
-        assertWrittenText(sut: sut, input: input, expectedActiveLine: PickerPadding.top + 1)
+        assertWrittenText(sut: sut, input: input, activeIndex: activeIndex)
     }
 }
 
@@ -90,12 +91,13 @@ fileprivate extension BaseSelectionHandlerTests {
 
 // MARK: - Helper Assertions
 extension BaseSelectionHandlerTests {
-    func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, expectedActiveLine: Int, file: StaticString = #filePath, line: UInt = #line) {
+    func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, activeIndex: Int = 0, file: StaticString = #filePath, line: UInt = #line) {
         let state = sut.state
+        let expectedActiveLine = PickerPadding.top + activeIndex
         let headerText = [state.topLineText, "\n", "\n", state.title, "\n"]
         var displayableText: [String] = []
         for i in 0..<20 {
-            displayableText.append("○")
+            displayableText.append(i == activeIndex ? "" : "○")
             displayableText.append(state.options[i].title)
         }
         let footerText = ["\n", "", "\n", state.bottomLineText]

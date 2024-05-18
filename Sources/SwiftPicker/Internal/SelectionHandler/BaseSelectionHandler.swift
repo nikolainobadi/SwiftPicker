@@ -62,6 +62,20 @@ private extension BaseSelectionHandler {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
     
+        renderHeader(start: start, columns: columns)
+        
+        for i in start..<end {
+            let option = state.options[i]
+            let isActive = option.line == state.activeLine
+            let row = i - start + (topPadding + 1)
+            
+            renderOption(option: option, isActive: isActive, row: row, col: 0)
+        }
+        
+        renderFooter(end: end, displayableOptionsCount: displayableOptionsCount)
+    }
+    
+    func renderHeader(start: Int, columns: Int) {
         inputHandler.clearScreen()
         inputHandler.moveToHome()
         inputHandler.write(centerText(state.topLineText, inWidth: columns))
@@ -69,16 +83,12 @@ private extension BaseSelectionHandler {
         inputHandler.write("\n")
         inputHandler.write(state.title)
         inputHandler.write("\n")
-        
         if start > 0 {
             inputHandler.write("↑".lightGreen)
         }
-        
-        for i in start..<end {
-            let option = state.options[i]
-            renderOption(option: option, isActive: option.line == state.activeLine, row: i - start + (topPadding + 1), col: 0)
-        }
-        
+    }
+    
+    func renderFooter(end: Int, displayableOptionsCount: Int) {
         inputHandler.write("\n")
         if state.options.count > displayableOptionsCount {
             if end < state.options.count {
@@ -101,8 +111,20 @@ private extension BaseSelectionHandler {
     func renderOption(option: Option<Item>, isActive: Bool, row: Int, col: Int = 0) {
         inputHandler.moveTo(row, col)
         inputHandler.moveRight()
-        inputHandler.write(option.isSelected ? "●".lightGreen : "○".foreColor(250))
+        inputHandler.write(state.showAsSelected(option) ? "●".lightGreen : "○".foreColor(250))
         inputHandler.moveRight()
         inputHandler.write(isActive ? option.title.underline : option.title.foreColor(250))
+    }
+    
+    func makeSelectionCircle(_ isSelected: Bool) -> String {
+        return isSelected ? "●".lightGreen : "○".foreColor(250)
+    }
+}
+
+
+// MARK: - Extension Dependencies
+fileprivate extension SelectionState {
+    func showAsSelected(_ option: Option<Item>) -> Bool {
+        return isSingleSelection ? option.line == activeLine : option.isSelected
     }
 }
