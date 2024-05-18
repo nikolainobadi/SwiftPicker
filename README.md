@@ -1,5 +1,8 @@
-
 # SwiftPicker
+![](https://badgen.net/badge/Swift/5+/orange)
+![](https://badgen.net/badge/platform/macos?list=|&color=grey)
+![](https://badgen.net/badge/distro/SPM%20only?color=red)
+![](https://badgen.net/badge/license/MIT/blue)
 
 SwiftPicker is a command-line picker tool written in Swift. It allows users to interactively select single or multiple items from a list using a text-based interface.
 
