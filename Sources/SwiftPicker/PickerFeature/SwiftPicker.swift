@@ -7,7 +7,7 @@
 
 /// SwiftPicker is a command-line tool written in Swift that allows for interactive selection of items.
 /// It supports both single and multiple selection modes.
-public struct SwiftPicker {
+public struct SwiftPicker: Picker {
     
     /// Initializes a new instance of `SwiftPicker`.
     public init() { }
@@ -18,15 +18,15 @@ public extension SwiftPicker {
     /// Prompts the user for input with the given prompt string.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: The user's input as a String.
-    func getInput(_ prompt: String) -> String {
-        return InputHandler.getInput(prompt)
+    func getInput(prompt: PickerPrompt) -> String {
+        return InputHandler.getInput(prompt.title)
     }
     
     /// Prompts the user for input with the given prompt string and requires input.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.inputRequired` if the user does not provide any input.
     /// - Returns: The user's input as a String.
-    func getRequiredInput(_ prompt: String) throws -> String {
+    func getRequiredInput(prompt: PickerPrompt) throws -> String {
         let input = getInput(prompt)
         if input.isEmpty {
             throw SwiftPickerError.inputRequired
@@ -40,14 +40,14 @@ public extension SwiftPicker {
     /// Prompts the user for permission with a yes/no question.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: `true` if the user grants permission, `false` otherwise.
-    func getPermission(prompt: String) -> Bool {
-        return InputHandler.getPermission(prompt)
+    func getPermission(prompt: PickerPrompt) -> Bool {
+        return InputHandler.getPermission(prompt.title)
     }
     
     /// Prompts the user for permission with a yes/no question and requires a yes to proceed.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not grant permission.
-    func requiredPermission(prompt: String) throws {
+    func requiredPermission(prompt: PickerPrompt) throws {
         guard getPermission(prompt: prompt) else {
             throw SwiftPickerError.selectionCancelled
         }
@@ -61,8 +61,8 @@ public extension SwiftPicker {
     ///   - title: The title to display at the top of the selection list.
     ///   - items: The list of items to select from.
     /// - Returns: The selected item, or `nil` if no selection was made.
-    func singleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> Item? {
-        let info = makeInfo(title: title, items: items)
+    func singleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> Item? {
+        let info = makeInfo(title: title.title, items: items)
         return captureSingleInput(info: info, showNewScreen: true)
     }
     
@@ -72,7 +72,7 @@ public extension SwiftPicker {
     ///   - items: The list of items to select from.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not make a selection.
     /// - Returns: The selected item.
-    func requiredSingleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) throws -> Item {
+    func requiredSingleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) throws -> Item {
         guard let selection = singleSelection(title: title, items: items) else {
             throw SwiftPickerError.selectionCancelled
         }
@@ -87,8 +87,8 @@ public extension SwiftPicker {
     ///   - title: The title to display at the top of the selection list.
     ///   - items: The list of items to select from.
     /// - Returns: An array of selected items.
-    func multiSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> [Item] {
-        let info = makeInfo(title: title, items: items)
+    func multiSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> [Item] {
+        let info = makeInfo(title: title.title, items: items)
         return captureMultiInput(info: info, showNewScreen: true)
     }
 }

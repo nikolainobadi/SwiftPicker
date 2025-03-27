@@ -19,4 +19,3 @@ extension String: DisplayablePickerItem {
     /// A string representation of the string itself.
     public var displayName: String { self }
 }
-
