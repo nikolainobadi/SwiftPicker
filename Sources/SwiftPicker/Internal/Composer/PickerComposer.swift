@@ -21,7 +21,7 @@ internal extension PickerComposer {
     ///   - newScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: A SingleSelectionHandler instance.
     static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> SingleSelectionHandler<Item> {
-        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: true)
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: true, inputHandler: inputHandler)
         return .init(state: state, inputHandler: inputHandler)
     }
     
@@ -31,7 +31,29 @@ internal extension PickerComposer {
     ///   - newScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: A MultiSelectionHandler instance.
     static func makeMultiSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool) -> MultiSelectionHandler<Item> {
-        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: false)
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: false, inputHandler: inputHandler)
+        return .init(state: state, inputHandler: inputHandler)
+    }
+    
+    /// Creates a single selection handler with the provided information and custom input handler.
+    /// - Parameters:
+    ///   - info: The PickerInfo object containing the title and items.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    /// - Returns: A SingleSelectionHandler instance.
+    static func makeSingleSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool, inputHandler: PickerInput) -> SingleSelectionHandler<Item> {
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: true, inputHandler: inputHandler)
+        return .init(state: state, inputHandler: inputHandler)
+    }
+    
+    /// Creates a multi-selection handler with the provided information and custom input handler.
+    /// - Parameters:
+    ///   - info: The PickerInfo object containing the title and items.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    /// - Returns: A MultiSelectionHandler instance.
+    static func makeMultiSelectionHandler<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool, inputHandler: PickerInput) -> MultiSelectionHandler<Item> {
+        let state = makeState(info: info, newScreen: newScreen, isSingleSelection: false, inputHandler: inputHandler)
         return .init(state: state, inputHandler: inputHandler)
     }
 }
@@ -43,17 +65,20 @@ private extension PickerComposer {
     ///   - info: The PickerInfo object containing the title and items.
     ///   - newScreen: A Boolean value indicating whether to show a new screen.
     ///   - isSingleSelection: A Boolean value indicating whether the selection mode is single selection.
+    ///   - inputHandler: The input handler to use for screen configuration and cursor positioning.
     /// - Returns: A SelectionState instance.
-    static func makeState<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool, isSingleSelection: Bool) -> SelectionState<Item> {
-        configureScreen(newScreen)
+    static func makeState<Item: DisplayablePickerItem>(info: PickerInfo<Item>, newScreen: Bool, isSingleSelection: Bool, inputHandler: PickerInput) -> SelectionState<Item> {
+        configureScreen(newScreen, inputHandler: inputHandler)
         let topLine = inputHandler.readCursorPos().row + PickerPadding.top
         let options = makeOptions(items: info.items, topLine: topLine)
         return .init(options: options, topLine: topLine, title: info.title, isSingleSelection: isSingleSelection)
     }
     
     /// Configures the screen for selection.
-    /// - Parameter newScreen: A Boolean value indicating whether to show a new screen.
-    static func configureScreen(_ newScreen: Bool) {
+    /// - Parameters:
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: The input handler to use for screen configuration.
+    static func configureScreen(_ newScreen: Bool, inputHandler: PickerInput) {
         if (newScreen) { inputHandler.enterAlternativeScreen() }
         inputHandler.cursorOff()
         inputHandler.clearScreen()
