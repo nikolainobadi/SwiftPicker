@@ -10,8 +10,12 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 
 ### Core Components
 
-- **`Picker` Protocol** (`Sources/SwiftPicker/PickerFeature/Picker.swift:9`): Main interface defining input, permission, and selection methods
-- **`SwiftPicker` Struct** (`Sources/SwiftPicker/PickerFeature/SwiftPicker.swift:10`): Concrete implementation of the `Picker` protocol
+- **`CommandLinePicker` Protocol** (`Sources/SwiftPicker/PickerFeature/Picker.swift:39`): Unified interface combining input, permission, and selection capabilities
+- **Protocol Composition**:
+  - `CommandLineInput` (`Sources/SwiftPicker/PickerFeature/Picker.swift:9`): Text input methods
+  - `CommandLinePermission` (`Sources/SwiftPicker/PickerFeature/Picker.swift:18`): Yes/no permission methods  
+  - `CommandLineSelection` (`Sources/SwiftPicker/PickerFeature/Picker.swift:27`): Single/multi selection methods
+- **`InteractivePicker` Struct** (`Sources/SwiftPicker/PickerFeature/SwiftPicker.swift:10`): Concrete implementation of `CommandLinePicker`
 - **`DisplayablePickerItem` Protocol** (`Sources/SwiftPicker/PickerFeature/DisplayablePickerItem.swift:10`): Protocol for items that can be displayed in picker lists
 - **`PickerPrompt` Protocol** (`Sources/SwiftPicker/PickerFeature/PickerPrompt.swift:8`): Protocol for prompt messages (String conforms by default)
 
@@ -69,10 +73,11 @@ swift package update
 ## Code Conventions
 
 - **Access Control**: Public APIs in `PickerFeature/`, internal implementation in `Internal/`
-- **Protocol-Oriented Design**: Heavy use of protocols (`Picker`, `DisplayablePickerItem`, `PickerPrompt`, `PickerInput`)
+- **Protocol-Oriented Design**: Composition-based protocols (`CommandLineInput`, `CommandLinePermission`, `CommandLineSelection`, `DisplayablePickerItem`, `PickerPrompt`, `PickerInput`)
 - **Generic Constraints**: Selection methods use `<Item: DisplayablePickerItem>` generic constraints
 - **Error Handling**: Custom `SwiftPickerError` enum for picker-specific errors
 - **Extension Organization**: Public API methods organized in separate extensions by functionality (Input, Permission, SingleSelection, MultiSelection)
+- **Backward Compatibility**: Deprecated type aliases (`Picker`, `SwiftPicker`) maintain API compatibility
 
 ## Platform Requirements
 

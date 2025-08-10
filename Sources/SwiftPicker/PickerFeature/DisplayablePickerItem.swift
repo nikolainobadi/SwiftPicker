@@ -5,7 +5,7 @@
 //  Created by Nikolai Nobadi on 5/14/24.
 //
 
-/// A protocol that defines an item that can be displayed in the `SwiftPicker`.
+/// A protocol that defines an item that can be displayed in the `InteractivePicker`.
 /// Types conforming to this protocol must provide a string representation for display purposes.
 public protocol DisplayablePickerItem {
     

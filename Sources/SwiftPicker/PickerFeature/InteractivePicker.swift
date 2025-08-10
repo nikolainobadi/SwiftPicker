@@ -1,20 +1,24 @@
 //
-//  SwiftPicker.swift
+//  InteractivePicker.swift
 //
 //
 //  Created by Nikolai Nobadi on 5/16/24.
 //
 
-/// SwiftPicker is a command-line tool written in Swift that allows for interactive selection of items.
+/// InteractivePicker is a command-line tool written in Swift that allows for interactive selection of items.
 /// It supports both single and multiple selection modes.
-public struct SwiftPicker: Picker {
+public struct InteractivePicker: CommandLinePicker {
     
-    /// Initializes a new instance of `SwiftPicker`.
+    /// Initializes a new instance of `InteractivePicker`.
     public init() { }
 }
 
+/// Legacy struct name for backward compatibility. Use `InteractivePicker` instead.
+@available(*, deprecated, renamed: "InteractivePicker", message: "Use InteractivePicker to avoid confusion with package name")
+public typealias SwiftPicker = InteractivePicker
+
 // MARK: - Input
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user for input with the given prompt string.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: The user's input as a String.
@@ -36,7 +40,7 @@ public extension SwiftPicker {
 }
 
 // MARK: - Permission
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user for permission with a yes/no question.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: `true` if the user grants permission, `false` otherwise.
@@ -55,7 +59,7 @@ public extension SwiftPicker {
 }
 
 // MARK: - SingleSelection
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user to make a single selection from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
@@ -81,7 +85,7 @@ public extension SwiftPicker {
 }
 
 // MARK: - MultiSelection
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user to make multiple selections from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
@@ -94,7 +98,7 @@ public extension SwiftPicker {
 }
 
 // MARK: - Private Methods
-private extension SwiftPicker {
+private extension InteractivePicker {
     /// Creates a `PickerInfo` object with the given title and items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
