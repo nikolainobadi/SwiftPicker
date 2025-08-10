@@ -23,7 +23,7 @@ To use SwiftPicker in your Swift project, add it as a dependency in your `Packag
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/nikolainobadi/SwiftPicker.git", from: "1.0.0")
+    .package(url: "https://github.com/nikolainobadi/SwiftPicker.git", from: "0.9.0")
 ]
 ```
 
