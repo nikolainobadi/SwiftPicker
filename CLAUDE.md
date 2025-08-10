@@ -10,13 +10,13 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 
 ### Core Components
 
-- **`CommandLinePicker` Protocol** (`Sources/SwiftPicker/PickerFeature/Picker.swift:39`): Unified interface combining input, permission, and selection capabilities
+- **`CommandLinePicker` Protocol** (`Sources/SwiftPicker/PickerFeature/Picker.swift:9`): Unified interface combining input, permission, and selection capabilities
 - **Protocol Composition**:
-  - `CommandLineInput` (`Sources/SwiftPicker/PickerFeature/Picker.swift:9`): Text input methods
-  - `CommandLinePermission` (`Sources/SwiftPicker/PickerFeature/Picker.swift:18`): Yes/no permission methods  
-  - `CommandLineSelection` (`Sources/SwiftPicker/PickerFeature/Picker.swift:27`): Single/multi selection methods
-- **`InteractivePicker` Struct** (`Sources/SwiftPicker/PickerFeature/SwiftPicker.swift:10`): Concrete implementation of `CommandLinePicker`
-- **`DisplayablePickerItem` Protocol** (`Sources/SwiftPicker/PickerFeature/DisplayablePickerItem.swift:10`): Protocol for items that can be displayed in picker lists
+  - `CommandLineInput` (`Sources/SwiftPicker/PickerFeature/CommandLineInput.swift:8`): Text input methods
+  - `CommandLinePermission` (`Sources/SwiftPicker/PickerFeature/CommandLinePermission.swift:8`): Yes/no permission methods  
+  - `CommandLineSelection` (`Sources/SwiftPicker/PickerFeature/CommandLineSelection.swift:8`): Single/multi selection methods
+- **`InteractivePicker` Struct** (`Sources/SwiftPicker/PickerFeature/InteractivePicker.swift:10`): Concrete implementation of `CommandLinePicker`
+- **`DisplayablePickerItem` Protocol** (`Sources/SwiftPicker/PickerFeature/DisplayablePickerItem.swift:8`): Protocol for items that can be displayed in picker lists
 - **`PickerPrompt` Protocol** (`Sources/SwiftPicker/PickerFeature/PickerPrompt.swift:8`): Protocol for prompt messages (String conforms by default)
 
 ### Internal Architecture
