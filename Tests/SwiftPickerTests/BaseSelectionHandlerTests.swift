@@ -5,54 +5,59 @@
 //  Created by Nikolai Nobadi on 5/17/24.
 //
 
-import XCTest
+import Testing
 @testable import SwiftPicker
 
-final class BaseSelectionHandlerTests: XCTestCase {
-    func test_init_startingValues() {
+struct BaseSelectionHandlerTests {
+    @Test("Selection handler starts with clean terminal state")
+    func init_startingValues() {
         let (_, input) = makeSUT(state: makeState())
         
-        XCTAssertTrue(input.writtenText.isEmpty)
-        XCTAssertFalse(input.didEnableNormalInput)
-        XCTAssertFalse(input.didExitAlternateScreen)
+        #expect(input.writtenText.isEmpty)
+        #expect(!input.didEnableNormalInput)
+        #expect(!input.didExitAlternateScreen)
     }
     
-    func test_endSelection() {
+    @Test("Ending selection restores normal terminal input mode")
+    func endSelection() {
         let (sut, input) = makeSUT(state: makeState())
         
         sut.endSelection()
         
-        XCTAssertTrue(input.didEnableNormalInput)
-        XCTAssertTrue(input.didExitAlternateScreen)
+        #expect(input.didEnableNormalInput)
+        #expect(input.didExitAlternateScreen)
     }
     
-    func test_scrollAndRenderOptions_startingValues() {
+    @Test("User sees all available options when selection starts")
+    func scrollAndRenderOptions_startingValues() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state)
         
         assertWrittenText(sut: sut, input: input)
     }
     
-    func test_handleArrowKeys_activeLineUpdates() {
+    @Test("User can navigate through all options with arrow keys")
+    func handleArrowKeys_activeLineUpdates() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
         
         var count = 0
         for _ in 0..<20 {
-            XCTAssertEqual(state.activeLine, count + PickerPadding.top)
+            #expect(state.activeLine == count + PickerPadding.top)
             sut.handleArrowKeys()
             count += 1
         }
         
         input.directionKey = .up
         for _ in 0..<20 {
-            XCTAssertEqual(state.activeLine, count + PickerPadding.top)
+            #expect(state.activeLine == count + PickerPadding.top)
             sut.handleArrowKeys()
             count -= 1
         }
     }
     
-    func test_handleArrowKeys() {
+    @Test("User sees selection update after pressing arrow key")
+    func handleArrowKeys() {
         let activeIndex = 1
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
@@ -65,7 +70,7 @@ final class BaseSelectionHandlerTests: XCTestCase {
 
 
 // MARK: - SUT
-fileprivate extension BaseSelectionHandlerTests {
+private extension BaseSelectionHandlerTests {
     func makeSUT(state: SelectionState<String>, screenSize: (Int, Int) = (26, 100), directionKey: Direction? = nil) -> (sut: BaseSelectionHandler<String>, input: MockInput) {
         let input = MockInput(screenSize: screenSize, directionKey: directionKey)
         let sut = BaseSelectionHandler(state: state, inputHandler: input)
@@ -90,8 +95,8 @@ fileprivate extension BaseSelectionHandlerTests {
 
 
 // MARK: - Helper Assertions
-extension BaseSelectionHandlerTests {
-    func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, activeIndex: Int = 0, file: StaticString = #filePath, line: UInt = #line) {
+private extension BaseSelectionHandlerTests {
+    func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, activeIndex: Int = 0, sourceLocation: SourceLocation = #_sourceLocation) {
         let state = sut.state
         let expectedActiveLine = PickerPadding.top + activeIndex
         let headerText = [state.topLineText, "\n", "\n", state.title, "\n"]
@@ -105,11 +110,11 @@ extension BaseSelectionHandlerTests {
         
         sut.scrollAndRenderOptions()
     
-        XCTAssertEqual(state.activeLine, expectedActiveLine, "wrong active line", file: file, line: line)
+        #expect(state.activeLine == expectedActiveLine, "wrong active line", sourceLocation: sourceLocation)
         
         allText.enumerated().forEach {
             if !$1.isEmpty {
-                XCTAssertTrue(input.writtenText[$0].contains($1), "writtenText: \(input.writtenText[$0]) is not equal to \($1)", file: file, line: line)
+                #expect(input.writtenText[$0].contains($1), "writtenText: \(input.writtenText[$0]) is not equal to \($1)", sourceLocation: sourceLocation)
             }
         }
     }

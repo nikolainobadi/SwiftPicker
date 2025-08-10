@@ -1,32 +1,36 @@
 //
-//  SwiftPicker.swift
+//  InteractivePicker.swift
 //
 //
 //  Created by Nikolai Nobadi on 5/16/24.
 //
 
-/// SwiftPicker is a command-line tool written in Swift that allows for interactive selection of items.
+/// InteractivePicker is a command-line tool written in Swift that allows for interactive selection of items.
 /// It supports both single and multiple selection modes.
-public struct SwiftPicker {
+public struct InteractivePicker: CommandLinePicker {
     
-    /// Initializes a new instance of `SwiftPicker`.
+    /// Initializes a new instance of `InteractivePicker`.
     public init() { }
 }
 
+/// Legacy struct name for backward compatibility. Use `InteractivePicker` instead.
+@available(*, deprecated, renamed: "InteractivePicker", message: "Use InteractivePicker to avoid confusion with package name")
+public typealias SwiftPicker = InteractivePicker
+
 // MARK: - Input
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user for input with the given prompt string.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: The user's input as a String.
-    func getInput(_ prompt: String) -> String {
-        return InputHandler.getInput(prompt)
+    func getInput(prompt: PickerPrompt) -> String {
+        return InputHandler.getInput(prompt.title)
     }
     
     /// Prompts the user for input with the given prompt string and requires input.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.inputRequired` if the user does not provide any input.
     /// - Returns: The user's input as a String.
-    func getRequiredInput(_ prompt: String) throws -> String {
+    func getRequiredInput(prompt: PickerPrompt) throws -> String {
         let input = getInput(prompt)
         if input.isEmpty {
             throw SwiftPickerError.inputRequired
@@ -36,18 +40,18 @@ public extension SwiftPicker {
 }
 
 // MARK: - Permission
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user for permission with a yes/no question.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: `true` if the user grants permission, `false` otherwise.
-    func getPermission(prompt: String) -> Bool {
-        return InputHandler.getPermission(prompt)
+    func getPermission(prompt: PickerPrompt) -> Bool {
+        return InputHandler.getPermission(prompt.title)
     }
     
     /// Prompts the user for permission with a yes/no question and requires a yes to proceed.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not grant permission.
-    func requiredPermission(prompt: String) throws {
+    func requiredPermission(prompt: PickerPrompt) throws {
         guard getPermission(prompt: prompt) else {
             throw SwiftPickerError.selectionCancelled
         }
@@ -55,14 +59,14 @@ public extension SwiftPicker {
 }
 
 // MARK: - SingleSelection
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user to make a single selection from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
     ///   - items: The list of items to select from.
     /// - Returns: The selected item, or `nil` if no selection was made.
-    func singleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> Item? {
-        let info = makeInfo(title: title, items: items)
+    func singleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> Item? {
+        let info = makeInfo(title: title.title, items: items)
         return captureSingleInput(info: info, showNewScreen: true)
     }
     
@@ -72,7 +76,7 @@ public extension SwiftPicker {
     ///   - items: The list of items to select from.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not make a selection.
     /// - Returns: The selected item.
-    func requiredSingleSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) throws -> Item {
+    func requiredSingleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) throws -> Item {
         guard let selection = singleSelection(title: title, items: items) else {
             throw SwiftPickerError.selectionCancelled
         }
@@ -81,20 +85,20 @@ public extension SwiftPicker {
 }
 
 // MARK: - MultiSelection
-public extension SwiftPicker {
+public extension InteractivePicker {
     /// Prompts the user to make multiple selections from a list of items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.
     ///   - items: The list of items to select from.
     /// - Returns: An array of selected items.
-    func multiSelection<Item: DisplayablePickerItem>(title: String, items: [Item]) -> [Item] {
-        let info = makeInfo(title: title, items: items)
+    func multiSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> [Item] {
+        let info = makeInfo(title: title.title, items: items)
         return captureMultiInput(info: info, showNewScreen: true)
     }
 }
 
 // MARK: - Private Methods
-private extension SwiftPicker {
+private extension InteractivePicker {
     /// Creates a `PickerInfo` object with the given title and items.
     /// - Parameters:
     ///   - title: The title to display at the top of the selection list.

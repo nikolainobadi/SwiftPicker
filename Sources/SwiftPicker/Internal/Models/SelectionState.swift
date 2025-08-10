@@ -5,7 +5,7 @@
 //  Created by Nikolai Nobadi on 5/14/24.
 //
 
-/// A class representing the state of the selection process in `SwiftPicker`.
+/// A class representing the state of the selection process in `InteractivePicker`.
 /// This includes the title, options, active line, and selection mode.
 internal final class SelectionState<Item: DisplayablePickerItem> {
     /// The line position of the top line in the selection list.
@@ -53,7 +53,7 @@ extension SelectionState {
     
     /// The text to display at the top line of the selection list.
     var topLineText: String {
-        return "SwiftPicker (\(isSingleSelection ? "single" : "multi")-selection)"
+        return "InteractivePicker (\(isSingleSelection ? "single" : "multi")-selection)"
     }
     
     /// The text to display at the bottom line of the selection list.
