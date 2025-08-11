@@ -1,7 +1,6 @@
 # SwiftPicker
 ![](https://badgen.net/badge/Swift/5+/orange)
 ![](https://badgen.net/badge/platform/macos?list=|&color=grey)
-![](https://badgen.net/badge/distro/SPM%20only?color=red)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 SwiftPicker is a Swift Package Manager library that provides interactive command-line picker functionality for Swift applications. It supports single and multiple item selection with terminal-based UI using ANSI escape sequences.
