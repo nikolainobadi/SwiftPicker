@@ -9,22 +9,18 @@ import Testing
 @testable import SwiftPicker
 
 struct ConvenienceMethodTests {
-    @Test("Single item selection works with default screen configuration")
-    func singleSelectionWithDefaultNewScreenParameterWorksCorrectly() {
-        let items = ["Option A", "Option B", "Option C"]
-        let input = MockInput(screenSize: (30, 100), directionKey: nil)
-        
-        input.pressKey = true
-        input.enqueueSpecialChar(specialChar: .enter)
-        
-        let info = makePickerInfo(title: "Default Screen", items: items)
-        // Test the default parameter version (newScreen defaults to true)
-        let handlerWithDefault = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
-        let handlerExplicit = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
-        
-        // Both should behave the same
-        #expect(handlerWithDefault.state.title == handlerExplicit.state.title)
-        #expect(handlerWithDefault.state.options.count == handlerExplicit.state.options.count)
+    @Test("Single item selection constructs consistent state")
+    func singleSelectionBuildsConsistentState() {
+      let input = MockInput(screenSize: (30, 100), directionKey: nil)
+      input.pressKey = true
+      input.enqueueSpecialChar(specialChar: .enter)
+
+      let info = makePickerInfo(title: "Default Screen", items: ["A","B","C"])
+      let h1 = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
+      let h2 = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+
+      #expect(h1.state.title == h2.state.title)
+      #expect(h1.state.options.count == h2.state.options.count)
     }
     
     @Test("Custom titles display correctly during selection")
