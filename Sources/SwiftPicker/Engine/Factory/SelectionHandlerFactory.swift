@@ -1,5 +1,5 @@
 //
-//  PickerComposer.swift
+//  SelectionHandlerFactory.swift
 //
 //
 //  Created by Nikolai Nobadi on 5/16/24.
@@ -7,14 +7,14 @@
 
 /// An enumeration that composes various handlers for SwiftPicker.
 /// Provides methods to create single and multi-selection handlers.
-internal enum PickerComposer {
+internal enum SelectionHandlerFactory {
     
     /// The input handler for reading user input and controlling the terminal.
     static var inputHandler: PickerInput = PickerInputAdapter()
 }
 
 // MARK: - Composer
-internal extension PickerComposer {
+internal extension SelectionHandlerFactory {
     /// Creates a single selection handler with the provided information.
     /// - Parameters:
     ///   - info: The PickerInfo object containing the title and items.
@@ -59,7 +59,7 @@ internal extension PickerComposer {
 }
 
 // MARK: - Private Methods
-private extension PickerComposer {
+private extension SelectionHandlerFactory {
     /// Creates a selection state with the provided information.
     /// - Parameters:
     ///   - info: The PickerInfo object containing the title and items.

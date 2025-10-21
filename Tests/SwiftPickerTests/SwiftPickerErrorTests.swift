@@ -22,7 +22,7 @@ extension SwiftPickerErrorTests {
         input.pressKey = false // No key pressed simulates empty input
         
         let info = PickerInfo(title: "Test", items: [""])
-        let _ = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let _ = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         // This test structure shows the expected error pattern
         // In actual implementation, we would need to mock the text input mechanism
@@ -75,7 +75,7 @@ extension SwiftPickerErrorTests {
         input.enqueueSpecialChar(specialChar: .quit)
         
         let info = PickerInfo(title: "Test", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         // In actual implementation, quit should return nil which triggers selectionCancelled
         let result = handler.captureUserInput()
@@ -91,7 +91,7 @@ extension SwiftPickerErrorTests {
         input.enqueueSpecialChar(specialChar: .quit)
         
         let info = PickerInfo(title: "Test", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         // Multi-selection should return empty array when quit without selection
         let result = handler.captureUserInput()

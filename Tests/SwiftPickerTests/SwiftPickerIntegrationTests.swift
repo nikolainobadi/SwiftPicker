@@ -32,7 +32,7 @@ extension SwiftPickerIntegrationTests {
     func singleSelection() {
         let input = MockInput(screenSize: (26, 100), directionKey: nil)
         let info = makeInfo()
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: SpecialChar.enter)
@@ -49,7 +49,7 @@ extension SwiftPickerIntegrationTests {
     func multiSelection_noSelection() {
         let input = MockInput(screenSize: (26, 100), directionKey: nil)
         let info = makeInfo()
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: SpecialChar.enter)
@@ -64,7 +64,7 @@ extension SwiftPickerIntegrationTests {
         let info = makeInfo()
         let selectionCount = 6
         let input = MockInput(screenSize: (26, 100), directionKey: .down)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         input.pressKey = true
         
@@ -86,7 +86,7 @@ extension SwiftPickerIntegrationTests {
     func multiSelection_movingUp_activeLineCannotRiseAboveTopLineLimit() {
         let info = makeInfo()
         let input = MockInput(screenSize: (26, 100), directionKey: .up)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         let state = handler.state
         let topLineLimit = PickerPadding.top
         
@@ -110,7 +110,7 @@ extension SwiftPickerIntegrationTests {
         let info = makeInfo(items: items)
         let directionCount = itemCount
         let input = MockInput(screenSize: (26, 100), directionKey: .down)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         let state = handler.state
         
         /// # of items plus the amount of top padding = furthest down a row can be active
@@ -135,7 +135,7 @@ extension SwiftPickerIntegrationTests {
         let info = makeInfo(items: items)
         let directionCount = 30
         let input = MockInput(screenSize: (26, 100), directionKey: .down)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         let state = handler.state
         
         /// # of items plus the amount of top padding = furthest down a row can be active

@@ -24,8 +24,8 @@ extension ConvenienceMethodTests {
         
         let info = PickerInfo(title: "Default Screen", items: items)
         // Test the default parameter version (newScreen defaults to true)
-        let handlerWithDefault = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
-        let handlerExplicit = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handlerWithDefault = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handlerExplicit = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         // Both should behave the same
         #expect(handlerWithDefault.state.title == handlerExplicit.state.title)
@@ -42,7 +42,7 @@ extension ConvenienceMethodTests {
         
         let customTitle = "🎯 Choose Your Target"
         let info = PickerInfo(title: customTitle, items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         #expect(handler.state.title == customTitle)
         
@@ -64,7 +64,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .enter)  // Finish
         
         let info = PickerInfo(title: "Multi Default", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -82,7 +82,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .enter) // Finish without selecting
         
         let info = PickerInfo(title: "No Selection", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -152,7 +152,7 @@ extension ConvenienceMethodTests {
         
         // Test that methods return expected types for chaining
         let info = PickerInfo(title: "Colors", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         let processedResult = result?.uppercased()
@@ -173,7 +173,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Numbers", items: numbers)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -201,10 +201,10 @@ extension ConvenienceMethodTests {
         let info = PickerInfo(title: "Screen Test", items: items)
         
         // Test with newScreen = true
-        let handlerNewScreen = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
+        let handlerNewScreen = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
         
         // Test with newScreen = false  
-        let handlerSameScreen = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handlerSameScreen = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         // Both should work, but may have different screen setup
         #expect(handlerNewScreen.state.title == handlerSameScreen.state.title)
@@ -226,8 +226,8 @@ extension ConvenienceMethodTests {
         input2.enqueueSpecialChar(specialChar: .enter) // Select second item
         
         let info = PickerInfo(title: "Screen Logic Test", items: items)
-        let handlerNew = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input1)
-        let handlerSame = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input2)
+        let handlerNew = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input1)
+        let handlerSame = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input2)
         
         let resultNew = handlerNew.captureUserInput()
         let resultSame = handlerSame.captureUserInput()

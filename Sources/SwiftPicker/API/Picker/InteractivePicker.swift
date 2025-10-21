@@ -114,12 +114,12 @@ private extension InteractivePicker {
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: The selected item, or `nil` if no selection was made.
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: showNewScreen)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: showNewScreen)
         let selection = handler.captureUserInput()
-        
+
         handler.endSelection()
         handler.printResult(selection?.displayName)
-        
+
         return selection
     }
     
@@ -129,12 +129,12 @@ private extension InteractivePicker {
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: An array of selected items.
     func captureMultiInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> [Item] {
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
         let selections = handler.captureUserInput()
-        
+
         handler.endSelection()
         handler.printResults(selections.map({ $0.displayName }))
-        
+
         return selections
     }
 }

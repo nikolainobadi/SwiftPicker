@@ -24,7 +24,7 @@ extension InteractivePickerTests {
         
         // Override the composer to use our mock input
         let info = PickerInfo(title: "Test Selection", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -44,7 +44,7 @@ extension InteractivePickerTests {
         input.enqueueSpecialChar(specialChar: .enter) // Select
         
         let info = PickerInfo(title: "Navigation Test", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -69,7 +69,7 @@ extension InteractivePickerTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Multi Selection", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -92,7 +92,7 @@ extension InteractivePickerTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Deselection Test", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         

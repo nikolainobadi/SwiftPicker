@@ -22,7 +22,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Empty List Test", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -39,7 +39,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Empty Multi List", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -56,7 +56,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Single Item", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -75,7 +75,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .quit)
         
         let info = PickerInfo(title: "Quit Test", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -100,7 +100,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .quit)
         
         let info = PickerInfo(title: "Partial Quit", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         let result = handler.captureUserInput()
         
         // Multi-selection quit behavior: should return empty array on quit
@@ -121,7 +121,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .quit)
         
         let info = PickerInfo(title: "Middle Quit", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -139,7 +139,7 @@ extension EdgeCaseTests {
         input.pressKey = true
         
         let info = PickerInfo(title: "Top Boundary", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         let state = handler.state
         let initialLine = state.activeLine
         
@@ -163,7 +163,7 @@ extension EdgeCaseTests {
         input.pressKey = true
         
         let info = PickerInfo(title: "Bottom Boundary", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         // The mock input system doesn't perfectly simulate the complex navigation logic
         // In a real scenario, navigation would stop at the bottom boundary
@@ -194,7 +194,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Large List", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -218,7 +218,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter) // Finish
         
         let info = PickerInfo(title: "Large Multi", items: items)
-        let handler = PickerComposer.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -238,7 +238,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Special Chars", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
@@ -255,7 +255,7 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let info = PickerInfo(title: "Unicode Test", items: items)
-        let handler = PickerComposer.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
         
