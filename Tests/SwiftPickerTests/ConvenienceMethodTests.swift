@@ -10,7 +10,7 @@ import Testing
 
 struct ConvenienceMethodTests {
     @Test("Single selection with default newScreen parameter works correctly")
-    func selectSingleItem_withDefaultNewScreen() {
+    func singleSelectionWithDefaultNewScreenParameterWorksCorrectly() {
         let items = ["Option A", "Option B", "Option C"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -28,48 +28,48 @@ struct ConvenienceMethodTests {
     }
     
     @Test("Single selection with custom title formatting")
-    func selectSingleItem_withCustomTitleFormatting() {
+    func singleSelectionWithCustomTitleFormatting() {
         let items = ["Item 1", "Item 2"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
-        
+
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter)
-        
+
         let customTitle = "🎯 Choose Your Target"
         let info = PickerInfo(title: customTitle, items: items)
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
-        
+
         #expect(handler.state.title == customTitle)
-        
+
         let result = handler.captureUserInput()
-        #expect(result == "Item 1")
+        #expect(result == items[0])
     }
 }
 
 // MARK: - Multi Selection Convenience Methods  
 extension ConvenienceMethodTests {
     @Test("Multi selection with default newScreen parameter works correctly")
-    func selectMultipleItems_withDefaultNewScreen() {
+    func multiSelectionWithDefaultNewScreenParameterWorksCorrectly() {
         let items = ["Choice 1", "Choice 2", "Choice 3"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
-        
+
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .space) // Select first
         input.enqueueSpecialChar(specialChar: .space) // Select second
         input.enqueueSpecialChar(specialChar: .enter)  // Finish
-        
+
         let info = PickerInfo(title: "Multi Default", items: items)
         let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
-        
+
         let result = handler.captureUserInput()
-        
+
         #expect(result.count == 2)
-        #expect(result.contains("Choice 1"))
-        #expect(result.contains("Choice 2"))
+        #expect(result.contains(items[0]))
+        #expect(result.contains(items[1]))
     }
     
     @Test("Multi selection allows no selections")
-    func selectMultipleItems_allowsNoSelections() {
+    func multiSelectionAllowsNoSelections() {
         let items = ["A", "B", "C"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -85,10 +85,31 @@ extension ConvenienceMethodTests {
     }
 }
 
+// MARK: - SUT
+private extension ConvenienceMethodTests {
+    func makeSUT<Item: DisplayablePickerItem>(
+        items: [Item],
+        title: String = "Test Selection",
+        screenSize: (Int, Int) = (30, 100),
+        directionKey: Direction? = nil,
+        specialChars: [SpecialChar?] = []
+    ) -> MockInput {
+        let input = MockInput(screenSize: screenSize, directionKey: directionKey)
+        input.pressKey = true
+
+        for char in specialChars {
+            input.enqueueSpecialChar(specialChar: char)
+        }
+
+        return input
+    }
+}
+
+
 // MARK: - PickerInfo Convenience Tests
 extension ConvenienceMethodTests {
     @Test("PickerInfo initializes with title and items correctly")
-    func pickerInfo_initializesCorrectly() {
+    func pickerInfoInitializesWithTitleAndItemsCorrectly() {
         let title = "Test Selection"
         let items = ["One", "Two", "Three"]
         
@@ -100,33 +121,33 @@ extension ConvenienceMethodTests {
     }
     
     @Test("PickerInfo works with different DisplayablePickerItem types")
-    func pickerInfo_worksWithDifferentTypes() {
+    func pickerInfoWorksWithDifferentDisplayablePickerItemTypes() {
         struct MenuItem: DisplayablePickerItem {
             let name: String
             let category: String
-            
+
             var displayName: String {
                 return "\(category): \(name)"
             }
         }
-        
+
         let items = [
             MenuItem(name: "Burger", category: "Main"),
             MenuItem(name: "Fries", category: "Side"),
             MenuItem(name: "Soda", category: "Drink")
         ]
-        
+
         let info = PickerInfo(title: "Restaurant Menu", items: items)
-        
+
         #expect(info.title == "Restaurant Menu")
         #expect(info.items.count == 3)
-        #expect(info.items[0].displayName == "Main: Burger")
-        #expect(info.items[1].displayName == "Side: Fries")
-        #expect(info.items[2].displayName == "Drink: Soda")
+        #expect(info.items[0].displayName == items[0].displayName)
+        #expect(info.items[1].displayName == items[1].displayName)
+        #expect(info.items[2].displayName == items[2].displayName)
     }
     
     @Test("PickerInfo handles empty items array")
-    func pickerInfo_handlesEmptyItems() {
+    func pickerInfoHandlesEmptyItemsArray() {
         let items: [String] = []
         let info = PickerInfo(title: "Empty List", items: items)
         
@@ -138,25 +159,25 @@ extension ConvenienceMethodTests {
 // MARK: - Method Chaining and Fluent Interface Tests
 extension ConvenienceMethodTests {
     @Test("Selection methods can be used in functional style")
-    func selectionMethods_supportFunctionalStyle() {
+    func selectionMethodsCanBeUsedInFunctionalStyle() {
         let items = ["Red", "Green", "Blue"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
-        
+
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter)
-        
+
         // Test that methods return expected types for chaining
         let info = PickerInfo(title: "Colors", items: items)
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
-        
+
         let result = handler.captureUserInput()
         let processedResult = result?.uppercased()
-        
-        #expect(processedResult == "RED")
+
+        #expect(processedResult == items[0].uppercased())
     }
     
     @Test("Multiple operations can be performed on selection results")
-    func selectionResults_supportMultipleOperations() {
+    func multipleOperationsCanBePerformedOnSelectionResults() {
         let numbers = ["1", "2", "3", "4", "5"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -186,7 +207,7 @@ extension ConvenienceMethodTests {
 // MARK: - Screen Configuration Tests
 extension ConvenienceMethodTests {
     @Test("newScreen parameter affects screen behavior")
-    func newScreen_parameterAffectsScreenBehavior() {
+    func newScreenParameterAffectsScreenBehavior() {
         let items = ["Test Item"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -207,28 +228,28 @@ extension ConvenienceMethodTests {
     }
     
     @Test("Screen configuration doesn't affect selection logic")
-    func screenConfiguration_doesNotAffectSelectionLogic() {
+    func screenConfigurationDoesNotAffectSelectionLogic() {
         let items = ["Alpha", "Beta", "Gamma"]
         let input1 = MockInput(screenSize: (30, 100), directionKey: .down)
         let input2 = MockInput(screenSize: (30, 100), directionKey: .down)
-        
+
         input1.pressKey = true
         input1.enqueueSpecialChar(specialChar: nil) // Down
         input1.enqueueSpecialChar(specialChar: .enter) // Select second item
-        
-        input2.pressKey = true  
+
+        input2.pressKey = true
         input2.enqueueSpecialChar(specialChar: nil) // Down
         input2.enqueueSpecialChar(specialChar: .enter) // Select second item
-        
+
         let info = PickerInfo(title: "Screen Logic Test", items: items)
         let handlerNew = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input1)
         let handlerSame = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input2)
-        
+
         let resultNew = handlerNew.captureUserInput()
         let resultSame = handlerSame.captureUserInput()
-        
+
         // Both should select the same item regardless of screen configuration
         #expect(resultNew == resultSame)
-        #expect(resultNew == "Beta")
+        #expect(resultNew == items[1])
     }
 }
