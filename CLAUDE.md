@@ -112,5 +112,5 @@ swift package update
 ## Platform Requirements
 
 - **macOS 10.14+** minimum deployment target
-- **Swift 5.0+** toolchain requirement
+- **Swift 5.9+** toolchain requirement
 - **Terminal environment** required for ANSI escape sequence support

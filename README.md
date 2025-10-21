@@ -1,5 +1,5 @@
 # SwiftPicker
-![](https://badgen.net/badge/Swift/5+/orange)
+![](https://badgen.net/badge/Swift/5.9+/orange)
 ![](https://badgen.net/badge/platform/macos?list=|&color=grey)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
@@ -13,7 +13,7 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 - **Input & Permission Handling**: Built-in text input and yes/no confirmation methods
 - **ANSI Terminal Support**: Enhanced UI with cursor control and screen management
 - **Error Handling**: Comprehensive error handling with `SwiftPickerError` enum
-- **Modern Swift**: Built with Swift 5+ using contemporary patterns
+- **Modern Swift**: Built with Swift 5.9+ using contemporary patterns
 - **Comprehensive Testing**: 52+ tests ensuring reliability and behavior validation
 
 ## Installation
