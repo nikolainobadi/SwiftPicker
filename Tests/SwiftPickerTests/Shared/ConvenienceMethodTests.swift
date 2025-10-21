@@ -17,7 +17,7 @@ struct ConvenienceMethodTests {
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter)
         
-        let info = PickerInfo(title: "Default Screen", items: items)
+        let info = makePickerInfo(title: "Default Screen", items: items)
         // Test the default parameter version (newScreen defaults to true)
         let handlerWithDefault = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
         let handlerExplicit = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
@@ -36,7 +36,7 @@ struct ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .enter)
 
         let customTitle = "🎯 Choose Your Target"
-        let info = PickerInfo(title: customTitle, items: items)
+        let info = makePickerInfo(title: customTitle, items: items)
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
 
         #expect(handler.state.title == customTitle)
@@ -58,7 +58,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .space) // Select second
         input.enqueueSpecialChar(specialChar: .enter)  // Finish
 
-        let info = PickerInfo(title: "Multi Default", items: items)
+        let info = makePickerInfo(title: "Multi Default", items: items)
         let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: true, inputHandler: input)
 
         let result = handler.captureUserInput()
@@ -76,7 +76,7 @@ extension ConvenienceMethodTests {
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter) // Finish without selecting
         
-        let info = PickerInfo(title: "No Selection", items: items)
+        let info = makePickerInfo(title: "No Selection", items: items)
         let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
@@ -85,27 +85,6 @@ extension ConvenienceMethodTests {
     }
 }
 
-// MARK: - SUT
-private extension ConvenienceMethodTests {
-    func makeSUT<Item: DisplayablePickerItem>(
-        items: [Item],
-        title: String = "Test Selection",
-        screenSize: (Int, Int) = (30, 100),
-        directionKey: Direction? = nil,
-        specialChars: [SpecialChar?] = []
-    ) -> MockInput {
-        let input = MockInput(screenSize: screenSize, directionKey: directionKey)
-        input.pressKey = true
-
-        for char in specialChars {
-            input.enqueueSpecialChar(specialChar: char)
-        }
-
-        return input
-    }
-}
-
-
 // MARK: - PickerInfo Convenience Tests
 extension ConvenienceMethodTests {
     @Test("Selection configuration preserves title and items")
@@ -113,7 +92,7 @@ extension ConvenienceMethodTests {
         let title = "Test Selection"
         let items = ["One", "Two", "Three"]
         
-        let info = PickerInfo(title: title, items: items)
+        let info = makePickerInfo(title: title, items: items)
         
         #expect(info.title == title)
         #expect(info.items == items)
@@ -149,7 +128,7 @@ extension ConvenienceMethodTests {
     @Test("Empty item lists maintain valid configuration")
     func pickerInfoHandlesEmptyItemsArray() {
         let items: [String] = []
-        let info = PickerInfo(title: "Empty List", items: items)
+        let info = makePickerInfo(title: "Empty List", items: items)
         
         #expect(info.title == "Empty List")
         #expect(info.items.isEmpty)
@@ -167,7 +146,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .enter)
 
         // Test that methods return expected types for chaining
-        let info = PickerInfo(title: "Colors", items: items)
+        let info = makePickerInfo(title: "Colors", items: items)
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
 
         let result = handler.captureUserInput()
@@ -188,7 +167,7 @@ extension ConvenienceMethodTests {
         input.enqueueSpecialChar(specialChar: .space) // Select "3"
         input.enqueueSpecialChar(specialChar: .enter)
         
-        let info = PickerInfo(title: "Numbers", items: numbers)
+        let info = makePickerInfo(title: "Numbers", items: numbers)
         let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
@@ -214,7 +193,7 @@ extension ConvenienceMethodTests {
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter)
         
-        let info = PickerInfo(title: "Screen Test", items: items)
+        let info = makePickerInfo(title: "Screen Test", items: items)
         
         // Test with newScreen = true
         let handlerNewScreen = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input)
@@ -241,15 +220,34 @@ extension ConvenienceMethodTests {
         input2.enqueueSpecialChar(specialChar: nil) // Down
         input2.enqueueSpecialChar(specialChar: .enter) // Select second item
 
-        let info = PickerInfo(title: "Screen Logic Test", items: items)
+        let info = makePickerInfo(title: "Screen Logic Test", items: items)
         let handlerNew = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: true, inputHandler: input1)
         let handlerSame = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input2)
 
         let resultNew = handlerNew.captureUserInput()
         let resultSame = handlerSame.captureUserInput()
 
-        // Both should select the same item regardless of screen configuration
         #expect(resultNew == resultSame)
         #expect(resultNew == items[1])
+    }
+}
+
+// MARK: - SUT
+private extension ConvenienceMethodTests {
+    func makeSUT<Item: DisplayablePickerItem>(
+        items: [Item],
+        title: String = "Test Selection",
+        screenSize: (Int, Int) = (30, 100),
+        directionKey: Direction? = nil,
+        specialChars: [SpecialChar?] = []
+    ) -> MockInput {
+        let input = MockInput(screenSize: screenSize, directionKey: directionKey)
+        input.pressKey = true
+
+        for char in specialChars {
+            input.enqueueSpecialChar(specialChar: char)
+        }
+
+        return input
     }
 }

@@ -99,7 +99,7 @@ extension SingleSelectionTests {
 // MARK: - SUT
 private extension SingleSelectionTests {
     func makeSUT(items: [String], input: MockInput, title: String = "Test Selection") -> SingleSelectionHandler<String> {
-        let info = PickerInfo(title: title, items: items)
+        let info = makePickerInfo(title: title, items: items)
 
         return SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
     }

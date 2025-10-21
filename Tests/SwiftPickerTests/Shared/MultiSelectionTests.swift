@@ -151,7 +151,7 @@ extension MultiSelectionTests {
 // MARK: - SUT
 private extension MultiSelectionTests {
     func makeSUT(items: [String], input: MockInput, title: String = "Test Selection") -> MultiSelectionHandler<String> {
-        let info = PickerInfo(title: title, items: items)
+        let info = makePickerInfo(title: title, items: items)
 
         return SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: false, inputHandler: input)
     }
