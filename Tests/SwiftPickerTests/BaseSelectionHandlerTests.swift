@@ -9,7 +9,7 @@ import Testing
 @testable import SwiftPicker
 
 struct BaseSelectionHandlerTests {
-    @Test("Selection handler starts with clean terminal state")
+    @Test("Terminal state initializes clean with correct configuration")
     func selectionHandlerStartsWithCleanTerminalState() {
         let title = "This is my title"
         let itemCount = 25
@@ -32,7 +32,7 @@ struct BaseSelectionHandlerTests {
         #expect(sut.state.bottomLineText == "Tap 'enter' to select. Type 'q' to quit.")
     }
     
-    @Test("Ending selection restores normal terminal input mode")
+    @Test("Terminal restores to normal input mode after selection ends")
     func endingSelectionRestoresNormalTerminalInputMode() {
         let (sut, input) = makeSUT(state: makeState())
 
@@ -42,7 +42,7 @@ struct BaseSelectionHandlerTests {
         #expect(input.didExitAlternateScreen)
     }
     
-    @Test("User sees all available options when selection starts")
+    @Test("All available options display when selection starts")
     func userSeesAllAvailableOptionsWhenSelectionStarts() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state)
@@ -50,7 +50,7 @@ struct BaseSelectionHandlerTests {
         assertWrittenText(sut: sut, input: input)
     }
     
-    @Test("User can navigate through all options with arrow keys")
+    @Test("Arrow key navigation cycles through all available options")
     func userCanNavigateThroughAllOptionsWithArrowKeys() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
@@ -70,7 +70,7 @@ struct BaseSelectionHandlerTests {
         }
     }
     
-    @Test("User sees selection update after pressing arrow key")
+    @Test("Display updates to reflect new selection after arrow key press")
     func userSeesSelectionUpdateAfterPressingArrowKey() {
         let activeIndex = 1
         let state = makeState()
