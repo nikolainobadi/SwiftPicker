@@ -9,7 +9,7 @@ import Testing
 @testable import SwiftPicker
 
 struct ConvenienceMethodTests {
-    @Test("Single selection with default newScreen parameter works correctly")
+    @Test("Single item selection works with default screen configuration")
     func singleSelectionWithDefaultNewScreenParameterWorksCorrectly() {
         let items = ["Option A", "Option B", "Option C"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
@@ -27,7 +27,7 @@ struct ConvenienceMethodTests {
         #expect(handlerWithDefault.state.options.count == handlerExplicit.state.options.count)
     }
     
-    @Test("Single selection with custom title formatting")
+    @Test("Custom titles display correctly during selection")
     func singleSelectionWithCustomTitleFormatting() {
         let items = ["Item 1", "Item 2"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
@@ -48,7 +48,7 @@ struct ConvenienceMethodTests {
 
 // MARK: - Multi Selection Convenience Methods  
 extension ConvenienceMethodTests {
-    @Test("Multi selection with default newScreen parameter works correctly")
+    @Test("Multiple items selected and confirmed returns correct results")
     func multiSelectionWithDefaultNewScreenParameterWorksCorrectly() {
         let items = ["Choice 1", "Choice 2", "Choice 3"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
@@ -68,7 +68,7 @@ extension ConvenienceMethodTests {
         #expect(result.contains(items[1]))
     }
     
-    @Test("Multi selection allows no selections")
+    @Test("Confirming without selections returns empty result")
     func multiSelectionAllowsNoSelections() {
         let items = ["A", "B", "C"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
@@ -108,7 +108,7 @@ private extension ConvenienceMethodTests {
 
 // MARK: - PickerInfo Convenience Tests
 extension ConvenienceMethodTests {
-    @Test("PickerInfo initializes with title and items correctly")
+    @Test("Selection configuration preserves title and items")
     func pickerInfoInitializesWithTitleAndItemsCorrectly() {
         let title = "Test Selection"
         let items = ["One", "Two", "Three"]
@@ -120,7 +120,7 @@ extension ConvenienceMethodTests {
         #expect(info.items.count == 3)
     }
     
-    @Test("PickerInfo works with different DisplayablePickerItem types")
+    @Test("Custom item types display with correct formatting")
     func pickerInfoWorksWithDifferentDisplayablePickerItemTypes() {
         struct MenuItem: DisplayablePickerItem {
             let name: String
@@ -146,7 +146,7 @@ extension ConvenienceMethodTests {
         #expect(info.items[2].displayName == items[2].displayName)
     }
     
-    @Test("PickerInfo handles empty items array")
+    @Test("Empty item lists maintain valid configuration")
     func pickerInfoHandlesEmptyItemsArray() {
         let items: [String] = []
         let info = PickerInfo(title: "Empty List", items: items)
@@ -158,7 +158,7 @@ extension ConvenienceMethodTests {
 
 // MARK: - Method Chaining and Fluent Interface Tests
 extension ConvenienceMethodTests {
-    @Test("Selection methods can be used in functional style")
+    @Test("Selection results support functional transformations")
     func selectionMethodsCanBeUsedInFunctionalStyle() {
         let items = ["Red", "Green", "Blue"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
@@ -176,7 +176,7 @@ extension ConvenienceMethodTests {
         #expect(processedResult == items[0].uppercased())
     }
     
-    @Test("Multiple operations can be performed on selection results")
+    @Test("Selection results chain with multiple operations")
     func multipleOperationsCanBePerformedOnSelectionResults() {
         let numbers = ["1", "2", "3", "4", "5"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
@@ -206,7 +206,7 @@ extension ConvenienceMethodTests {
 
 // MARK: - Screen Configuration Tests
 extension ConvenienceMethodTests {
-    @Test("newScreen parameter affects screen behavior")
+    @Test("Screen configuration modes produce consistent state")
     func newScreenParameterAffectsScreenBehavior() {
         let items = ["Test Item"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
@@ -227,7 +227,7 @@ extension ConvenienceMethodTests {
         #expect(handlerNewScreen.state.options.count == handlerSameScreen.state.options.count)
     }
     
-    @Test("Screen configuration doesn't affect selection logic")
+    @Test("Selection behavior remains consistent across screen modes")
     func screenConfigurationDoesNotAffectSelectionLogic() {
         let items = ["Alpha", "Beta", "Gamma"]
         let input1 = MockInput(screenSize: (30, 100), directionKey: .down)
