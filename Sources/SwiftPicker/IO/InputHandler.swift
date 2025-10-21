@@ -7,7 +7,7 @@
 
 /// An enumeration for handling user input in `SwiftPicker`.
 /// Provides methods to prompt for permissions and retrieve user input.
-internal enum InputHandler {
+enum InputHandler {
     /// Prompts the user for permission with a yes/no question.
     /// - Parameters:
     ///   - prompt: The prompt message to display to the user.

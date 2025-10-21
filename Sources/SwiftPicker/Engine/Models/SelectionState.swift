@@ -7,7 +7,7 @@
 
 /// A class representing the state of the selection process in `InteractivePicker`.
 /// This includes the title, options, active line, and selection mode.
-internal final class SelectionState<Item: DisplayablePickerItem> {
+final class SelectionState<Item: DisplayablePickerItem> {
     /// The line position of the top line in the selection list.
     let topLine: Int
     

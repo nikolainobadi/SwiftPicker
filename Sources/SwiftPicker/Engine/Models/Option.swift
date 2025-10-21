@@ -7,7 +7,7 @@
 
 /// A structure representing an option in the `SwiftPicker` selection list.
 /// Each option contains an item conforming to `DisplayablePickerItem`, its line position in the list, and its selection state.
-internal struct Option<Item: DisplayablePickerItem> {
+struct Option<Item: DisplayablePickerItem> {
     /// The item represented by this option.
     let item: Item
     

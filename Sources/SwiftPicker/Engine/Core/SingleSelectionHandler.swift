@@ -7,7 +7,7 @@
 
 /// A class for handling single selection logic in InteractivePicker.
 /// It captures the user's single selection from the list of options.
-internal final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHandler<Item> {
+final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHandler<Item> {
     /// Captures the user's input for a single selection.
     /// - Returns: The selected item, or `nil` if no selection was made.
     func captureUserInput() -> Item? {

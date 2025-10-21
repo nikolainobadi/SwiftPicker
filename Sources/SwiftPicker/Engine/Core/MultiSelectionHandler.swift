@@ -7,7 +7,7 @@
 
 /// A class for handling multi-selection logic in `InteractivePicker`.
 /// It captures the user's multiple selections from the list of options.
-internal final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHandler<Item> {
+final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHandler<Item> {
     /// Captures the user's input for multiple selections.
     /// - Returns: An array of selected items.
     func captureUserInput() -> [Item] {

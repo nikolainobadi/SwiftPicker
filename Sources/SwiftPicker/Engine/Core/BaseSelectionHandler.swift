@@ -9,7 +9,7 @@ import ANSITerminal
 
 /// A base class for handling selection logic in SwiftPicker.
 /// It manages the user input and rendering of options for both single and multi-selection modes.
-internal class BaseSelectionHandler<Item: DisplayablePickerItem> {
+class BaseSelectionHandler<Item: DisplayablePickerItem> {
     /// The input handler for reading user input and controlling the terminal.
     let inputHandler: PickerInput
     
@@ -161,7 +161,7 @@ private extension BaseSelectionHandler {
 
 
 // MARK: - Extension Dependencies
-fileprivate extension SelectionState {
+private extension SelectionState {
     /// Determines whether an option should be shown as selected.
     /// - Parameter option: The option to check.
     /// - Returns: A Boolean value indicating whether the option is selected.

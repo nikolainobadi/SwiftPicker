@@ -7,7 +7,7 @@
 
 /// A protocol defining the input methods required for SwiftPicker.
 /// Provides methods for cursor control, screen manipulation, and reading user input.
-internal protocol PickerInput {
+protocol PickerInput {
     /// Turns off the cursor.
     func cursorOff()
     

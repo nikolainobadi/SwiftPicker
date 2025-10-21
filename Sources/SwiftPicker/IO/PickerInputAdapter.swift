@@ -9,8 +9,7 @@ import ANSITerminal
 
 /// A class that adapts the PickerInput protocol to use ANSITerminal for input handling.
 /// Provides methods for cursor control, screen manipulation, and reading user input.
-internal final class PickerInputAdapter: PickerInput {
-    
+final class PickerInputAdapter: PickerInput {
     /// Turns off the cursor.
     func cursorOff() {
         ANSITerminal.cursorOff()

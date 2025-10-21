@@ -6,7 +6,7 @@
 //
 
 /// A structure containing the title and items for the `SwiftPicker` selection list.
-internal struct PickerInfo<Item: DisplayablePickerItem> {
+struct PickerInfo<Item: DisplayablePickerItem> {
     /// The title to display at the top of the selection list.
     let title: String
     

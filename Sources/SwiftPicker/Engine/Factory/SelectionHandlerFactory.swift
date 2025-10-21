@@ -7,14 +7,13 @@
 
 /// An enumeration that composes various handlers for SwiftPicker.
 /// Provides methods to create single and multi-selection handlers.
-internal enum SelectionHandlerFactory {
-    
+enum SelectionHandlerFactory {
     /// The input handler for reading user input and controlling the terminal.
     static var inputHandler: PickerInput = PickerInputAdapter()
 }
 
 // MARK: - Composer
-internal extension SelectionHandlerFactory {
+extension SelectionHandlerFactory {
     /// Creates a single selection handler with the provided information.
     /// - Parameters:
     ///   - info: The PickerInfo object containing the title and items.
