@@ -21,23 +21,7 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 To use SwiftPicker in your Swift project, add it as a dependency in your `Package.swift` file:
 
 ```swift
-dependencies: [
     .package(url: "https://github.com/nikolainobadi/SwiftPicker.git", from: "1.0.0")
-]
-```
-
-Then add it to your target dependencies and import it in your project:
-
-```swift
-// In your Package.swift target
-.target(
-    name: "YourTarget",
-    dependencies: ["SwiftPicker"]
-)
-```
-
-```swift
-import SwiftPicker
 ```
 
 ## Quick Start
