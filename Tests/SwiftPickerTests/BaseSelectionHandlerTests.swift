@@ -10,44 +10,58 @@ import Testing
 
 struct BaseSelectionHandlerTests {
     @Test("Selection handler starts with clean terminal state")
-    func init_startingValues() {
-        let (_, input) = makeSUT(state: makeState())
-        
+    func selectionHandlerStartsWithCleanTerminalState() {
+        let title = "This is my title"
+        let itemCount = 25
+        let topLine = PickerPadding.top
+        let state = makeState()
+        let (sut, input) = makeSUT(state: state)
+
         #expect(input.writtenText.isEmpty)
         #expect(!input.didEnableNormalInput)
         #expect(!input.didExitAlternateScreen)
+        #expect(sut.state.title == title)
+        #expect(sut.state.options.count == itemCount)
+        #expect(sut.state.topLine == topLine)
+        #expect(sut.state.activeLine == topLine)
+        #expect(sut.state.isSingleSelection)
+        #expect(sut.state.selectedOptions.isEmpty)
+        #expect(sut.state.rangeOfLines.minimum == topLine)
+        #expect(sut.state.rangeOfLines.maximum == topLine + itemCount - 1)
+        #expect(sut.state.topLineText == "InteractivePicker (single-selection)")
+        #expect(sut.state.bottomLineText == "Tap 'enter' to select. Type 'q' to quit.")
     }
     
     @Test("Ending selection restores normal terminal input mode")
-    func endSelection() {
+    func endingSelectionRestoresNormalTerminalInputMode() {
         let (sut, input) = makeSUT(state: makeState())
-        
+
         sut.endSelection()
-        
+
         #expect(input.didEnableNormalInput)
         #expect(input.didExitAlternateScreen)
     }
     
     @Test("User sees all available options when selection starts")
-    func scrollAndRenderOptions_startingValues() {
+    func userSeesAllAvailableOptionsWhenSelectionStarts() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state)
-        
+
         assertWrittenText(sut: sut, input: input)
     }
     
     @Test("User can navigate through all options with arrow keys")
-    func handleArrowKeys_activeLineUpdates() {
+    func userCanNavigateThroughAllOptionsWithArrowKeys() {
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
-        
+
         var count = 0
         for _ in 0..<20 {
             #expect(state.activeLine == count + PickerPadding.top)
             sut.handleArrowKeys()
             count += 1
         }
-        
+
         input.directionKey = .up
         for _ in 0..<20 {
             #expect(state.activeLine == count + PickerPadding.top)
@@ -57,13 +71,13 @@ struct BaseSelectionHandlerTests {
     }
     
     @Test("User sees selection update after pressing arrow key")
-    func handleArrowKeys() {
+    func userSeesSelectionUpdateAfterPressingArrowKey() {
         let activeIndex = 1
         let state = makeState()
         let (sut, input) = makeSUT(state: state, directionKey: .down)
-        
+
         sut.handleArrowKeys()
-        
+
         assertWrittenText(sut: sut, input: input, activeIndex: activeIndex)
     }
 }
@@ -96,22 +110,26 @@ private extension BaseSelectionHandlerTests {
 
 // MARK: - Helper Assertions
 private extension BaseSelectionHandlerTests {
+    var selectedIndicator: String { "●" }
+    var unselectedIndicator: String { "○" }
+
     func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, activeIndex: Int = 0, sourceLocation: SourceLocation = #_sourceLocation) {
         let state = sut.state
         let expectedActiveLine = PickerPadding.top + activeIndex
         let headerText = [state.topLineText, "\n", "\n", state.title, "\n"]
         var displayableText: [String] = []
         for i in 0..<20 {
-            displayableText.append(i == activeIndex ? "" : "○")
+            let indicator = i == activeIndex ? selectedIndicator : unselectedIndicator
+            displayableText.append(indicator)
             displayableText.append(state.options[i].title)
         }
         let footerText = ["\n", "", "\n", state.bottomLineText]
         let allText = headerText + displayableText + footerText
-        
+
         sut.scrollAndRenderOptions()
-    
+
         #expect(state.activeLine == expectedActiveLine, "wrong active line", sourceLocation: sourceLocation)
-        
+
         allText.enumerated().forEach {
             if !$1.isEmpty {
                 #expect(input.writtenText[$0].contains($1), "writtenText: \(input.writtenText[$0]) is not equal to \($1)", sourceLocation: sourceLocation)
