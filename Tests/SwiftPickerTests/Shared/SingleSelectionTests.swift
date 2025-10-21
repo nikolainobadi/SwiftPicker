@@ -43,6 +43,19 @@ struct SingleSelectionTests {
         #expect(result != nil)
         #expect(result == expectedItem)
     }
+
+    @Test("Completes selection when user confirms with Enter key")
+    func completesSelectionWhenUserConfirmsWithEnterKey() {
+        let input = MockInput(screenSize: (26, 100), directionKey: nil)
+        let handler = makeSUT(items: makeItems(), input: input)
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+    }
 }
 
 // MARK: - Input Method Tests
