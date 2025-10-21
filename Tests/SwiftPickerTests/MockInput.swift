@@ -7,7 +7,7 @@
 
 @testable import SwiftPicker
 
-class MockInput: PickerInput {
+final class MockInput: PickerInput {
     var pressKey = false
     var screenSize: (Int, Int)
     var directionKey: Direction?

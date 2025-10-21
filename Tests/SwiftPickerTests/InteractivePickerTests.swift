@@ -9,11 +9,6 @@ import Testing
 @testable import SwiftPicker
 
 struct InteractivePickerTests {
-    private let picker = InteractivePicker()
-}
-
-// MARK: - Single Selection Tests
-extension InteractivePickerTests {
     @Test("User can select a single item from a list")
     func selectSingleItem_withValidItems() {
         let items = ["Option 1", "Option 2", "Option 3"]

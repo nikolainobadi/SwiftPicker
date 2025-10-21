@@ -9,11 +9,6 @@ import Testing
 @testable import SwiftPicker
 
 struct SwiftPickerErrorTests {
-    private let picker = InteractivePicker()
-}
-
-// MARK: - Input Required Error Tests
-extension SwiftPickerErrorTests {
     @Test("Required input throws inputRequired error when given empty string")
     func getRequiredInput_throwsInputRequired_whenEmptyString() async throws {
         let input = MockInput(screenSize: (30, 100), directionKey: nil)

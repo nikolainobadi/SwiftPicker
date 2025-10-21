@@ -9,10 +9,6 @@ import Testing
 @testable import SwiftPicker
 
 struct EdgeCaseTests {
-}
-
-// MARK: - Empty List Edge Cases
-extension EdgeCaseTests {
     @Test("Single selection handles empty item list gracefully")
     func selectSingleItem_withEmptyList() {
         let items: [String] = []

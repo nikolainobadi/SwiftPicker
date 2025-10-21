@@ -9,11 +9,6 @@ import Testing
 @testable import SwiftPicker
 
 struct ConvenienceMethodTests {
-    private let picker = InteractivePicker()
-}
-
-// MARK: - Single Selection Convenience Methods
-extension ConvenienceMethodTests {
     @Test("Single selection with default newScreen parameter works correctly")
     func selectSingleItem_withDefaultNewScreen() {
         let items = ["Option A", "Option B", "Option C"]
