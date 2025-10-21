@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Convenience method tests for helper utilities
 - Integration tests for end-to-end scenarios
 - CLAUDE.md documentation file for AI-assisted development guidance
-- CODEOWNERS file for repository management
 
 ### Changed
 - Renamed `SwiftPicker` struct to `InteractivePicker` for clarity (backward-compatible type alias maintained)
