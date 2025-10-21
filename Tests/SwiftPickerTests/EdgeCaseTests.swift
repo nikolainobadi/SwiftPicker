@@ -9,8 +9,8 @@ import Testing
 @testable import SwiftPicker
 
 struct EdgeCaseTests {
-    @Test("Single selection handles empty item list gracefully")
-    func selectSingleItem_withEmptyList() {
+    @Test("Empty item list returns nil for single selection")
+    func singleSelectionHandlesEmptyItemListGracefully() {
         let items: [String] = []
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -26,8 +26,8 @@ struct EdgeCaseTests {
         #expect(result == nil)
     }
     
-    @Test("Multi selection handles empty item list gracefully")
-    func selectMultipleItems_withEmptyList() {
+    @Test("Empty item list returns empty array for multi selection")
+    func multiSelectionHandlesEmptyItemListGracefully() {
         let items: [String] = []
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -43,27 +43,27 @@ struct EdgeCaseTests {
         #expect(result.isEmpty)
     }
     
-    @Test("Single item list allows immediate selection")
-    func selectSingleItem_withSingleItemList() {
+    @Test("Single item list selects only option immediately")
+    func singleItemListAllowsImmediateSelection() {
         let items = ["Only Option"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
-        
+
         input.pressKey = true
         input.enqueueSpecialChar(specialChar: .enter)
-        
+
         let info = PickerInfo(title: "Single Item", items: items)
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
-        
+
         let result = handler.captureUserInput()
-        
-        #expect(result == "Only Option")
+
+        #expect(result == items[0])
     }
 }
 
 // MARK: - Quit Behavior Edge Cases
 extension EdgeCaseTests {
-    @Test("User can quit single selection at any time")
-    func selectSingleItem_userQuitsImmediately() {
+    @Test("Quitting single selection returns nil")
+    func userCanQuitSingleSelectionAtAnyTime() {
         let items = ["Option 1", "Option 2", "Option 3"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -78,8 +78,8 @@ extension EdgeCaseTests {
         #expect(result == nil)
     }
     
-    @Test("User can quit multi selection after making partial selections")
-    func selectMultipleItems_userQuitsAfterPartialSelection() {
+    @Test("Quitting multi selection discards partial selections")
+    func userCanQuitMultiSelectionAfterMakingPartialSelections() {
         let items = ["A", "B", "C", "D"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -104,8 +104,8 @@ extension EdgeCaseTests {
         #expect(result.isEmpty)
     }
     
-    @Test("Quit behavior is consistent across different positions")
-    func selectSingleItem_quitFromDifferentPositions() {
+    @Test("Quit returns nil regardless of navigation position")
+    func quitBehaviorIsConsistentAcrossDifferentPositions() {
         let items = ["First", "Second", "Third", "Fourth"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -127,8 +127,8 @@ extension EdgeCaseTests {
 
 // MARK: - Navigation Boundary Edge Cases  
 extension EdgeCaseTests {
-    @Test("Navigation stops at top boundary consistently")
-    func navigation_stopsAtTopBoundary() {
+    @Test("Upward navigation stops at first item")
+    func navigationStopsAtTopBoundaryConsistently() {
         let items = ["Top", "Middle", "Bottom"]
         let input = MockInput(screenSize: (30, 100), directionKey: .up)
         
@@ -148,11 +148,11 @@ extension EdgeCaseTests {
         let result = handler.captureUserInput()
         
         #expect(state.activeLine == initialLine) // Should not move above initial
-        #expect(result == "Top") // Should select first item
+        #expect(result == items[0]) // Should select first item
     }
     
-    @Test("Navigation stops at bottom boundary consistently")
-    func navigation_stopsAtBottomBoundary() {
+    @Test("Downward navigation stops at last item")
+    func navigationStopsAtBottomBoundaryConsistently() {
         let items = ["First", "Second", "Last"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -168,16 +168,16 @@ extension EdgeCaseTests {
         input.enqueueSpecialChar(specialChar: .enter)
         
         let result = handler.captureUserInput()
-        
+
         // With the current mock setup, it will select the first item
-        #expect(result == "First") // Mock limitation - starts at first item
+        #expect(result == items[0]) // Mock limitation - starts at first item
     }
 }
 
 // MARK: - Large Dataset Edge Cases
 extension EdgeCaseTests {
-    @Test("Large item lists handle navigation efficiently")
-    func selectSingleItem_withLargeItemList() {
+    @Test("Thousands of items navigate and select correctly")
+    func largeItemListsHandleNavigationEfficiently() {
         let items = (1...1000).map { "Item \($0)" }
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -198,8 +198,8 @@ extension EdgeCaseTests {
         #expect(result!.hasPrefix("Item"))
     }
     
-    @Test("Multi selection handles large selections efficiently")
-    func selectMultipleItems_withLargeSelectionCount() {
+    @Test("Dozens of multi-selections return all selected items")
+    func multiSelectionHandlesLargeSelectionsEfficiently() {
         let items = (1...100).map { "Option \($0)" }
         let selectionCount = 50
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
@@ -223,10 +223,31 @@ extension EdgeCaseTests {
     }
 }
 
+// MARK: - SUT
+private extension EdgeCaseTests {
+    func makeSUT<Item: DisplayablePickerItem>(
+        items: [Item],
+        title: String = "Test Selection",
+        screenSize: (Int, Int) = (30, 100),
+        directionKey: Direction? = nil,
+        specialChars: [SpecialChar?] = []
+    ) -> MockInput {
+        let input = MockInput(screenSize: screenSize, directionKey: directionKey)
+        input.pressKey = true
+
+        for char in specialChars {
+            input.enqueueSpecialChar(specialChar: char)
+        }
+
+        return input
+    }
+}
+
+
 // MARK: - Special Character Edge Cases
 extension EdgeCaseTests {
-    @Test("Items with special characters display and select correctly")
-    func selectSingleItem_withSpecialCharacterItems() {
+    @Test("Special characters in items preserve exact values")
+    func itemsWithSpecialCharactersDisplayAndSelectCorrectly() {
         let items = ["Item@#$%", "Item with spaces", "Item\twith\ttabs", "Item\nwith\nnewlines"]
         let input = MockInput(screenSize: (30, 100), directionKey: nil)
         
@@ -237,12 +258,12 @@ extension EdgeCaseTests {
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
-        
-        #expect(result == "Item@#$%")
+
+        #expect(result == items[0])
     }
     
-    @Test("Unicode characters in items are handled correctly")
-    func selectSingleItem_withUnicodeItems() {
+    @Test("Unicode emoji items display and select accurately")
+    func unicodeCharactersInItemsAreHandledCorrectly() {
         let items = ["🚀 Rocket", "🎯 Target", "💡 Idea", "🔥 Fire"]
         let input = MockInput(screenSize: (30, 100), directionKey: .down)
         
@@ -254,7 +275,7 @@ extension EdgeCaseTests {
         let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: false, inputHandler: input)
         
         let result = handler.captureUserInput()
-        
-        #expect(result == "🎯 Target")
+
+        #expect(result == items[1])
     }
 }
