@@ -1,9 +1,26 @@
 # SwiftPicker
-![](https://badgen.net/badge/Swift/5+/orange)
+![Unit Tests](https://github.com/nikolainobadi/SwiftPicker/actions/workflows/ci.yml/badge.svg)
+![](https://badgen.net/badge/Swift/5.9+/orange)
 ![](https://badgen.net/badge/platform/macos?list=|&color=grey)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 SwiftPicker is a Swift Package Manager library that provides interactive command-line picker functionality for Swift applications. It supports single and multiple item selection with terminal-based UI using ANSI escape sequences.
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Protocol Architecture](#protocol-architecture)
+- [Usage Examples](#usage-examples)
+  - [Single Selection](#single-selection)
+  - [Multi-Selection](#multi-selection)
+  - [Error Handling](#error-handling)
+- [Backstory](#backstory)
+- [Testing](#testing)
+- [Acknowledgements](#acknowledgements)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Features
 
@@ -13,31 +30,15 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 - **Input & Permission Handling**: Built-in text input and yes/no confirmation methods
 - **ANSI Terminal Support**: Enhanced UI with cursor control and screen management
 - **Error Handling**: Comprehensive error handling with `SwiftPickerError` enum
-- **Modern Swift**: Built with Swift 5+ using contemporary patterns
-- **Comprehensive Testing**: 52+ tests ensuring reliability and behavior validation
+- **Modern Swift**: Built with Swift 5.9+ using contemporary patterns
+- **Comprehensive Testing**: 60+ tests ensuring reliability and behavior validation
 
 ## Installation
 
 To use SwiftPicker in your Swift project, add it as a dependency in your `Package.swift` file:
 
 ```swift
-dependencies: [
     .package(url: "https://github.com/nikolainobadi/SwiftPicker.git", from: "1.0.0")
-]
-```
-
-Then add it to your target dependencies and import it in your project:
-
-```swift
-// In your Package.swift target
-.target(
-    name: "YourTarget",
-    dependencies: ["SwiftPicker"]
-)
-```
-
-```swift
-import SwiftPicker
 ```
 
 ## Quick Start
@@ -53,20 +54,20 @@ let name = picker.getInput(prompt: "What's your name?")
 print("Hello, \(name)!")
 
 // Yes/no confirmation
-if let confirmed = try? picker.getPermission(prompt: "Continue?"), confirmed {
+if picker.getPermission(prompt: "Continue?") {
     // User confirmed
 }
 
 // Single selection
 let colors = ["Red", "Green", "Blue"]
-if let color = try? picker.selectSingleItem(title: "Pick a color:", items: colors) {
+if let color = picker.singleSelection(title: "Pick a color:", items: colors) {
     print("You chose: \(color)")
 }
 
 // Multiple selection
 let hobbies = ["Reading", "Gaming", "Cooking", "Sports"]
-let selected = try? picker.selectMultipleItems(title: "Your hobbies:", items: hobbies)
-print("Selected \(selected?.count ?? 0) hobbies")
+let selected = picker.multiSelection(title: "Your hobbies:", items: hobbies)
+print("Selected \(selected.count) hobbies")
 ```
 
 ## Protocol Architecture
@@ -87,8 +88,8 @@ let selectionHandler: CommandLineSelection = picker
 
 - **`CommandLinePicker`**: Composition of all command-line interaction protocols
 - **`CommandLineInput`**: Text input methods (`getInput`, `getRequiredInput`)
-- **`CommandLinePermission`**: Yes/no confirmation methods (`getPermission`)
-- **`CommandLineSelection`**: Single/multi selection methods (`selectSingleItem`, `selectMultipleItems`)
+- **`CommandLinePermission`**: Yes/no confirmation methods (`getPermission`, `requiredPermission`)
+- **`CommandLineSelection`**: Single/multi selection methods (`singleSelection`, `requiredSingleSelection`, `multiSelection`)
 - **`DisplayablePickerItem`**: Items that can be displayed (requires `displayName: String`)
 - **`PickerPrompt`**: Prompt messages (requires `title: String`)
 
@@ -117,8 +118,8 @@ let title = "Choose Your Favorite Programming Language"
 let sampleList = ["Swift", "Python", "JavaScript", "C#", "Java", "Go", "Ruby", "Kotlin"]
 
 // Select a single item
-if let selection = try? picker.selectSingleItem(title: title, items: sampleList) {
-    print("You selected: \(selection.displayName)")
+if let selection = picker.singleSelection(title: title, items: sampleList) {
+    print("You selected: \(selection)")
 }
 ```
 
@@ -147,16 +148,16 @@ let marvelMovies = [
 ]
 
 let title = "Select Your Favorite Marvel Movies"
-let results = try? picker.selectMultipleItems(title: title, items: marvelMovies)
-print("Selected \(results?.count ?? 0) movies")
+let results = picker.multiSelection(title: title, items: marvelMovies)
+print("Selected \(results.count) movies")
 ```
 
 ### Error Handling
 
-SwiftPicker can throw errors which you may handle using `do-catch`:
+SwiftPicker provides throwing methods for required inputs and selections:
 
 ```swift
-// Text input with validation
+// Required text input with validation
 do {
     let input = try picker.getRequiredInput(prompt: "Please provide your name:")
     print("Hello, \(input)!")
@@ -164,21 +165,28 @@ do {
     print("Input cannot be empty.")
 }
 
-// Permission handling
+// Required permission (throws if user denies)
 do {
-    let confirmed = try picker.getPermission(prompt: "Do you want to continue?")
-    if confirmed {
-        print("Proceeding...")
-    }
+    try picker.requiredPermission(prompt: "Do you want to continue?")
+    print("Proceeding...")
 } catch SwiftPickerError.selectionCancelled {
     print("Operation cancelled.")
 }
 
-// Required selection with error handling
+// Required selection (throws if user quits)
 do {
-    let selection = try picker.selectSingleItem(title: "Choose a language:", items: languages, allowQuit: false)
-    print("You selected: \(selection.displayName)")
+    let languages = ["Swift", "Python", "JavaScript"]
+    let selection = try picker.requiredSingleSelection(title: "Choose a language:", items: languages)
+    print("You selected: \(selection)")
 } catch SwiftPickerError.selectionCancelled {
+    print("No selection made.")
+}
+
+// Optional selection (returns nil on quit, no error)
+let colors = ["Red", "Green", "Blue"]
+if let color = picker.singleSelection(title: "Pick a color:", items: colors) {
+    print("Selected: \(color)")
+} else {
     print("No selection made.")
 }
 ```
@@ -189,7 +197,7 @@ SwiftPicker is simply my contribution to the (hopefully growing) ecosystem of Sw
 
 ## Testing
 
-SwiftPicker includes comprehensive test coverage with 52+ tests using the Swift Testing framework:
+SwiftPicker includes comprehensive test coverage with 60+ tests using the Swift Testing framework:
 
 ```bash
 # Run all tests

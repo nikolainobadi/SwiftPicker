@@ -8,33 +8,55 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 
 ## Architecture
 
-### Core Components
+### Module Organization
 
-- **`CommandLinePicker` Protocol** (`Sources/SwiftPicker/PickerFeature/Picker.swift`): Unified interface combining input, permission, and selection capabilities through protocol composition
-- **Protocol Architecture**:
-  - `CommandLineInput` (`Sources/SwiftPicker/PickerFeature/CommandLineInput.swift`): Text input methods (`getInput`, `getRequiredInput`)
-  - `CommandLinePermission` (`Sources/SwiftPicker/PickerFeature/CommandLinePermission.swift`): Yes/no permission methods (`getPermission`)
-  - `CommandLineSelection` (`Sources/SwiftPicker/PickerFeature/CommandLineSelection.swift`): Single/multi selection methods (`selectSingleItem`, `selectMultipleItems`)
-- **`InteractivePicker` Struct** (`Sources/SwiftPicker/PickerFeature/InteractivePicker.swift`): Concrete implementation of `CommandLinePicker` (renamed from `SwiftPicker`)
-- **`DisplayablePickerItem` Protocol** (`Sources/SwiftPicker/PickerFeature/DisplayablePickerItem.swift`): Items that can be displayed in picker lists (requires `displayName: String`)
-- **`PickerPrompt` Protocol** (`Sources/SwiftPicker/PickerFeature/PickerPrompt.swift`): Prompt messages (requires `title: String`, String conforms by default)
-- **`SwiftPickerError` Enum** (`Sources/SwiftPicker/PickerFeature/SwiftPickerError.swift`): Custom errors (`selectionCancelled`, `inputRequired`)
+The codebase is organized into three main modules:
+- **API/** - Public interface and protocols
+- **Engine/** - Core selection logic and state management
+- **IO/** - Terminal input/output handling
 
-### Internal Architecture
+### API Module (`Sources/SwiftPicker/API/`)
 
-- **PickerComposer** (`Sources/SwiftPicker/Internal/Composer/PickerComposer.swift`): Factory class that creates selection handlers with dependency injection support
+- **`CommandLinePicker` Protocol** (`API/Typealiases/CommandLinePicker.swift`): Unified interface combining input, permission, and selection capabilities through protocol composition
+- **Protocol Architecture** (`API/Protocols/`):
+  - `CommandLineInput`: Text input methods (`getInput`, `getRequiredInput`)
+  - `CommandLinePermission`: Yes/no permission methods (`getPermission`, `requiredPermission`)
+  - `CommandLineSelection`: Single/multi selection methods (`singleSelection`, `requiredSingleSelection`, `multiSelection`)
+  - `DisplayablePickerItem`: Items that can be displayed in picker lists (requires `displayName: String`)
+  - `PickerPrompt`: Prompt messages (requires `title: String`, String conforms by default)
+- **`InteractivePicker` Struct** (`API/Picker/InteractivePicker.swift`): Concrete implementation of `CommandLinePicker` with dependency injection support
+  - Public init: Uses default production dependencies
+  - Internal init: Accepts `TextInputHandler` and `PickerInput` for testing
+- **`SwiftPickerError` Enum** (`API/Errors/SwiftPickerError.swift`): Custom errors (`selectionCancelled`, `inputRequired`)
+
+### Engine Module (`Sources/SwiftPicker/Engine/`)
+
+- **SelectionHandlerFactory** (`Engine/Factory/SelectionHandlerFactory.swift`): Factory class that creates selection handlers with dependency injection support (renamed from `PickerComposer`)
   - Default methods: Use static `inputHandler` property
   - Overloaded methods: Accept custom `inputHandler` parameter for testing
-- **Selection Handlers** (`Sources/SwiftPicker/Internal/SelectionHandler/`): 
+- **Core Selection Handlers** (`Engine/Core/`):
   - `BaseSelectionHandler`: Abstract base class for selection logic and terminal management
   - `SingleSelectionHandler`: Handles single item selection (returns item or nil on quit)
   - `MultiSelectionHandler`: Handles multiple item selection (returns empty array on quit)
-- **Input System** (`Sources/SwiftPicker/Internal/Input/`):
-  - `PickerInput` protocol: Terminal input abstraction (`readSpecialChar`, `readDirectionKey`, cursor control)
-  - `PickerInputAdapter`: Real terminal implementation
+- **Models** (`Engine/Models/`): Core data structures
+  - `Option`: Represents a selectable item with position and state
+  - `PickerInfo`: Container for title and items
+  - `SelectionState`: Manages active selection state
+- **Configuration** (`Engine/Config/`):
+  - `PickerPadding`: Top and bottom padding constants
+
+### IO Module (`Sources/SwiftPicker/IO/`)
+
+- **`TextInputHandler` Protocol** (`IO/InputHandler.swift`): Protocol for text input and permission operations
+  - `getInput(_:)`: Prompts for text input
+  - `getPermission(_:)`: Prompts for yes/no permission
+- **`DefaultInputHandler` Struct** (`IO/DefaultInputHandler.swift`): Default implementation of `TextInputHandler` that delegates to static `InputHandler` methods
+- **`InputHandler` Enum** (`IO/InputHandler.swift`): Static methods for text input and permission prompts with retry logic
+- **`PickerInput` Protocol** (`IO/PickerInput.swift`): Terminal input abstraction (`readSpecialChar`, `readDirectionKey`, cursor control)
+- **`PickerInputAdapter`** (`IO/PickerInputAdapter.swift`): Real terminal implementation using ANSITerminal
+- **Input Types**:
   - `Direction` enum: `.up`, `.down` navigation
   - `SpecialChar` enum: `.enter`, `.space`, `.quit` actions
-- **Models** (`Sources/SwiftPicker/Internal/Models/`): Core data structures including `Option`, `PickerInfo`, `SelectionState`
 
 ### Behavioral Notes
 - **Quit Behavior**: Single selection returns `nil`, multi-selection returns empty array `[]`
@@ -73,44 +95,57 @@ swift package update
 
 ### Framework & Coverage
 - **Swift Testing Framework**: Modern testing with behavior-driven descriptions using `@Test` attributes
-- **Comprehensive Coverage**: 52 tests across 6 test suites covering all major functionality
-- **Mock Input System**: `MockInput` class provides controllable terminal input simulation
-- **Dependency Injection**: Tests use overloaded composer methods to inject mock dependencies
+- **Comprehensive Coverage**: 60+ tests across multiple test suites covering all major functionality
+- **Mock Input System**: `MockInput` and `MockTextInputHandler` classes provide controllable input simulation
+- **Test Utilities**: `TestFactory` provides standardized data creation for tests
+- **Dependency Injection**: Tests use internal initializers and factory methods to inject mock dependencies
 
-### Test Suites
-- **InteractivePickerTests.swift**: Public API testing (12 tests)
-- **SwiftPickerErrorTests.swift**: Error handling and validation (12 tests)
-- **EdgeCaseTests.swift**: Boundary conditions and special scenarios (20 tests)
-- **ProtocolConformanceTests.swift**: Protocol implementation validation (15 tests)
-- **ConvenienceMethodTests.swift**: Helper methods and utilities (8 tests)
-- **BaseSelectionHandlerTests.swift**: Core selection logic (5 tests)
-- **SwiftPickerIntegrationTests.swift**: End-to-end integration scenarios
+### Test Organization (`Tests/SwiftPickerTests/`)
+
+- **Shared/** - Integration and shared behavior tests:
+  - `SingleSelectionTests.swift`: Single item selection scenarios
+  - `MultiSelectionTests.swift`: Multiple item selection scenarios
+  - `EdgeCaseTests.swift`: Boundary conditions and special scenarios
+  - `ConvenienceMethodTests.swift`: Helper methods and utilities
+  - `BaseSelectionHandlerTests.swift`: Core selection handler logic
+  - `InteractivePickerTests.swift`: Public API testing for `InteractivePicker` with dependency injection
+- **UnitTests/** - Test utilities and mocks:
+  - `MockInput.swift`: Mock terminal input for testing picker selections
+  - `MockTextInputHandler.swift`: Mock text input handler for testing `InteractivePicker`
+  - `TestFactory.swift`: Standardized test data factory
 
 ### Key Test Patterns
 - **Behavior-Driven Descriptions**: Tests use descriptive names like "User can select multiple items using spacebar then confirm with Enter"
-- **Dependency Injection**: `PickerComposer.makeSingleSelectionHandler(info:newScreen:inputHandler:)` enables isolated testing
-- **Mock Limitations**: Complex navigation scenarios simplified due to mock input system constraints
+- **Dependency Injection**:
+  - `InteractivePicker(textInputHandler:pickerInputHandler:)` internal init enables public API testing
+  - `SelectionHandlerFactory.makeSingleSelectionHandler(info:newScreen:inputHandler:)` enables isolated selection testing
+- **Test Data Factory**: `makePickerInfo(title:items:)` creates standardized test data
+- **Mock Input Queuing**: Special characters (enter, space, quit) and direction keys simulated
 - **Protocol Testing**: Validates conformance to `DisplayablePickerItem`, `PickerPrompt`, and composition protocols
 - **Edge Case Coverage**: Empty lists, quit behavior, boundary navigation, Unicode support
+- **makeSUT Pattern**: Test helper methods create system under test with tracked dependencies
 
 ### Test Execution
 - **Concurrent Execution**: Tests run in parallel for performance (race conditions eliminated)
 - **Isolated State**: No shared mutable state between tests
-- **Mock Input Queuing**: Special characters (enter, space, quit) and direction keys simulated
 
 ## Code Conventions
 
-- **Access Control**: Public APIs in `PickerFeature/`, internal implementation in `Internal/`
+- **Module Organization**: Clear separation between public API (`API/`), core logic (`Engine/`), and I/O (`IO/`)
+- **Access Control**:
+  - Public APIs in `API/` module
+  - Engine and IO modules use package-internal access by default (no explicit `internal` modifiers)
 - **Protocol-Oriented Design**: Composition-based protocols (`CommandLineInput`, `CommandLinePermission`, `CommandLineSelection`, `DisplayablePickerItem`, `PickerPrompt`, `PickerInput`)
 - **Generic Constraints**: Selection methods use `<Item: DisplayablePickerItem>` generic constraints
 - **Error Handling**: Custom `SwiftPickerError` enum for picker-specific errors
 - **Extension Organization**: Public API methods organized in separate extensions by functionality (Input, Permission, SingleSelection, MultiSelection)
 - **Backward Compatibility**: Deprecated type aliases (`Picker` → `CommandLinePicker`, `SwiftPicker` → `InteractivePicker`) maintain API compatibility
 - **Protocol Properties**: `DisplayablePickerItem.displayName`, `PickerPrompt.title` for consistent interface
-- **Dependency Injection**: Overloaded composer methods support both default and custom input handlers
+- **Dependency Injection**: Overloaded factory methods support both default and custom input handlers
+- **Factory Pattern**: `SelectionHandlerFactory` creates selection handlers with proper dependency injection
 
 ## Platform Requirements
 
 - **macOS 10.14+** minimum deployment target
-- **Swift 5.0+** toolchain requirement
+- **Swift 5.9+** toolchain requirement
 - **Terminal environment** required for ANSI escape sequence support
