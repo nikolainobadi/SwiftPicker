@@ -5,6 +5,19 @@
 //  Created by Nikolai Nobadi on 5/17/24.
 //
 
+/// Protocol for handling text input and permission prompts.
+protocol TextInputHandler {
+    /// Prompts the user for input with the given prompt string.
+    /// - Parameter prompt: The prompt message to display to the user.
+    /// - Returns: The user's input as a String.
+    func getInput(_ prompt: String) -> String
+
+    /// Prompts the user for permission with a yes/no question.
+    /// - Parameter prompt: The prompt message to display to the user.
+    /// - Returns: `true` if the user grants permission, `false` otherwise.
+    func getPermission(_ prompt: String) -> Bool
+}
+
 /// An enumeration for handling user input in `SwiftPicker`.
 /// Provides methods to prompt for permissions and retrieve user input.
 enum InputHandler {

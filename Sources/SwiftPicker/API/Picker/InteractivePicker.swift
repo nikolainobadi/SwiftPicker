@@ -8,9 +8,20 @@
 /// InteractivePicker is a command-line tool written in Swift that allows for interactive selection of items.
 /// It supports both single and multiple selection modes.
 public struct InteractivePicker: CommandLinePicker {
-    
+    private let textInputHandler: TextInputHandler
+    private let pickerInputHandler: PickerInput
+
     /// Initializes a new instance of `InteractivePicker`.
-    public init() { }
+    public init() {
+        self.textInputHandler = DefaultInputHandler()
+        self.pickerInputHandler = PickerInputAdapter()
+    }
+
+    /// Internal initializer for dependency injection (used in tests).
+    init(textInputHandler: TextInputHandler, pickerInputHandler: PickerInput) {
+        self.textInputHandler = textInputHandler
+        self.pickerInputHandler = pickerInputHandler
+    }
 }
 
 /// Legacy struct name for backward compatibility. Use `InteractivePicker` instead.
@@ -23,15 +34,15 @@ public extension InteractivePicker {
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: The user's input as a String.
     func getInput(prompt: PickerPrompt) -> String {
-        return InputHandler.getInput(prompt.title)
+        return textInputHandler.getInput(prompt.title)
     }
-    
+
     /// Prompts the user for input with the given prompt string and requires input.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.inputRequired` if the user does not provide any input.
     /// - Returns: The user's input as a String.
     func getRequiredInput(prompt: PickerPrompt) throws -> String {
-        let input = getInput(prompt)
+        let input = getInput(prompt: prompt)
         if input.isEmpty {
             throw SwiftPickerError.inputRequired
         }
@@ -45,9 +56,9 @@ public extension InteractivePicker {
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Returns: `true` if the user grants permission, `false` otherwise.
     func getPermission(prompt: PickerPrompt) -> Bool {
-        return InputHandler.getPermission(prompt.title)
+        return textInputHandler.getPermission(prompt.title)
     }
-    
+
     /// Prompts the user for permission with a yes/no question and requires a yes to proceed.
     /// - Parameter prompt: The prompt message to display to the user.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not grant permission.
@@ -114,7 +125,7 @@ private extension InteractivePicker {
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: The selected item, or `nil` if no selection was made.
     func captureSingleInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> Item? {
-        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: showNewScreen)
+        let handler = SelectionHandlerFactory.makeSingleSelectionHandler(info: info, newScreen: showNewScreen, inputHandler: pickerInputHandler)
         let selection = handler.captureUserInput()
 
         handler.endSelection()
@@ -122,14 +133,14 @@ private extension InteractivePicker {
 
         return selection
     }
-    
+
     /// Captures user input for multiple selections.
     /// - Parameters:
     ///   - info: The `PickerInfo` object containing the title and items.
     ///   - showNewScreen: A Boolean value indicating whether to show a new screen.
     /// - Returns: An array of selected items.
     func captureMultiInput<Item: DisplayablePickerItem>(info: PickerInfo<Item>, showNewScreen: Bool) -> [Item] {
-        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: showNewScreen)
+        let handler = SelectionHandlerFactory.makeMultiSelectionHandler(info: info, newScreen: showNewScreen, inputHandler: pickerInputHandler)
         let selections = handler.captureUserInput()
 
         handler.endSelection()
