@@ -85,6 +85,22 @@ extension MockSwiftPicker: CommandLinePermission {
 }
 
 
+// MARK: - CommandLineSelection
+extension MockSwiftPicker: CommandLineSelection {
+    public func singleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> Item? {
+        fatalError() // TODO: -
+    }
+    
+    public func requiredSingleSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) throws -> Item {
+        fatalError() // TODO: -
+    }
+    
+    public func multiSelection<Item: DisplayablePickerItem>(title: PickerPrompt, items: [Item]) -> [Item] {
+        fatalError() // TODO: -
+    }
+}
+
+
 // MARK: - Dependencies
 public enum MockPermissionType {
     case ordered([Bool])
