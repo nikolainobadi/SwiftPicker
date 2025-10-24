@@ -8,12 +8,21 @@
 import SwiftPicker
 
 public class MockSwiftPicker {
+    private let defaultInputValue: String
     private let grantPermissionByDefault: Bool
+    private var mockInputType: MockInputType
     private var mockPermissionType: MockPermissionType
-    
-    init(grantPermissionByDefault: Bool = true, mockPermissionType: MockPermissionType = .ordered([])) {
+
+    public init(
+        defaultInputValue: String = "",
+        grantPermissionByDefault: Bool = true,
+        mockInputType: MockInputType = .ordered([]),
+        mockPermissionType: MockPermissionType = .ordered([]),
+    ) {
         self.grantPermissionByDefault = grantPermissionByDefault
+        self.defaultInputValue = defaultInputValue
         self.mockPermissionType = mockPermissionType
+        self.mockInputType = mockInputType
     }
 }
 
@@ -21,11 +30,30 @@ public class MockSwiftPicker {
 // MARK: - CommandLineInput
 extension MockSwiftPicker: CommandLineInput {
     public func getInput(prompt: PickerPrompt) -> String {
-        return ""
+        switch mockInputType {
+        case .ordered(var responses):
+            if responses.isEmpty {
+                return defaultInputValue
+            }
+
+            let response = responses.removeFirst()
+
+            mockInputType = .ordered(responses)
+
+            return response
+        case .dictionary(let dict):
+            return dict[prompt.title] ?? defaultInputValue
+        }
     }
-    
+
     public func getRequiredInput(prompt: PickerPrompt) throws -> String {
-        return ""
+        let input = getInput(prompt: prompt)
+
+        guard !input.isEmpty else {
+            throw SwiftPickerError.inputRequired
+        }
+
+        return input
     }
 }
 
@@ -61,4 +89,9 @@ extension MockSwiftPicker: CommandLinePermission {
 public enum MockPermissionType {
     case ordered([Bool])
     case dictionary([String: Bool])
+}
+
+public enum MockInputType {
+    case ordered([String])
+    case dictionary([String: String])
 }
