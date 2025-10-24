@@ -5,6 +5,22 @@
 
 SwiftPicker is a Swift Package Manager library that provides interactive command-line picker functionality for Swift applications. It supports single and multiple item selection with terminal-based UI using ANSI escape sequences.
 
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Protocol Architecture](#protocol-architecture)
+- [Usage Examples](#usage-examples)
+  - [Single Selection](#single-selection)
+  - [Multi-Selection](#multi-selection)
+  - [Error Handling](#error-handling)
+- [Backstory](#backstory)
+- [Testing](#testing)
+- [Acknowledgements](#acknowledgements)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
 - **Single & Multiple Selection**: Interactive selection from lists with keyboard navigation
