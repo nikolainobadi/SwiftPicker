@@ -10,10 +10,11 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 
 ### Module Organization
 
-The codebase is organized into three main modules:
+The codebase is organized into four main modules:
 - **API/** - Public interface and protocols
 - **Engine/** - Core selection logic and state management
 - **IO/** - Terminal input/output handling
+- **SwiftPickerTesting/** - Mock implementations for unit testing (separate library)
 
 ### API Module (`Sources/SwiftPicker/API/`)
 
@@ -64,6 +65,39 @@ The codebase is organized into three main modules:
 - **Selection State**: Multi-selection maintains toggle state until enter/quit
 - **Terminal Management**: Alternative screen mode, cursor control, input buffering
 
+### SwiftPickerTesting Module (`Sources/SwiftPickerTesting/`)
+
+A separate testing library that provides mock implementations for unit testing code that depends on command-line interaction.
+
+- **`MockSwiftPicker` Class** (`SwiftPickerTesting/MockSwiftPicker.swift`): Configurable mock implementing `CommandLineInput`, `CommandLinePermission`, and `CommandLineSelection`
+  - Supports ordered responses (FIFO queue)
+  - Supports dictionary-based responses (keyed by prompt title)
+  - Configurable default fallback values
+  - Full error simulation support
+- **Result Structs** (`SwiftPickerTesting/`):
+  - `MockInputResult` (`MockInputResult.swift`): Groups input default value and `MockInputType` enum
+  - `MockPermissionResult` (`MockPermissionResult.swift`): Groups permission grant default and `MockPermissionType` enum
+  - `MockSelectionResult` (`MockSelectionResult.swift`): Groups selection default index, `MockSelectionType`, and `MockMultiSelectionType` enums
+- **Response Types**:
+  - `.ordered([T])`: Responses consumed in sequence (FIFO)
+  - `.dictionary([String: T])`: Responses matched by prompt title
+  - Default values used when ordered queue is empty or dictionary has no match
+
+**Usage Example:**
+```swift
+import SwiftPickerTesting
+
+let mock = MockSwiftPicker(
+    inputResult: .init(type: .ordered(["Alice", "Bob"])),
+    permissionResult: .init(type: .dictionary(["Continue?": true])),
+    selectionResult: .init(singleSelectionType: .ordered([1, 2]))
+)
+
+mock.getInput(prompt: "Name:")  // "Alice"
+mock.getPermission(prompt: "Continue?")  // true
+mock.singleSelection(title: "Pick:", items: ["A", "B", "C"])  // "B" (index 1)
+```
+
 ### Dependencies
 
 - **ANSITerminal** (from ANSITerminalModified package): Provides terminal control and ANSI escape sequence support
@@ -109,10 +143,11 @@ swift package update
   - `ConvenienceMethodTests.swift`: Helper methods and utilities
   - `BaseSelectionHandlerTests.swift`: Core selection handler logic
   - `InteractivePickerTests.swift`: Public API testing for `InteractivePicker` with dependency injection
-- **UnitTests/** - Test utilities and mocks:
+- **UnitTests/** - Test utilities, mocks, and library tests:
   - `MockInput.swift`: Mock terminal input for testing picker selections
   - `MockTextInputHandler.swift`: Mock text input handler for testing `InteractivePicker`
   - `TestFactory.swift`: Standardized test data factory
+  - `MockSwiftPickerTests.swift`: Comprehensive tests for `MockSwiftPicker` (39 tests covering all functionality)
 
 ### Key Test Patterns
 - **Behavior-Driven Descriptions**: Tests use descriptive names like "User can select multiple items using spacebar then confirm with Enter"

@@ -38,8 +38,27 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 To use SwiftPicker in your Swift project, add it as a dependency in your `Package.swift` file:
 
 ```swift
+dependencies: [
     .package(url: "https://github.com/nikolainobadi/SwiftPicker.git", from: "1.0.0")
+],
+targets: [
+    .target(
+        name: "YourTarget",
+        dependencies: ["SwiftPicker"]
+    ),
+    .testTarget(
+        name: "YourTestTarget",
+        dependencies: [
+            "YourTarget",
+            .product(name: "SwiftPickerTesting", package: "SwiftPicker")  // For testing
+        ]
+    )
+]
 ```
+
+### SwiftPickerTesting
+
+SwiftPicker includes a dedicated testing library (`SwiftPickerTesting`) that provides `MockSwiftPicker` for unit testing code that depends on command-line interaction without requiring actual terminal I/O.
 
 ## Quick Start
 
@@ -197,29 +216,46 @@ SwiftPicker is simply my contribution to the (hopefully growing) ecosystem of Sw
 
 ## Testing
 
-SwiftPicker includes comprehensive test coverage with 60+ tests using the Swift Testing framework:
+### MockSwiftPicker for Unit Testing
 
-```bash
-# Run all tests
-swift test
+The `SwiftPickerTesting` library provides `MockSwiftPicker`, a configurable mock implementation for testing code that depends on user interaction:
 
-# Run specific test suite
-swift test --filter EdgeCaseTests
+```swift
+import Testing
+import SwiftPickerTesting
 
-# Run with verbose output
-swift test --verbose
+@Test("User flow with multiple interactions")
+func testUserFlow() {
+    // Configure mock with pre-defined responses
+    let mock = MockSwiftPicker(
+        inputResult: .init(type: .ordered(["Alice", "alice@example.com"])),
+        permissionResult: .init(type: .ordered([true, false])),
+        selectionResult: .init(singleSelectionType: .ordered([1]))
+    )
+
+    // Test your code that uses the picker
+    let name = mock.getInput(prompt: "Name:")  // Returns "Alice"
+    let email = mock.getInput(prompt: "Email:")  // Returns "alice@example.com"
+    let canContinue = mock.getPermission(prompt: "Continue?")  // Returns true
+    let canDelete = mock.getPermission(prompt: "Delete?")  // Returns false
+
+    let items = ["Red", "Green", "Blue"]
+    let color = mock.singleSelection(title: "Color:", items: items)  // Returns "Green" (index 1)
+
+    // Verify behavior
+    #expect(name == "Alice")
+    #expect(color == "Green")
+}
 ```
 
-### Test Coverage Areas
+**Key Features:**
+- **Ordered Responses**: Queue responses that are consumed in sequence (FIFO)
+- **Dictionary Responses**: Map responses to specific prompts by title
+- **Default Fallbacks**: Configure default values when queues are exhausted
+- **Error Testing**: Simulate cancellations and invalid inputs
+- **Multi-Selection**: Support for testing multiple item selections with configurable indices
 
-- **Public API Testing**: All user-facing methods and protocols
-- **Error Handling**: Input validation and cancellation scenarios  
-- **Edge Cases**: Empty lists, quit behavior, boundary conditions
-- **Protocol Conformance**: Custom types and protocol implementations
-- **Integration Testing**: End-to-end picker workflows
-- **Performance Testing**: Large datasets and navigation efficiency
-
-The test suite ensures reliability and validates behavior across different scenarios, making SwiftPicker production-ready.
+See `MockSwiftPicker` inline documentation for comprehensive usage examples and API details.
 
 ## Acknowledgements
 
