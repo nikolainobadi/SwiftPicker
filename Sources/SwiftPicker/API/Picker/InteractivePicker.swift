@@ -8,9 +8,15 @@
 /// InteractivePicker is a command-line tool written in Swift that allows for interactive selection of items.
 /// It supports both single and multiple selection modes.
 public struct InteractivePicker: CommandLinePicker {
+    /// Handler for text input and permission prompts.
     private let textInputHandler: TextInputHandler
+    /// Handler for picker-specific input (navigation, selection, etc.).
     private let pickerInputHandler: PickerInput
 
+    /// Internal initializer for dependency injection (used in tests).
+    /// - Parameters:
+    ///   - textInputHandler: Handler for text input and permission prompts.
+    ///   - pickerInputHandler: Handler for picker-specific input operations.
     init(textInputHandler: TextInputHandler, pickerInputHandler: PickerInput) {
         self.textInputHandler = textInputHandler
         self.pickerInputHandler = pickerInputHandler
