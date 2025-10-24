@@ -11,22 +11,22 @@ public struct InteractivePicker: CommandLinePicker {
     private let textInputHandler: TextInputHandler
     private let pickerInputHandler: PickerInput
 
-    /// Initializes a new instance of `InteractivePicker`.
-    public init() {
-        self.textInputHandler = DefaultInputHandler()
-        self.pickerInputHandler = PickerInputAdapter()
-    }
-
-    /// Internal initializer for dependency injection (used in tests).
     init(textInputHandler: TextInputHandler, pickerInputHandler: PickerInput) {
         self.textInputHandler = textInputHandler
         self.pickerInputHandler = pickerInputHandler
     }
 }
 
-/// Legacy struct name for backward compatibility. Use `InteractivePicker` instead.
-@available(*, deprecated, renamed: "InteractivePicker", message: "Use InteractivePicker to avoid confusion with package name")
-public typealias SwiftPicker = InteractivePicker
+
+// MARK: - Init
+public extension InteractivePicker {
+    /// Initializes a new instance of `InteractivePicker`.
+    init() {
+        self.textInputHandler = DefaultInputHandler()
+        self.pickerInputHandler = PickerInputAdapter()
+    }
+}
+
 
 // MARK: - Input
 public extension InteractivePicker {
@@ -50,6 +50,7 @@ public extension InteractivePicker {
     }
 }
 
+
 // MARK: - Permission
 public extension InteractivePicker {
     /// Prompts the user for permission with a yes/no question.
@@ -68,6 +69,7 @@ public extension InteractivePicker {
         }
     }
 }
+
 
 // MARK: - SingleSelection
 public extension InteractivePicker {
@@ -95,6 +97,7 @@ public extension InteractivePicker {
     }
 }
 
+
 // MARK: - MultiSelection
 public extension InteractivePicker {
     /// Prompts the user to make multiple selections from a list of items.
@@ -107,6 +110,7 @@ public extension InteractivePicker {
         return captureMultiInput(info: info, showNewScreen: true)
     }
 }
+
 
 // MARK: - Private Methods
 private extension InteractivePicker {
@@ -149,3 +153,9 @@ private extension InteractivePicker {
         return selections
     }
 }
+
+
+// MARK: - Legacy
+/// Legacy struct name for backward compatibility. Use `InteractivePicker` instead.
+@available(*, deprecated, renamed: "InteractivePicker", message: "Use InteractivePicker to avoid confusion with package name")
+public typealias SwiftPicker = InteractivePicker
