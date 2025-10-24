@@ -13,6 +13,10 @@ let package = Package(
             name: "SwiftPicker",
             targets: ["SwiftPicker"]
         ),
+        .library(
+            name: "SwiftPickerTesting",
+            targets: ["SwiftPickerTesting"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/nikolainobadi/ANSITerminalModified", from: "0.6.0")
@@ -24,9 +28,16 @@ let package = Package(
                 .product(name: "ANSITerminal", package: "ANSITerminalModified")
             ]
         ),
+        .target(
+            name: "SwiftPickerTesting",
+            dependencies: ["SwiftPicker"]
+        ),
         .testTarget(
             name: "SwiftPickerTests",
-            dependencies: ["SwiftPicker"]
+            dependencies: [
+                "SwiftPicker",
+                "SwiftPickerTesting"
+            ]
         ),
     ]
 )
