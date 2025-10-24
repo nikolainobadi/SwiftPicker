@@ -13,9 +13,12 @@ struct MockSwiftPickerTests {
     @Test("Starting values configured correctly")
     func startingValuesConfiguredCorrectly() {
         let sut = makeSUT()
-        let result = sut.getPermission(prompt: "Test")
 
-        #expect(result == true)
+        let permissionResult = sut.getPermission(prompt: "Test")
+        let inputResult = sut.getInput(prompt: "Test")
+
+        #expect(permissionResult == true)
+        #expect(inputResult.isEmpty)
     }
 }
 
@@ -117,14 +120,131 @@ extension MockSwiftPickerTests {
     func throwsSelectionCancelledErrorWhenPermissionDenied() throws {
         let sut = makeSUT(grantPermissionByDefault: false, mockPermissionType: .ordered([false]))
 
-        do {
+        #expect(throws: SwiftPickerError.selectionCancelled) {
             try sut.requiredPermission(prompt: "Continue?")
-            #expect(Bool(false), "Should have thrown error")
-        } catch let error as SwiftPickerError {
-            #expect(error == .selectionCancelled)
         }
     }
 }
+
+// MARK: - Ordered Input Tests
+extension MockSwiftPickerTests {
+    @Test("Returns input responses in order from array")
+    func returnsInputResponsesInOrderFromArray() {
+        let responses = ["First", "Second", "Third"]
+        let sut = makeSUT(mockInputType: .ordered(responses))
+
+        let firstResult = sut.getInput(prompt: "Enter first:")
+        let secondResult = sut.getInput(prompt: "Enter second:")
+        let thirdResult = sut.getInput(prompt: "Enter third:")
+
+        #expect(firstResult == "First")
+        #expect(secondResult == "Second")
+        #expect(thirdResult == "Third")
+    }
+
+    @Test("Returns default input value when ordered array is empty")
+    func returnsDefaultInputValueWhenOrderedArrayIsEmpty() {
+        let defaultValue = "default"
+        let sut = makeSUT(defaultInputValue: defaultValue, mockInputType: .ordered([]))
+
+        let result = sut.getInput(prompt: "Enter:")
+
+        #expect(result == defaultValue)
+    }
+
+    @Test("Returns default input value after all ordered responses used")
+    func returnsDefaultInputValueAfterAllOrderedResponsesUsed() {
+        let defaultValue = "default"
+        let responses = ["First", "Second"]
+        let sut = makeSUT(defaultInputValue: defaultValue, mockInputType: .ordered(responses))
+
+        _ = sut.getInput(prompt: "First")
+        _ = sut.getInput(prompt: "Second")
+        let thirdResult = sut.getInput(prompt: "Third")
+
+        #expect(thirdResult == defaultValue)
+    }
+}
+
+
+// MARK: - Dictionary Input Tests
+extension MockSwiftPickerTests {
+    @Test("Returns input value from dictionary matching prompt title")
+    func returnsInputValueFromDictionaryMatchingPromptTitle() {
+        let dictionary = ["Name:": "John", "Email:": "john@example.com"]
+        let sut = makeSUT(mockInputType: .dictionary(dictionary))
+
+        let nameResult = sut.getInput(prompt: "Name:")
+        let emailResult = sut.getInput(prompt: "Email:")
+
+        #expect(nameResult == "John")
+        #expect(emailResult == "john@example.com")
+    }
+
+    @Test("Returns default input value when prompt not in dictionary")
+    func returnsDefaultInputValueWhenPromptNotInDictionary() {
+        let defaultValue = "default"
+        let dictionary = ["Name:": "John"]
+        let sut = makeSUT(defaultInputValue: defaultValue, mockInputType: .dictionary(dictionary))
+
+        let result = sut.getInput(prompt: "Unknown:")
+
+        #expect(result == defaultValue)
+    }
+
+    @Test("Uses custom default input value when prompt not in dictionary")
+    func usesCustomDefaultInputValueWhenPromptNotInDictionary() {
+        let defaultValue = "custom"
+        let dictionary = ["Name:": "John"]
+        let sut = makeSUT(defaultInputValue: defaultValue, mockInputType: .dictionary(dictionary))
+
+        let result = sut.getInput(prompt: "Unknown:")
+
+        #expect(result == defaultValue)
+    }
+}
+
+
+// MARK: - Required Input Tests
+extension MockSwiftPickerTests {
+    @Test("Returns input when required input provided")
+    func returnsInputWhenRequiredInputProvided() throws {
+        let expectedInput = "Valid Input"
+        let sut = makeSUT(mockInputType: .ordered([expectedInput]))
+
+        let result = try sut.getRequiredInput(prompt: "Enter:")
+
+        #expect(result == expectedInput)
+    }
+
+    @Test("Throws error when required input is empty")
+    func throwsErrorWhenRequiredInputIsEmpty() throws {
+        let sut = makeSUT(defaultInputValue: "", mockInputType: .ordered([]))
+
+        #expect(throws: SwiftPickerError.self) {
+            try sut.getRequiredInput(prompt: "Enter:")
+        }
+    }
+
+    @Test("Throws input required error when required input is empty")
+    func throwsInputRequiredErrorWhenRequiredInputIsEmpty() throws {
+        let sut = makeSUT(defaultInputValue: "", mockInputType: .ordered([]))
+
+        #expect(throws: SwiftPickerError.inputRequired) {
+            try sut.getRequiredInput(prompt: "Enter:")
+        }
+    }
+
+    @Test("Throws error when ordered input response is empty string")
+    func throwsErrorWhenOrderedInputResponseIsEmptyString() throws {
+        let sut = makeSUT(mockInputType: .ordered([""]))
+
+        #expect(throws: SwiftPickerError.self) {
+            try sut.getRequiredInput(prompt: "Enter:")
+        }
+    }
+}
+
 
 // MARK: - Custom Prompt Type Tests
 extension MockSwiftPickerTests {
@@ -154,16 +274,36 @@ extension MockSwiftPickerTests {
 
         #expect(result == true)
     }
+
+    @Test("Supports custom PickerPrompt types with input dictionary")
+    func supportsCustomPickerPromptTypesWithInputDictionary() {
+        struct CustomPrompt: PickerPrompt {
+            let title: String
+            let description: String
+        }
+
+        let customPrompt = CustomPrompt(title: "Name:", description: "Enter name")
+        let dictionary = ["Name:": "Alice"]
+        let sut = makeSUT(mockInputType: .dictionary(dictionary))
+
+        let result = sut.getInput(prompt: customPrompt)
+
+        #expect(result == "Alice")
+    }
 }
 
 // MARK: - SUT
 private extension MockSwiftPickerTests {
     func makeSUT(
+        defaultInputValue: String = "",
         grantPermissionByDefault: Bool = true,
+        mockInputType: MockInputType = .ordered([]),
         mockPermissionType: MockPermissionType = .ordered([])
     ) -> MockSwiftPicker {
         return .init(
+            defaultInputValue: defaultInputValue,
             grantPermissionByDefault: grantPermissionByDefault,
+            mockInputType: mockInputType,
             mockPermissionType: mockPermissionType
         )
     }
