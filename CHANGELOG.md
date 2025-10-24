@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-24
+
+### Added
+- SwiftPickerTesting library with `MockSwiftPicker` class for unit testing command-line interactions
+- Mock implementations supporting ordered responses (FIFO queue) and dictionary-based responses (keyed by prompt title)
+- `MockInputResult`, `MockPermissionResult`, and `MockSelectionResult` structs for configurable mock behavior
+- Comprehensive test suite with 39 tests for `MockSwiftPicker` functionality
+- GitHub Actions CI workflow for automated PR builds and tests
+- `TextInputHandler` protocol for dependency injection of text input handling
+- `DefaultInputHandler` implementation for production text input
+- Internal initializer for `InteractivePicker` enabling dependency injection in tests
+- Test utilities including `MockTextInputHandler` and `TestFactory` for standardized test data
+- Inline API documentation for `InteractivePicker` properties and initializer
+- CI build status badge to README
+- Table of contents to README
+
+### Changed
+- Reorganized source files into modular structure with API, Engine, and IO directories
+- Renamed `PickerComposer` to `SelectionHandlerFactory` for clarity
+- Reorganized test files by moving mocks to Shared directory and tests to UnitTests directory
+- Split single and multi selection tests into separate files for better organization
+- Refactored test methods to use behavior-driven naming conventions
+- Updated Swift tools version requirement to 5.9+
+- Improved README architecture section to reflect new module organization
+- Enhanced CLAUDE.md with comprehensive SwiftPickerTesting documentation
+
+### Fixed
+- Removed unused internal access modifiers from Engine and IO modules for cleaner code
+
 ## [1.0.0] - 2025-08-10
 
 ### Added
