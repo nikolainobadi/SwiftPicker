@@ -1,4 +1,5 @@
 # SwiftPicker
+![Unit Tests](https://github.com/nikolainobadi/SwiftPicker/actions/workflows/ci.yml/badge.svg)
 ![](https://badgen.net/badge/Swift/5.9+/orange)
 ![](https://badgen.net/badge/platform/macos?list=|&color=grey)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
