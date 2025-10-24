@@ -17,6 +17,20 @@ public class MockSwiftPicker {
     }
 }
 
+
+// MARK: - CommandLineInput
+extension MockSwiftPicker: CommandLineInput {
+    public func getInput(prompt: PickerPrompt) -> String {
+        return ""
+    }
+    
+    public func getRequiredInput(prompt: PickerPrompt) throws -> String {
+        return ""
+    }
+}
+
+
+// MARK: - CommandLinePermission
 extension MockSwiftPicker: CommandLinePermission {
     public func getPermission(prompt: PickerPrompt) -> Bool {
         switch mockPermissionType {
@@ -42,6 +56,8 @@ extension MockSwiftPicker: CommandLinePermission {
     }
 }
 
+
+// MARK: - Dependencies
 public enum MockPermissionType {
     case ordered([Bool])
     case dictionary([String: Bool])
