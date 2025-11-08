@@ -176,6 +176,9 @@ private extension ColumnSelectionHandler {
             renderDividers(columnCount: columnsToRender.count, startRow: 4, maxRows: rows - 8)
         }
 
+        // Render separator line before footer
+        renderSeparator(at: rows - 4, screenWidth: screenCols)
+
         // Render navigation hints
         renderFooter(at: rows - 3)
 
@@ -246,6 +249,16 @@ private extension ColumnSelectionHandler {
                 inputHandler.write(dividerChar.foreColor(240))
             }
         }
+    }
+
+    /// Renders a horizontal separator line.
+    /// - Parameters:
+    ///   - row: The row position for the separator.
+    ///   - screenWidth: The width of the screen.
+    func renderSeparator(at row: Int, screenWidth: Int) {
+        inputHandler.moveTo(row, 1)
+        let separator = String(repeating: "─", count: screenWidth - 2)
+        inputHandler.write(separator.foreColor(240))
     }
 
     /// Renders the footer with navigation instructions.
