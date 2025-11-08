@@ -177,7 +177,10 @@ private extension ColumnSelectionHandler {
         }
 
         // Render navigation hints
-        renderFooter(at: rows - 2)
+        renderFooter(at: rows - 3)
+
+        // Render currently selected item name
+        renderSelectedItemName(at: rows - 1, screenWidth: screenCols)
     }
 
     /// Renders a single column.
@@ -253,6 +256,30 @@ private extension ColumnSelectionHandler {
             ? "Use ←→ to switch columns, ↑↓ to navigate • Space to navigate into • Enter to select • Q to quit"
             : state.bottomLineText
         inputHandler.write(footerText)
+    }
+
+    /// Renders the currently selected item's full name.
+    /// - Parameters:
+    ///   - row: The row position for the selected item name.
+    ///   - screenWidth: The width of the screen for centering.
+    func renderSelectedItemName(at row: Int, screenWidth: Int) {
+        guard let selectedItem = state.activeColumn.activeItem else { return }
+
+        inputHandler.moveTo(row, 1)
+
+        let prefix = "Selected: "
+        let itemName = selectedItem.displayName
+        let displayText = prefix + itemName
+
+        // Truncate if too long for screen width
+        let maxWidth = screenWidth - 2
+        let finalText = displayText.count > maxWidth
+            ? prefix + truncate(itemName, maxWidth: maxWidth - prefix.count)
+            : displayText
+
+        // Center and display in cyan color
+        let centeredText = centerText(finalText, inWidth: screenWidth)
+        inputHandler.write(centeredText.foreColor(51))  // Cyan color
     }
 
     /// Ends the selection process and restores terminal state.
