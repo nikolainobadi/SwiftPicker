@@ -103,47 +103,55 @@ This plan encapsulates text truncation and selected item display logic to make t
 
 ---
 
-## Phase 5: Update SingleSelectionHandler
+## Phase 5: Update BaseSelectionHandler for Text Truncation and Selected Item Display ✅ COMPLETED
 
-**Objective:** Add selected item display and text truncation to single selection mode.
+**Objective:** Add selected item display and text truncation to `BaseSelectionHandler`, which powers both single and multi-selection modes.
 
-**Tasks:**
-1. Read `SingleSelectionHandler.swift` to understand rendering structure
-2. Update rendering to:
-   - Truncate item display names using `PickerTextFormatter.truncate` (via inherited helper)
-   - Reserve space at bottom for selected item display
-   - Call inherited `renderSelectedItem` to display current selection at bottom
-3. Adjust footer positioning to accommodate selected item row
-4. Add horizontal separator line above footer (matching ColumnSelectionHandler pattern)
+**Completed Tasks:**
+1. ✅ Read `SingleSelectionHandler.swift` and `BaseSelectionHandler.swift` to understand rendering structure
+2. ✅ Updated `scrollAndRenderOptions()` to reserve space for separator (1 row) and selected item (1 row)
+3. ✅ Updated `renderScrollableOptions()` to:
+   - Accept `rows` parameter for calculating positions
+   - Pass `screenWidth` to `renderOption` for text truncation
+   - Render separator line before selected item and footer
+   - Render selected item display showing currently highlighted item
+4. ✅ Added `renderSeparator(at:screenWidth:)` method for horizontal separator line
+5. ✅ Updated `renderOption` to:
+   - Accept `screenWidth` parameter
+   - Truncate option titles using `PickerTextFormatter.truncate`
+   - Reserve space for indicator and margins (4 chars total)
+6. ✅ Updated `BaseSelectionHandlerTests.swift` to verify new rendering format:
+   - Separator line appears in output
+   - Selected item display appears in output
+   - Adjusted expected displayable options count from 20 to 18 (due to 2 reserved rows)
 
 **Files Modified:**
-- `Sources/SwiftPicker/Engine/Core/SingleSelectionHandler.swift`
+- `Sources/SwiftPicker/Engine/Core/BaseSelectionHandler.swift`
+- `Tests/SwiftPickerTests/UnitTests/BaseSelectionHandlerTests.swift`
 
-**Testing:**
-- Run single selection tests: `swift test --filter SingleSelectionTests`
-- Manual testing to verify visual appearance
+**Testing:** ✅ All 114 tests passed - Both single and multi-selection now have selected item display and text truncation.
 
 ---
 
-## Phase 6: Update MultiSelectionHandler
+## Phase 6: MultiSelectionHandler Automatically Updated ✅ COMPLETED
 
 **Objective:** Add selected item display and text truncation to multi-selection mode.
 
-**Tasks:**
-1. Read `MultiSelectionHandler.swift` to understand rendering structure
-2. Update rendering to:
-   - Truncate item display names using `PickerTextFormatter.truncate` (via inherited helper)
-   - Reserve space at bottom for highlighted item display
-   - Call inherited `renderSelectedItem` to show currently highlighted item (not all selected items)
-3. Adjust footer positioning to accommodate selected item row
-4. Add horizontal separator line above footer (matching ColumnSelectionHandler pattern)
+**Outcome:** ✅ **Automatically completed through Phase 5 changes.**
+
+Since `MultiSelectionHandler` inherits from `BaseSelectionHandler` and uses the same rendering methods (`scrollAndRenderOptions`, `renderScrollableOptions`, `renderOption`), all the improvements made in Phase 5 automatically apply to multi-selection mode:
+
+- ✅ Text truncation for item display names
+- ✅ Selected item display at bottom showing currently highlighted item (not all selected items)
+- ✅ Horizontal separator line above footer
+- ✅ Proper footer positioning
+
+**No additional changes required.**
 
 **Files Modified:**
-- `Sources/SwiftPicker/Engine/Core/MultiSelectionHandler.swift`
+- None (inheritance from `BaseSelectionHandler` provides all functionality)
 
-**Testing:**
-- Run multi-selection tests: `swift test --filter MultiSelectionTests`
-- Manual testing to verify visual appearance
+**Testing:** ✅ All 114 tests passed - Multi-selection tests confirm the new rendering works correctly.
 
 ---
 

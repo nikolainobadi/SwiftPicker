@@ -38,9 +38,11 @@ extension BaseSelectionHandler {
     /// Scrolls and renders the options in the selection list based on the terminal size.
     func scrollAndRenderOptions() {
         let (rows, cols) = inputHandler.readScreenSize()
-        let displayableOptionsCount = rows - verticalPadding
-        
-        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount, columns: cols)
+        // Reserve additional space for separator (1) and selected item (1)
+        let reservedFooterSpace = 2
+        let displayableOptionsCount = rows - verticalPadding - reservedFooterSpace
+
+        renderScrollableOptions(displayableOptionsCount: displayableOptionsCount, columns: cols, rows: rows)
     }
     
     /// Handles the user's arrow key inputs to navigate the selection list.
@@ -83,20 +85,31 @@ private extension BaseSelectionHandler {
     /// - Parameters:
     ///   - displayableOptionsCount: The number of options that can be displayed at once.
     ///   - columns: The number of columns in the terminal.
-    func renderScrollableOptions(displayableOptionsCount: Int, columns: Int) {
+    ///   - rows: The total number of rows in the terminal.
+    func renderScrollableOptions(displayableOptionsCount: Int, columns: Int, rows: Int) {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
-    
+
         renderHeader(start: start, columns: columns)
-        
+
         for i in start..<end {
             let option = state.options[i]
             let isActive = option.line == state.activeLine
             let row = i - start + (topPadding + 1)
-            
-            renderOption(option: option, isActive: isActive, row: row, col: 0)
+
+            renderOption(option: option, isActive: isActive, row: row, col: 0, screenWidth: columns)
         }
-        
+
+        // Render separator line before selected item and footer
+        let separatorRow = rows - 4
+        renderSeparator(at: separatorRow, screenWidth: columns)
+
+        // Render selected item display
+        if let activeOption = state.options.first(where: { $0.line == state.activeLine }) {
+            let selectedItemRow = rows - 2
+            renderSelectedItem(activeOption.item, at: selectedItemRow, screenWidth: columns)
+        }
+
         renderFooter(end: end, displayableOptionsCount: displayableOptionsCount)
     }
     
@@ -175,18 +188,34 @@ private extension BaseSelectionHandler {
         inputHandler.write(centeredText.foreColor(51))  // Cyan color
     }
 
+    /// Renders a horizontal separator line.
+    /// - Parameters:
+    ///   - row: The row position for the separator.
+    ///   - screenWidth: The width of the screen.
+    func renderSeparator(at row: Int, screenWidth: Int) {
+        inputHandler.moveTo(row, 1)
+        let separator = String(repeating: "─", count: screenWidth - 2)
+        inputHandler.write(separator.foreColor(240))
+    }
+
     /// Renders a single option in the selection list.
     /// - Parameters:
     ///   - option: The option to render.
     ///   - isActive: A Boolean value indicating whether the option is currently active.
     ///   - row: The row position of the option.
     ///   - col: The column position of the option.
-    func renderOption(option: Option<Item>, isActive: Bool, row: Int, col: Int = 0) {
+    ///   - screenWidth: The width of the screen for text truncation.
+    func renderOption(option: Option<Item>, isActive: Bool, row: Int, col: Int = 0, screenWidth: Int) {
         inputHandler.moveTo(row, col)
         inputHandler.moveRight()
         inputHandler.write(state.showAsSelected(option) ? "●".lightGreen : "○".foreColor(250))
         inputHandler.moveRight()
-        inputHandler.write(isActive ? option.title.underline : option.title.foreColor(250))
+
+        // Reserve space for the indicator (2 chars: "● ") and margins
+        let maxWidth = screenWidth - 4
+        let truncatedTitle = truncate(option.title, maxWidth: maxWidth)
+
+        inputHandler.write(isActive ? truncatedTitle.underline : truncatedTitle.foreColor(250))
     }
 }
 
