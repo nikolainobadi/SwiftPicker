@@ -65,9 +65,9 @@ protocol PickerInput {
 
 // MARK: - Dependencies
 
-/// An enumeration representing direction keys (up, down).
+/// An enumeration representing direction keys (up, down, left, right).
 internal enum Direction {
-    case up, down
+    case up, down, left, right
 }
 
 /// An enumeration representing special characters (enter, space, quit).

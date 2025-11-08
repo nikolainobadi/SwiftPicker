@@ -71,12 +71,14 @@ final class PickerInputAdapter: PickerInput {
         ANSITerminal.moveTo(row, col)
     }
     
-    /// Reads a direction key input (e.g., up, down).
+    /// Reads a direction key input (e.g., up, down, left, right).
     /// - Returns: A Direction value indicating the key pressed, or `nil` if no direction key was pressed.
     func readDirectionKey() -> Direction? {
         switch ANSITerminal.readKey().code {
         case .up: return .up
         case .down: return .down
+        case .left: return .left
+        case .right: return .right
         default: return nil
         }
     }
