@@ -15,6 +15,7 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 - [Usage Examples](#usage-examples)
   - [Single Selection](#single-selection)
   - [Multi-Selection](#multi-selection)
+  - [Column Selection](#column-selection)
   - [Error Handling](#error-handling)
 - [Backstory](#backstory)
 - [Testing](#testing)
@@ -25,13 +26,14 @@ SwiftPicker is a Swift Package Manager library that provides interactive command
 ## Features
 
 - **Single & Multiple Selection**: Interactive selection from lists with keyboard navigation
+- **Column Selection**: Multi-column navigation with horizontal and vertical browsing
 - **Protocol-Oriented Design**: Flexible architecture with composable protocols
 - **Custom Types**: Any type can conform to `DisplayablePickerItem` for picker support
 - **Input & Permission Handling**: Built-in text input and yes/no confirmation methods
 - **ANSI Terminal Support**: Enhanced UI with cursor control and screen management
 - **Error Handling**: Comprehensive error handling with `SwiftPickerError` enum
 - **Modern Swift**: Built with Swift 5.9+ using contemporary patterns
-- **Comprehensive Testing**: 60+ tests ensuring reliability and behavior validation
+- **Comprehensive Testing**: 109 tests ensuring reliability and behavior validation
 
 ## Installation
 
@@ -87,6 +89,17 @@ if let color = picker.singleSelection(title: "Pick a color:", items: colors) {
 let hobbies = ["Reading", "Gaming", "Cooking", "Sports"]
 let selected = picker.multiSelection(title: "Your hobbies:", items: hobbies)
 print("Selected \(selected.count) hobbies")
+
+// Column selection
+let folders = ["Documents", "Downloads", "Pictures"]
+let files = ["report.pdf", "data.csv", "photo.jpg"]
+let columns = [
+    PickerColumn(title: "Folders", items: folders),
+    PickerColumn(title: "Files", items: files)
+]
+if let selection = picker.columnSelection(columns: columns, title: "Browse Files") {
+    print("You selected: \(selection)")
+}
 ```
 
 ## Protocol Architecture
@@ -170,6 +183,67 @@ let title = "Select Your Favorite Marvel Movies"
 let results = picker.multiSelection(title: title, items: marvelMovies)
 print("Selected \(results.count) movies")
 ```
+
+### Column Selection
+
+Navigate through multiple columns with horizontal (←→) and vertical (↑↓) arrow keys:
+
+```swift
+import SwiftPicker
+
+let picker = InteractivePicker()
+
+// Create columns with different categories
+let folders = ["Documents", "Downloads", "Desktop", "Pictures"]
+let files = ["report.pdf", "data.csv", "notes.txt", "photo.jpg"]
+let actions = ["Open", "Copy", "Move", "Delete"]
+
+let columns = [
+    PickerColumn(title: "Folders", items: folders),
+    PickerColumn(title: "Files", items: files),
+    PickerColumn(title: "Actions", items: actions)
+]
+
+// User can navigate horizontally between columns and vertically within them
+if let selection = picker.columnSelection(columns: columns, title: "File Browser") {
+    print("Selected: \(selection)")
+} else {
+    print("Selection cancelled")
+}
+
+// Column selection also works with custom types
+struct FileItem: DisplayablePickerItem {
+    let name: String
+    let size: String
+
+    var displayName: String { "\(name) (\(size))" }
+}
+
+let documents = [
+    FileItem(name: "Report.pdf", size: "2.4 MB"),
+    FileItem(name: "Presentation.pptx", size: "5.1 MB")
+]
+
+let images = [
+    FileItem(name: "Photo1.jpg", size: "1.2 MB"),
+    FileItem(name: "Photo2.png", size: "3.5 MB")
+]
+
+let fileColumns = [
+    PickerColumn(title: "Documents", items: documents),
+    PickerColumn(title: "Images", items: images)
+]
+
+if let file = picker.columnSelection(columns: fileColumns, title: "Select File") {
+    print("Selected: \(file.name) - \(file.size)")
+}
+```
+
+**Navigation:**
+- **←→ arrows**: Switch between columns
+- **↑↓ arrows**: Navigate items within the active column
+- **Enter**: Select the active item
+- **Q**: Quit without selecting
 
 ### Error Handling
 
