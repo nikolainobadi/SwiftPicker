@@ -122,21 +122,25 @@ public extension InteractivePicker {
 public extension InteractivePicker {
     /// Displays multiple columns for navigation and selection.
     /// Supports horizontal navigation between columns (←→) and vertical navigation within columns (↑↓).
+    /// Press Space to navigate into an item (loads children), Enter to select, Q to quit.
     /// - Parameters:
     ///   - columns: Array of columns to display. Each column contains a title and list of items.
     ///   - title: The title to display above the columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
+    ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
     /// - Returns: The selected item from the active column, or `nil` if the user quits.
     func columnSelection<Item: DisplayablePickerItem>(
         columns: [PickerColumn<Item>],
         title: some PickerPrompt = "",
-        newScreen: Bool = true
+        newScreen: Bool = true,
+        onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil
     ) -> Item? {
         let handler = SelectionHandlerFactory.makeColumnSelectionHandler(
             columns: columns,
             title: title.title,
             newScreen: newScreen,
-            inputHandler: pickerInputHandler
+            inputHandler: pickerInputHandler,
+            onNavigate: onNavigate
         )
 
         return handler.captureUserInput()

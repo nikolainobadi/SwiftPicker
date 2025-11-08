@@ -325,18 +325,145 @@ extension ColumnSelectionTests {
 }
 
 
+// MARK: - Space Navigation Tests
+extension ColumnSelectionTests {
+    @Test("Navigates into item when space pressed with children")
+    func navigatesIntoItemWhenSpacePressedWithChildren() {
+        let parentItem = "Parent"
+        let childItem = "Child 0"
+        let parentColumn = makeColumn(items: [parentItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == parentItem {
+                return (items: ["Child 0", "Child 1"], title: "Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [parentColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == childItem)
+    }
+
+    @Test("Does nothing when space pressed without onNavigate closure")
+    func doesNothingWhenSpacePressedWithoutOnNavigateClosure() {
+        let items = Self.makeItems(count: 3)
+        let columns = [makeColumn(items: items)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(items.contains(result!))
+    }
+
+    @Test("Does nothing when onNavigate returns nil")
+    func doesNothingWhenOnNavigateReturnsNil() {
+        let items = Self.makeItems(count: 3)
+        let columns = [makeColumn(items: items)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { _ in nil }
+
+        let handler = makeSUT(columns: columns, input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(items.contains(result!))
+    }
+
+    @Test("Removes subsequent columns when navigating into parent column item")
+    func removesSubsequentColumnsWhenNavigatingIntoParentColumnItem() {
+        let firstColumnItems = ["Item A", "Item B"]
+        let secondColumnItems = ["Old Child"]
+        let thirdColumnItems = ["Old Grandchild"]
+        let columns = [
+            makeColumn(title: "First", items: firstColumnItems),
+            makeColumn(title: "Second", items: secondColumnItems),
+            makeColumn(title: "Third", items: thirdColumnItems)
+        ]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueDirectionKey(directionKey: .left)
+        input.enqueueSpecialChar(specialChar: nil)
+        input.enqueueDirectionKey(directionKey: .left)
+        input.enqueueSpecialChar(specialChar: nil)
+        input.enqueueDirectionKey(directionKey: nil)
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueDirectionKey(directionKey: nil)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == "Item A" {
+                return (items: ["New Child A", "New Child B"], title: "New Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: columns, input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == "New Child A")
+    }
+
+    @Test("Supports multiple level navigation into nested children")
+    func supportsMultipleLevelNavigationIntoNestedChildren() {
+        let rootItem = "Root"
+        let rootColumn = makeColumn(items: [rootItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueSpecialChar(specialChar: .space)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == "Root" {
+                return (items: ["Child"], title: "Children")
+            } else if item == "Child" {
+                return (items: ["Grandchild"], title: "Grandchildren")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [rootColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == "Grandchild")
+    }
+}
+
+
 // MARK: - SUT
 private extension ColumnSelectionTests {
     func makeSUT(
         columns: [PickerColumn<String>],
         input: MockInput,
-        title: String = "Test Columns"
+        title: String = "Test Columns",
+        onNavigate: ((String) -> (items: [String], title: String)?)? = nil
     ) -> ColumnSelectionHandler<String> {
         return SelectionHandlerFactory.makeColumnSelectionHandler(
             columns: columns,
             title: title,
             newScreen: false,
-            inputHandler: input
+            inputHandler: input,
+            onNavigate: onNavigate
         )
     }
 

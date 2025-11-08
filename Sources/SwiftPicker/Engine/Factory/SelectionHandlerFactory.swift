@@ -61,13 +61,15 @@ extension SelectionHandlerFactory {
     ///   - columns: The columns to display.
     ///   - title: The title to display above the columns.
     ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
     /// - Returns: A ColumnSelectionHandler instance.
     static func makeColumnSelectionHandler<Item: DisplayablePickerItem>(
         columns: [PickerColumn<Item>],
         title: String,
-        newScreen: Bool
+        newScreen: Bool,
+        onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil
     ) -> ColumnSelectionHandler<Item> {
-        return makeColumnSelectionHandler(columns: columns, title: title, newScreen: newScreen, inputHandler: inputHandler)
+        return makeColumnSelectionHandler(columns: columns, title: title, newScreen: newScreen, inputHandler: inputHandler, onNavigate: onNavigate)
     }
 
     /// Creates a column selection handler with a custom input handler.
@@ -76,12 +78,14 @@ extension SelectionHandlerFactory {
     ///   - title: The title to display above the columns.
     ///   - newScreen: A Boolean value indicating whether to show a new screen.
     ///   - inputHandler: Custom input handler to use instead of the default.
+    ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
     /// - Returns: A ColumnSelectionHandler instance.
     static func makeColumnSelectionHandler<Item: DisplayablePickerItem>(
         columns: [PickerColumn<Item>],
         title: String,
         newScreen: Bool,
-        inputHandler: PickerInput
+        inputHandler: PickerInput,
+        onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil
     ) -> ColumnSelectionHandler<Item> {
         configureScreen(newScreen, inputHandler: inputHandler)
         let topLine = inputHandler.readCursorPos().row + PickerPadding.top
@@ -93,7 +97,7 @@ extension SelectionHandlerFactory {
             topLine: topLine
         )
 
-        return .init(state: state, inputHandler: inputHandler)
+        return .init(state: state, inputHandler: inputHandler, onNavigate: onNavigate)
     }
 }
 

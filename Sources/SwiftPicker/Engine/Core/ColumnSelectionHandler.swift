@@ -12,6 +12,7 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
     private let inputHandler: PickerInput
     private let columnWidth: Int
     private let columnSpacing: Int
+    private let onNavigate: ((Item) -> (items: [Item], title: String)?)?
 
     /// Initializes a new column selection handler.
     /// - Parameters:
@@ -19,11 +20,13 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
     ///   - inputHandler: The input handler for reading user input and controlling the terminal.
     ///   - columnWidth: The width of each column in characters. Defaults to 30.
     ///   - columnSpacing: The spacing between columns in characters. Defaults to 4.
-    init(state: ColumnSelectionState<Item>, inputHandler: PickerInput, columnWidth: Int = 30, columnSpacing: Int = 4) {
+    ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
+    init(state: ColumnSelectionState<Item>, inputHandler: PickerInput, columnWidth: Int = 30, columnSpacing: Int = 4, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) {
         self.state = state
         self.inputHandler = inputHandler
         self.columnWidth = columnWidth
         self.columnSpacing = columnSpacing
+        self.onNavigate = onNavigate
     }
 }
 
@@ -47,7 +50,8 @@ extension ColumnSelectionHandler {
                         endSelection()
                         return nil
                     case .space:
-                        continue
+                        handleSpaceKeyNavigation()
+                        renderColumns()
                     }
                 }
 
@@ -75,6 +79,33 @@ private extension ColumnSelectionHandler {
         case .right:
             moveHorizontal(delta: 1)
         }
+    }
+
+    /// Handles space key press to navigate into selected item's children.
+    func handleSpaceKeyNavigation() {
+        guard let onNavigate = onNavigate,
+              let activeItem = state.activeColumn.activeItem,
+              let result = onNavigate(activeItem) else {
+            return
+        }
+
+        addChildColumn(items: result.items, title: result.title)
+    }
+
+    /// Adds a new column with child items to the right of the active column.
+    /// - Parameters:
+    ///   - items: The child items to display in the new column.
+    ///   - title: The title for the new column.
+    func addChildColumn(items: [Item], title: String) {
+        let newColumn = PickerColumn(title: title, items: items, activeIndex: 0)
+        let insertIndex = state.activeColumnIndex + 1
+
+        if insertIndex < state.columns.count {
+            state.columns.removeSubrange(insertIndex...)
+        }
+
+        state.columns.append(newColumn)
+        state.activeColumnIndex = state.columns.count - 1
     }
 
     /// Moves the active item within the current column.
@@ -176,7 +207,10 @@ private extension ColumnSelectionHandler {
     /// - Parameter row: The row position for the footer.
     func renderFooter(at row: Int) {
         inputHandler.moveTo(row, 1)
-        inputHandler.write(state.bottomLineText)
+        let footerText = onNavigate != nil
+            ? "Use ←→ to switch columns, ↑↓ to navigate • Space to navigate into • Enter to select • Q to quit"
+            : state.bottomLineText
+        inputHandler.write(footerText)
     }
 
     /// Ends the selection process and restores terminal state.
