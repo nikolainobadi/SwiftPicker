@@ -54,6 +54,8 @@ extension BaseSelectionHandler {
             }
         case .down:
             handleScrolling(direction: 1)
+        case .left, .right:
+            break
         }
     }
 }

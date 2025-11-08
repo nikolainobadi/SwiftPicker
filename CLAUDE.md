@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SwiftPicker is a Swift Package Manager library that provides interactive command-line picker functionality for Swift applications. It supports single and multiple item selection with terminal-based UI using ANSI escape sequences.
+SwiftPicker is a Swift Package Manager library that provides interactive command-line picker functionality for Swift applications. It supports single selection, multiple selection, and column-based navigation with terminal-based UI using ANSI escape sequences.
 
 ## Architecture
 
@@ -28,6 +28,11 @@ The codebase is organized into four main modules:
 - **`InteractivePicker` Struct** (`API/Picker/InteractivePicker.swift`): Concrete implementation of `CommandLinePicker` with dependency injection support
   - Public init: Uses default production dependencies
   - Internal init: Accepts `TextInputHandler` and `PickerInput` for testing
+  - Column selection: `columnSelection(columns:title:newScreen:)` for multi-column navigation
+- **`PickerColumn` Struct** (`Engine/Models/PickerColumn.swift`): Public model for column data
+  - Generic over `DisplayablePickerItem` types
+  - Properties: `title`, `items`, `activeIndex`
+  - Computed: `activeItem` returns current selection or nil
 - **`SwiftPickerError` Enum** (`API/Errors/SwiftPickerError.swift`): Custom errors (`selectionCancelled`, `inputRequired`)
 
 ### Engine Module (`Sources/SwiftPicker/Engine/`)
@@ -35,14 +40,19 @@ The codebase is organized into four main modules:
 - **SelectionHandlerFactory** (`Engine/Factory/SelectionHandlerFactory.swift`): Factory class that creates selection handlers with dependency injection support (renamed from `PickerComposer`)
   - Default methods: Use static `inputHandler` property
   - Overloaded methods: Accept custom `inputHandler` parameter for testing
+  - Column methods: `makeColumnSelectionHandler(columns:title:newScreen:inputHandler:)` creates column handlers
 - **Core Selection Handlers** (`Engine/Core/`):
   - `BaseSelectionHandler`: Abstract base class for selection logic and terminal management
   - `SingleSelectionHandler`: Handles single item selection (returns item or nil on quit)
   - `MultiSelectionHandler`: Handles multiple item selection (returns empty array on quit)
+  - `BrowseSelectionHandler`: Handles browse mode with detail preview
+  - `ColumnSelectionHandler`: Handles multi-column navigation with horizontal/vertical movement (returns item or nil on quit)
 - **Models** (`Engine/Models/`): Core data structures
   - `Option`: Represents a selectable item with position and state
   - `PickerInfo`: Container for title and items
   - `SelectionState`: Manages active selection state
+  - `PickerColumn`: Generic column with title, items, and active index
+  - `ColumnSelectionState`: Manages multi-column selection state (columns, active column index, title, top line)
 - **Configuration** (`Engine/Config/`):
   - `PickerPadding`: Top and bottom padding constants
 
@@ -56,13 +66,15 @@ The codebase is organized into four main modules:
 - **`PickerInput` Protocol** (`IO/PickerInput.swift`): Terminal input abstraction (`readSpecialChar`, `readDirectionKey`, cursor control)
 - **`PickerInputAdapter`** (`IO/PickerInputAdapter.swift`): Real terminal implementation using ANSITerminal
 - **Input Types**:
-  - `Direction` enum: `.up`, `.down` navigation
+  - `Direction` enum: `.up`, `.down`, `.left`, `.right` navigation (supports both vertical and horizontal movement)
   - `SpecialChar` enum: `.enter`, `.space`, `.quit` actions
 
 ### Behavioral Notes
-- **Quit Behavior**: Single selection returns `nil`, multi-selection returns empty array `[]`
+- **Quit Behavior**: Single selection returns `nil`, multi-selection returns empty array `[]`, column selection returns `nil`
 - **Navigation**: Arrow keys handled by `readDirectionKey()`, not `readSpecialChar()`
 - **Selection State**: Multi-selection maintains toggle state until enter/quit
+- **Column Navigation**: Horizontal (left/right) switches columns, vertical (up/down) navigates within active column
+- **Column Default**: Column selection starts at the rightmost column by default
 - **Terminal Management**: Alternative screen mode, cursor control, input buffering
 
 ### SwiftPickerTesting Module (`Sources/SwiftPickerTesting/`)
@@ -129,7 +141,7 @@ swift package update
 
 ### Framework & Coverage
 - **Swift Testing Framework**: Modern testing with behavior-driven descriptions using `@Test` attributes
-- **Comprehensive Coverage**: 60+ tests across multiple test suites covering all major functionality
+- **Comprehensive Coverage**: 109 tests across multiple test suites covering all major functionality
 - **Mock Input System**: `MockInput` and `MockTextInputHandler` classes provide controllable input simulation
 - **Test Utilities**: `TestFactory` provides standardized data creation for tests
 - **Dependency Injection**: Tests use internal initializers and factory methods to inject mock dependencies
@@ -147,6 +159,7 @@ swift package update
   - `MockInput.swift`: Mock terminal input for testing picker selections
   - `MockTextInputHandler.swift`: Mock text input handler for testing `InteractivePicker`
   - `TestFactory.swift`: Standardized test data factory
+  - `ColumnSelectionTests.swift`: Column selection tests (15 tests covering navigation, boundaries, and integration)
   - `MockSwiftPickerTests.swift`: Comprehensive tests for `MockSwiftPicker` (39 tests covering all functionality)
 
 ### Key Test Patterns

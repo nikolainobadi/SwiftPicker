@@ -11,19 +11,24 @@ final class MockInput: PickerInput {
     var pressKey = false
     var screenSize: (Int, Int)
     var directionKey: Direction?
-    
+
     private(set) var writtenText: [String] = []
     private(set) var didEnableNormalInput = false
     private(set) var didExitAlternateScreen = false
     private(set) var specialKeyQueue: [SpecialChar?] = []
-    
-    init(screenSize: (Int, Int), directionKey: Direction?) {
+    private(set) var directionKeyQueue: [Direction?] = []
+
+    init(screenSize: (Int, Int) = (26, 100), directionKey: Direction? = nil) {
         self.screenSize = screenSize
         self.directionKey = directionKey
     }
-    
+
     func enqueueSpecialChar(specialChar: SpecialChar?) {
         specialKeyQueue.append(specialChar)
+    }
+
+    func enqueueDirectionKey(directionKey: Direction?) {
+        directionKeyQueue.append(directionKey)
     }
 }
 
@@ -54,7 +59,8 @@ extension MockInput {
     func moveTo(_ row: Int, _ col: Int) { }
     
     func readDirectionKey() -> Direction? {
-        return directionKey
+        guard !directionKeyQueue.isEmpty else { return directionKey }
+        return directionKeyQueue.removeFirst()
     }
     
     func readSpecialChar() -> SpecialChar? {
