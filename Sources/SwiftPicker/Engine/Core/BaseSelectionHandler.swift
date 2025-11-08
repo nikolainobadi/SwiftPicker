@@ -142,10 +142,24 @@ private extension BaseSelectionHandler {
         let textLength = text.count
         let spaces = (width - textLength) / 2
         let padding = String(repeating: " ", count: max(0, spaces))
-        
+
         return padding + text
     }
-    
+
+    /// Truncates text to fit within the specified width, adding ellipsis if needed.
+    /// - Parameters:
+    ///   - text: The text to truncate.
+    ///   - maxWidth: The maximum width allowed.
+    /// - Returns: The truncated text with ellipsis if it was truncated.
+    func truncate(_ text: String, maxWidth: Int) -> String {
+        guard text.count > maxWidth else { return text }
+        guard maxWidth > 1 else { return "" }
+
+        let truncatePoint = maxWidth - 1
+        let truncated = String(text.prefix(truncatePoint))
+        return truncated + "…"
+    }
+
     /// Renders a single option in the selection list.
     /// - Parameters:
     ///   - option: The option to render.
