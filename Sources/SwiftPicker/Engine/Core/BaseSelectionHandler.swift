@@ -160,6 +160,29 @@ private extension BaseSelectionHandler {
         return truncated + "…"
     }
 
+    /// Renders the currently selected item's full name at the bottom of the screen.
+    /// - Parameters:
+    ///   - item: The item to display.
+    ///   - row: The row position for the selected item name.
+    ///   - screenWidth: The width of the screen for centering.
+    func renderSelectedItem(_ item: Item, at row: Int, screenWidth: Int) {
+        inputHandler.moveTo(row, 1)
+
+        let prefix = "Selected: "
+        let itemName = item.displayName
+        let displayText = prefix + itemName
+
+        // Truncate if too long for screen width
+        let maxWidth = screenWidth - 2
+        let finalText = displayText.count > maxWidth
+            ? prefix + truncate(itemName, maxWidth: maxWidth - prefix.count)
+            : displayText
+
+        // Center and display in cyan color
+        let centeredText = centerText(finalText, inWidth: screenWidth)
+        inputHandler.write(centeredText.foreColor(51))  // Cyan color
+    }
+
     /// Renders a single option in the selection list.
     /// - Parameters:
     ///   - option: The option to render.
