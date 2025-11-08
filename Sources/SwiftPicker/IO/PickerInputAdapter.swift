@@ -83,13 +83,14 @@ final class PickerInputAdapter: PickerInput {
         }
     }
     
-    /// Reads a special character input (e.g., enter, space, quit).
+    /// Reads a special character input (e.g., enter, space, quit, backspace).
     /// - Returns: A SpecialChar value indicating the key pressed, or `nil` if no special character was pressed.
     func readSpecialChar() -> SpecialChar? {
         let char = ANSITerminal.readChar()
         if char == NonPrintableChar.enter.char() { return .enter }
         if char == " " { return .space }
         if char == "q" || char == "Q" { return .quit }
+        if char == "\u{7F}" { return .backspace }  // ASCII 127 (DEL/Backspace on macOS)
         return nil
     }
     

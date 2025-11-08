@@ -52,6 +52,9 @@ extension ColumnSelectionHandler {
                     case .space:
                         handleSpaceKeyNavigation()
                         renderColumns()
+                    case .backspace:
+                        handleBackNavigation()
+                        renderColumns()
                     }
                 }
 
@@ -92,32 +95,53 @@ private extension ColumnSelectionHandler {
         addChildColumn(items: result.items, title: result.title)
     }
 
+    /// Handles backspace key press to navigate back to parent level.
+    /// Removes the current column from the stack and adjusts the visible window.
+    func handleBackNavigation() {
+        // Can't go back if we only have one column (already at root)
+        guard state.navigationStack.count > 1 else { return }
+
+        // Remove the last column from the stack
+        state.navigationStack.removeLast()
+
+        // Adjust visible window to show last 2 columns
+        if state.navigationStack.count > 2 {
+            state.visibleStartIndex = state.navigationStack.count - 2
+            state.activeColumnIndex = 1  // Stay on the rightmost visible column
+        } else {
+            state.visibleStartIndex = 0
+            state.activeColumnIndex = state.navigationStack.count - 1
+        }
+
+        // Update breadcrumb to reflect new navigation path
+        updateBreadcrumb()
+    }
+
     /// Adds a new column with child items to the right of the active column.
-    /// Implements a 2-column sliding window: when adding a third column,
-    /// removes the first column and shifts left to maintain 2 columns maximum.
+    /// Implements a 2-column sliding window: adds to navigation stack and shifts visible window.
     /// Updates the breadcrumb title to reflect the new navigation path.
     /// - Parameters:
     ///   - items: The child items to display in the new column.
     ///   - title: The title for the new column.
     func addChildColumn(items: [Item], title: String) {
         let newColumn = PickerColumn(title: title, items: items, activeIndex: 0)
-        let insertIndex = state.activeColumnIndex + 1
+        let stackInsertIndex = state.visibleStartIndex + state.activeColumnIndex + 1
 
-        // Remove any columns to the right of where we're inserting
-        if insertIndex < state.columns.count {
-            state.columns.removeSubrange(insertIndex...)
+        // Remove any columns in the stack after where we're inserting
+        if stackInsertIndex < state.navigationStack.count {
+            state.navigationStack.removeSubrange(stackInsertIndex...)
         }
 
-        // Add the new column
-        state.columns.append(newColumn)
+        // Add the new column to the navigation stack
+        state.navigationStack.append(newColumn)
 
-        // Implement 2-column sliding window: if we now have more than 2 columns,
-        // remove the first column to shift the view left
-        if state.columns.count > 2 {
-            state.columns.removeFirst()
+        // Implement 2-column sliding window: shift visible window to show last 2 columns
+        if state.navigationStack.count > 2 {
+            state.visibleStartIndex = state.navigationStack.count - 2
             state.activeColumnIndex = 1  // Stay on the rightmost (newly added) column
         } else {
-            state.activeColumnIndex = state.columns.count - 1
+            state.visibleStartIndex = 0
+            state.activeColumnIndex = state.navigationStack.count - 1
         }
 
         // Update breadcrumb to reflect new navigation path
@@ -273,7 +297,7 @@ private extension ColumnSelectionHandler {
     func renderFooter(at row: Int) {
         inputHandler.moveTo(row, 1)
         let footerText = onNavigate != nil
-            ? "Use ←→ to switch columns, ↑↓ to navigate • Space to navigate into • Enter to select • Q to quit"
+            ? "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Enter to select • Q to quit"
             : state.bottomLineText
         inputHandler.write(footerText)
     }
@@ -344,13 +368,15 @@ private extension ColumnSelectionHandler {
     }
 
     /// Builds a breadcrumb trail from the column titles up to and including the active column.
-    /// - Returns: A breadcrumb string in the format "Column1 > Column2"
+    /// Uses the full navigation stack to show complete path.
+    /// - Returns: A breadcrumb string in the format "Column1 > Column2 > Column3"
     func buildBreadcrumb() -> String {
-        guard !state.columns.isEmpty else { return "" }
+        guard !state.navigationStack.isEmpty else { return "" }
 
-        // Include columns from start up to and including the active column
-        let endIndex = min(state.activeColumnIndex + 1, state.columns.count)
-        let relevantColumns = state.columns.prefix(endIndex)
+        // Include columns from start of stack up to and including the active column
+        let activeStackIndex = state.visibleStartIndex + state.activeColumnIndex
+        let endIndex = min(activeStackIndex + 1, state.navigationStack.count)
+        let relevantColumns = state.navigationStack.prefix(endIndex)
         let titles = relevantColumns.map { $0.title }
         return titles.joined(separator: " > ")
     }
