@@ -302,31 +302,6 @@ private extension ColumnSelectionHandler {
         inputHandler.write(centeredText.foreColor(51))  // Cyan color
     }
 
-    /// Ends the selection process and restores terminal state.
-    func endSelection() {
-        inputHandler.exitAlternativeScreen()
-        inputHandler.enableNormalInput()
-    }
-}
-
-
-// MARK: - Helper Methods
-private extension ColumnSelectionHandler {
-    /// Calculates the maximum number of columns that can fit on the screen.
-    /// - Parameter screenWidth: The width of the screen in characters.
-    /// - Returns: The maximum number of columns that can be displayed.
-    func calculateMaxVisibleColumns(screenWidth: Int) -> Int {
-        let totalColumnWidth = columnWidth + columnSpacing
-        return max(1, screenWidth / totalColumnWidth)
-    }
-
-    /// Calculates the X position for a column.
-    /// - Parameter columnIndex: The index of the column.
-    /// - Returns: The X position (column number) for rendering.
-    func calculateColumnXPosition(for columnIndex: Int) -> Int {
-        return 1 + (columnIndex * (columnWidth + columnSpacing))
-    }
-
     /// Centers text within the specified width.
     /// - Parameters:
     ///   - text: The text to center.
@@ -352,6 +327,31 @@ private extension ColumnSelectionHandler {
         let truncatePoint = maxWidth - 1
         let truncated = String(text.prefix(truncatePoint))
         return truncated + "…"
+    }
+
+    /// Ends the selection process and restores terminal state.
+    func endSelection() {
+        inputHandler.exitAlternativeScreen()
+        inputHandler.enableNormalInput()
+    }
+}
+
+
+// MARK: - Helper Methods
+private extension ColumnSelectionHandler {
+    /// Calculates the maximum number of columns that can fit on the screen.
+    /// - Parameter screenWidth: The width of the screen in characters.
+    /// - Returns: The maximum number of columns that can be displayed.
+    func calculateMaxVisibleColumns(screenWidth: Int) -> Int {
+        let totalColumnWidth = columnWidth + columnSpacing
+        return max(1, screenWidth / totalColumnWidth)
+    }
+
+    /// Calculates the X position for a column.
+    /// - Parameter columnIndex: The index of the column.
+    /// - Returns: The X position (column number) for rendering.
+    func calculateColumnXPosition(for columnIndex: Int) -> Int {
+        return 1 + (columnIndex * (columnWidth + columnSpacing))
     }
 
     /// Builds a breadcrumb trail from the column titles up to and including the active column.
