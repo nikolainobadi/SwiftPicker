@@ -220,7 +220,7 @@ private extension ColumnSelectionHandler {
 
             if isActiveItem && isActive {
                 // Active column, active item
-                inputHandler.write("> ".lightGreen + truncatedName)
+                inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
             } else if isActiveItem {
                 // Inactive column, active item
                 inputHandler.write("• ".yellow + truncatedName.foreColor(250))
@@ -287,19 +287,35 @@ private extension ColumnSelectionHandler {
 
         inputHandler.moveTo(row, 1)
 
-        let prefix = "Selected: "
         let itemName = selectedItem.displayName
-        let displayText = prefix + itemName
 
         // Truncate if too long for screen width
         let maxWidth = screenWidth - 2
-        let finalText = displayText.count > maxWidth
-            ? prefix + truncate(itemName, maxWidth: maxWidth - prefix.count)
-            : displayText
+        let finalText = itemName.count > maxWidth
+            ? truncate(itemName, maxWidth: maxWidth)
+            : itemName
 
         // Center and display in cyan color
         let centeredText = centerText(finalText, inWidth: screenWidth)
         inputHandler.write(centeredText.foreColor(51))  // Cyan color
+    }
+
+    /// Centers text within the specified width.
+    /// - Parameters:
+    ///   - text: The text to center.
+    ///   - width: The width within which to center the text.
+    /// - Returns: The centered text with padding.
+    func centerText(_ text: String, inWidth width: Int) -> String {
+        PickerTextFormatter.centerText(text, inWidth: width)
+    }
+
+    /// Truncates text to fit within the specified width, adding ellipsis if needed.
+    /// - Parameters:
+    ///   - text: The text to truncate.
+    ///   - maxWidth: The maximum width allowed.
+    /// - Returns: The truncated text with ellipsis if it was truncated.
+    func truncate(_ text: String, maxWidth: Int) -> String {
+        PickerTextFormatter.truncate(text, maxWidth: maxWidth)
     }
 
     /// Ends the selection process and restores terminal state.
@@ -325,33 +341,6 @@ private extension ColumnSelectionHandler {
     /// - Returns: The X position (column number) for rendering.
     func calculateColumnXPosition(for columnIndex: Int) -> Int {
         return 1 + (columnIndex * (columnWidth + columnSpacing))
-    }
-
-    /// Centers text within the specified width.
-    /// - Parameters:
-    ///   - text: The text to center.
-    ///   - width: The width within which to center the text.
-    /// - Returns: The centered text with padding.
-    func centerText(_ text: String, inWidth width: Int) -> String {
-        let textLength = text.count
-        let spaces = (width - textLength) / 2
-        let padding = String(repeating: " ", count: max(0, spaces))
-
-        return padding + text
-    }
-
-    /// Truncates text to fit within the specified width, adding ellipsis if needed.
-    /// - Parameters:
-    ///   - text: The text to truncate.
-    ///   - maxWidth: The maximum width allowed.
-    /// - Returns: The truncated text with ellipsis if it was truncated.
-    func truncate(_ text: String, maxWidth: Int) -> String {
-        guard text.count > maxWidth else { return text }
-        guard maxWidth > 1 else { return "" }
-
-        let truncatePoint = maxWidth - 1
-        let truncated = String(text.prefix(truncatePoint))
-        return truncated + "…"
     }
 
     /// Builds a breadcrumb trail from the column titles up to and including the active column.

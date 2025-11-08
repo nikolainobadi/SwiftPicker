@@ -116,24 +116,30 @@ private extension BaseSelectionHandlerTests {
     func assertWrittenText(sut: BaseSelectionHandler<String>, input: MockInput, activeIndex: Int = 0, sourceLocation: SourceLocation = #_sourceLocation) {
         let state = sut.state
         let expectedActiveLine = PickerPadding.top + activeIndex
-        let headerText = [state.topLineText, "\n", "\n", state.title, "\n"]
-        var displayableText: [String] = []
-        for i in 0..<20 {
-            let indicator = i == activeIndex ? selectedIndicator : unselectedIndicator
-            displayableText.append(indicator)
-            displayableText.append(state.options[i].title)
-        }
-        let footerText = ["\n", "", "\n", state.bottomLineText]
-        let allText = headerText + displayableText + footerText
 
         sut.scrollAndRenderOptions()
 
         #expect(state.activeLine == expectedActiveLine, "wrong active line", sourceLocation: sourceLocation)
 
-        allText.enumerated().forEach {
-            if !$1.isEmpty {
-                #expect(input.writtenText[$0].contains($1), "writtenText: \(input.writtenText[$0]) is not equal to \($1)", sourceLocation: sourceLocation)
-            }
+        // Verify header text appears in output
+        #expect(input.writtenText.contains(where: { $0.contains(state.topLineText) }), "missing top line text", sourceLocation: sourceLocation)
+        #expect(input.writtenText.contains(where: { $0.contains(state.title) }), "missing title", sourceLocation: sourceLocation)
+
+        // Verify options appear in output (now 18 instead of 20 due to separator + selected item taking 2 rows)
+        for i in 0..<18 {
+            let indicator = i == activeIndex ? selectedIndicator : unselectedIndicator
+            #expect(input.writtenText.contains(where: { $0.contains(indicator) }), "missing indicator for index \(i)", sourceLocation: sourceLocation)
+            #expect(input.writtenText.contains(where: { $0.contains(state.options[i].title) }), "missing option \(i)", sourceLocation: sourceLocation)
         }
+
+        // Verify separator line appears in output
+        #expect(input.writtenText.contains(where: { $0.contains("─") }), "missing separator line", sourceLocation: sourceLocation)
+
+        // Verify selected item display appears in output
+        let selectedItemName = state.options[activeIndex].title
+        #expect(input.writtenText.contains(where: { $0.contains("Selected: \(selectedItemName)") }), "missing selected item display", sourceLocation: sourceLocation)
+
+        // Verify footer text appears in output
+        #expect(input.writtenText.contains(where: { $0.contains(state.bottomLineText) }), "missing bottom line text", sourceLocation: sourceLocation)
     }
 }
