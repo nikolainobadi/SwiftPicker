@@ -220,7 +220,7 @@ private extension ColumnSelectionHandler {
 
             if isActiveItem && isActive {
                 // Active column, active item
-                inputHandler.write("> ".lightGreen + truncatedName)
+                inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
             } else if isActiveItem {
                 // Inactive column, active item
                 inputHandler.write("• ".yellow + truncatedName.foreColor(250))
@@ -287,15 +287,13 @@ private extension ColumnSelectionHandler {
 
         inputHandler.moveTo(row, 1)
 
-        let prefix = "Selected: "
         let itemName = selectedItem.displayName
-        let displayText = prefix + itemName
 
         // Truncate if too long for screen width
         let maxWidth = screenWidth - 2
-        let finalText = displayText.count > maxWidth
-            ? prefix + truncate(itemName, maxWidth: maxWidth - prefix.count)
-            : displayText
+        let finalText = itemName.count > maxWidth
+            ? truncate(itemName, maxWidth: maxWidth)
+            : itemName
 
         // Center and display in cyan color
         let centeredText = centerText(finalText, inWidth: screenWidth)
