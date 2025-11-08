@@ -58,31 +58,29 @@ This plan encapsulates text truncation and selected item display logic to make t
 
 ---
 
-## Phase 3: Create Shared Text Formatting Utility (REVISED)
+## Phase 3: Create Shared Text Formatting Utility ✅ COMPLETED
 
 **Objective:** Create a shared utility enum with static methods for text formatting that can be used by both `BaseSelectionHandler` and `ColumnSelectionHandler`.
 
 **Why This Change:** `ColumnSelectionHandler` doesn't inherit from `BaseSelectionHandler`, so we need a shared utility that both can use independently.
 
-**Tasks:**
-1. Create new file `Sources/SwiftPicker/Engine/Utilities/PickerTextFormatter.swift`
-2. Create `PickerTextFormatter` enum with static methods:
+**Completed Tasks:**
+1. ✅ Created new file `Sources/SwiftPicker/Engine/Utilities/PickerTextFormatter.swift`
+2. ✅ Created `PickerTextFormatter` enum with static methods:
    - `centerText(_:inWidth:)` - Centers text within specified width
    - `truncate(_:maxWidth:)` - Truncates text with ellipsis
-3. Update `BaseSelectionHandler` to use `PickerTextFormatter` utilities
-4. Update `ColumnSelectionHandler` to use `PickerTextFormatter` utilities
-5. Ensure both classes delegate to shared utilities instead of local implementations
+3. ✅ Updated `BaseSelectionHandler` to delegate to `PickerTextFormatter` utilities
+4. ✅ Updated `ColumnSelectionHandler` to delegate to `PickerTextFormatter` utilities
+5. ✅ Both classes now use shared utilities for consistent text formatting
 
-**Files to Create:**
+**Files Created:**
 - `Sources/SwiftPicker/Engine/Utilities/PickerTextFormatter.swift`
 
-**Files to Modify:**
+**Files Modified:**
 - `Sources/SwiftPicker/Engine/Core/BaseSelectionHandler.swift`
 - `Sources/SwiftPicker/Engine/Core/ColumnSelectionHandler.swift`
 
-**Testing:**
-- Run all tests to verify no regression
-- `swift test`
+**Testing:** ✅ All 114 tests passed - Shared utility integrated without breaking changes.
 
 ---
 

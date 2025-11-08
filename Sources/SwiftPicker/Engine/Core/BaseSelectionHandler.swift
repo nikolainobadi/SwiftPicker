@@ -139,11 +139,7 @@ private extension BaseSelectionHandler {
     ///   - width: The width within which to center the text.
     /// - Returns: The centered text.
     func centerText(_ text: String, inWidth width: Int) -> String {
-        let textLength = text.count
-        let spaces = (width - textLength) / 2
-        let padding = String(repeating: " ", count: max(0, spaces))
-
-        return padding + text
+        PickerTextFormatter.centerText(text, inWidth: width)
     }
 
     /// Truncates text to fit within the specified width, adding ellipsis if needed.
@@ -152,12 +148,7 @@ private extension BaseSelectionHandler {
     ///   - maxWidth: The maximum width allowed.
     /// - Returns: The truncated text with ellipsis if it was truncated.
     func truncate(_ text: String, maxWidth: Int) -> String {
-        guard text.count > maxWidth else { return text }
-        guard maxWidth > 1 else { return "" }
-
-        let truncatePoint = maxWidth - 1
-        let truncated = String(text.prefix(truncatePoint))
-        return truncated + "…"
+        PickerTextFormatter.truncate(text, maxWidth: maxWidth)
     }
 
     /// Renders the currently selected item's full name at the bottom of the screen.
