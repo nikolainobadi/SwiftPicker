@@ -12,7 +12,8 @@ final class ColumnSelectionState<Item: DisplayablePickerItem> {
     let topLine: Int
 
     /// The title to display at the top of the column selection.
-    let title: String
+    /// This can be updated during navigation to show breadcrumb trails.
+    var title: String
 
     /// The index of the currently active column.
     var activeColumnIndex: Int

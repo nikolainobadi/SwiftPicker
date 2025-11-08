@@ -95,6 +95,7 @@ private extension ColumnSelectionHandler {
     /// Adds a new column with child items to the right of the active column.
     /// Implements a 2-column sliding window: when adding a third column,
     /// removes the first column and shifts left to maintain 2 columns maximum.
+    /// Updates the breadcrumb title to reflect the new navigation path.
     /// - Parameters:
     ///   - items: The child items to display in the new column.
     ///   - title: The title for the new column.
@@ -118,6 +119,9 @@ private extension ColumnSelectionHandler {
         } else {
             state.activeColumnIndex = state.columns.count - 1
         }
+
+        // Update breadcrumb to reflect new navigation path
+        updateBreadcrumb()
     }
 
     /// Moves the active item within the current column.
@@ -133,12 +137,15 @@ private extension ColumnSelectionHandler {
     }
 
     /// Moves between columns.
+    /// Updates the breadcrumb title to reflect the active column context.
     /// - Parameter delta: The number of columns to move (-1 for left, 1 for right).
     func moveHorizontal(delta: Int) {
         let newColumnIndex = state.activeColumnIndex + delta
 
         if newColumnIndex >= 0 && newColumnIndex < state.columns.count {
             state.activeColumnIndex = newColumnIndex
+            // Update breadcrumb to show path up to active column
+            updateBreadcrumb()
         }
     }
 }
@@ -345,5 +352,22 @@ private extension ColumnSelectionHandler {
         let truncatePoint = maxWidth - 1
         let truncated = String(text.prefix(truncatePoint))
         return truncated + "…"
+    }
+
+    /// Builds a breadcrumb trail from the column titles up to and including the active column.
+    /// - Returns: A breadcrumb string in the format "Column1 > Column2"
+    func buildBreadcrumb() -> String {
+        guard !state.columns.isEmpty else { return "" }
+
+        // Include columns from start up to and including the active column
+        let endIndex = min(state.activeColumnIndex + 1, state.columns.count)
+        let relevantColumns = state.columns.prefix(endIndex)
+        let titles = relevantColumns.map { $0.title }
+        return titles.joined(separator: " > ")
+    }
+
+    /// Updates the state title to reflect the current breadcrumb trail.
+    func updateBreadcrumb() {
+        state.title = buildBreadcrumb()
     }
 }
