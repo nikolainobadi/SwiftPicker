@@ -93,6 +93,8 @@ private extension ColumnSelectionHandler {
     }
 
     /// Adds a new column with child items to the right of the active column.
+    /// Implements a 2-column sliding window: when adding a third column,
+    /// removes the first column and shifts left to maintain 2 columns maximum.
     /// - Parameters:
     ///   - items: The child items to display in the new column.
     ///   - title: The title for the new column.
@@ -100,12 +102,22 @@ private extension ColumnSelectionHandler {
         let newColumn = PickerColumn(title: title, items: items, activeIndex: 0)
         let insertIndex = state.activeColumnIndex + 1
 
+        // Remove any columns to the right of where we're inserting
         if insertIndex < state.columns.count {
             state.columns.removeSubrange(insertIndex...)
         }
 
+        // Add the new column
         state.columns.append(newColumn)
-        state.activeColumnIndex = state.columns.count - 1
+
+        // Implement 2-column sliding window: if we now have more than 2 columns,
+        // remove the first column to shift the view left
+        if state.columns.count > 2 {
+            state.columns.removeFirst()
+            state.activeColumnIndex = 1  // Stay on the rightmost (newly added) column
+        } else {
+            state.activeColumnIndex = state.columns.count - 1
+        }
     }
 
     /// Moves the active item within the current column.
