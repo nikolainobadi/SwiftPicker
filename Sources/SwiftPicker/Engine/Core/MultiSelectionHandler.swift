@@ -24,6 +24,8 @@ final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHan
                         scrollAndRenderOptions()
                     case .quit:
                         return []
+                    case .backspace:
+                        continue  // No action for backspace in multi selection
                     }
                 }
                 

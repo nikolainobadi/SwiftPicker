@@ -21,8 +21,8 @@ final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHa
                         return state.options.first(where: { $0.line == state.activeLine })?.item
                     case .quit:
                         return nil
-                    case .space:
-                        continue
+                    case .space, .backspace:
+                        continue  // No action for space or backspace in single selection
                     }
                 }
                 

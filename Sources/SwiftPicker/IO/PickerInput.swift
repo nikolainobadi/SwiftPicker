@@ -70,7 +70,7 @@ internal enum Direction {
     case up, down, left, right
 }
 
-/// An enumeration representing special characters (enter, space, quit).
+/// An enumeration representing special characters (enter, space, quit, backspace).
 internal enum SpecialChar {
-    case enter, space, quit
+    case enter, space, quit, backspace
 }

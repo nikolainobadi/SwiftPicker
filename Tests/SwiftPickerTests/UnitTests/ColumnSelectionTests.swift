@@ -450,6 +450,133 @@ extension ColumnSelectionTests {
 }
 
 
+// MARK: - Backspace Navigation Tests
+extension ColumnSelectionTests {
+    @Test("Navigates back one level when backspace pressed")
+    func navigatesBackOneLevelWhenBackspacePressed() {
+        let parentItem = "Parent"
+        let childItem = "Child 0"
+        let parentColumn = makeColumn(items: [parentItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate into child
+        input.enqueueSpecialChar(specialChar: .backspace)  // Navigate back
+        input.enqueueSpecialChar(specialChar: .enter)  // Select parent
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == parentItem {
+                return (items: ["Child 0", "Child 1"], title: "Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [parentColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == parentItem)  // Should be back at parent
+    }
+
+    @Test("Does nothing when backspace pressed at root level")
+    func doesNothingWhenBackspacePressedAtRootLevel() {
+        let items = Self.makeItems(count: 3)
+        let columns = [makeColumn(items: items)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .backspace)
+        input.enqueueSpecialChar(specialChar: .backspace)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(items.contains(result!))
+    }
+
+    @Test("Supports back navigation after multiple forward navigations")
+    func supportsBackNavigationAfterMultipleForwardNavigations() {
+        let rootItem = "Root"
+        let rootColumn = makeColumn(items: [rootItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Child
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Grandchild
+        input.enqueueSpecialChar(specialChar: .backspace)  // Back to Child
+        input.enqueueSpecialChar(specialChar: .enter)  // Select Child
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == "Root" {
+                return (items: ["Child"], title: "Children")
+            } else if item == "Child" {
+                return (items: ["Grandchild"], title: "Grandchildren")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [rootColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == "Child")  // Should be back at Child level
+    }
+
+    @Test("Allows navigation forward again after going back")
+    func allowsNavigationForwardAgainAfterGoingBack() {
+        let rootItem = "Root"
+        let rootColumn = makeColumn(items: [rootItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Child
+        input.enqueueSpecialChar(specialChar: .backspace)  // Back to Root
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Child again
+        input.enqueueSpecialChar(specialChar: .enter)  // Select Child
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == "Root" {
+                return (items: ["Child"], title: "Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [rootColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == "Child")
+    }
+
+    @Test("Navigates back multiple levels with repeated backspace")
+    func navigatesBackMultipleLevelsWithRepeatedBackspace() {
+        let rootItem = "Root"
+        let rootColumn = makeColumn(items: [rootItem])
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Child
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate to Grandchild
+        input.enqueueSpecialChar(specialChar: .backspace)  // Back to Child
+        input.enqueueSpecialChar(specialChar: .backspace)  // Back to Root
+        input.enqueueSpecialChar(specialChar: .enter)  // Select Root
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == "Root" {
+                return (items: ["Child"], title: "Children")
+            } else if item == "Child" {
+                return (items: ["Grandchild"], title: "Grandchildren")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: [rootColumn], input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == rootItem)  // Should be back at root
+    }
+}
+
+
 // MARK: - SUT
 private extension ColumnSelectionTests {
     func makeSUT(
