@@ -152,6 +152,7 @@ private extension BaseSelectionHandler {
     }
 
     /// Renders the currently selected item's full name at the bottom of the screen.
+    /// Uses PickerTextFormatter for consistent text formatting across all selection handlers.
     /// - Parameters:
     ///   - item: The item to display.
     ///   - row: The row position for the selected item name.
@@ -166,11 +167,11 @@ private extension BaseSelectionHandler {
         // Truncate if too long for screen width
         let maxWidth = screenWidth - 2
         let finalText = displayText.count > maxWidth
-            ? prefix + truncate(itemName, maxWidth: maxWidth - prefix.count)
+            ? prefix + PickerTextFormatter.truncate(itemName, maxWidth: maxWidth - prefix.count)
             : displayText
 
         // Center and display in cyan color
-        let centeredText = centerText(finalText, inWidth: screenWidth)
+        let centeredText = PickerTextFormatter.centerText(finalText, inWidth: screenWidth)
         inputHandler.write(centeredText.foreColor(51))  // Cyan color
     }
 

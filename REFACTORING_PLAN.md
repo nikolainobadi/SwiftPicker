@@ -84,22 +84,22 @@ This plan encapsulates text truncation and selected item display logic to make t
 
 ---
 
-## Phase 4: Add Selected Item Renderer Helper to BaseSelectionHandler
+## Phase 4: Update Selected Item Renderer to Use PickerTextFormatter ✅ COMPLETED
 
-**Objective:** Add a helper method in `BaseSelectionHandler` that uses `PickerInput` to render selected items.
+**Objective:** Update the `renderSelectedItem` method in `BaseSelectionHandler` to use `PickerTextFormatter` directly for consistent formatting.
 
-**Tasks:**
-1. Create `renderSelectedItemDisplay(_:at:screenWidth:)` method in `BaseSelectionHandler`
-2. Method should accept an item and delegate formatting to `PickerTextFormatter`
-3. Method uses `inputHandler` (PickerInput) to write to terminal
-4. This provides a convenient wrapper for subclasses
+**Completed Tasks:**
+1. ✅ Updated `renderSelectedItem(_:at:screenWidth:)` method in `BaseSelectionHandler` (created in Phase 2)
+2. ✅ Method now calls `PickerTextFormatter` directly for formatting instead of using helper methods
+3. ✅ Uses `PickerTextFormatter.truncate` for text truncation
+4. ✅ Uses `PickerTextFormatter.centerText` for text centering
+5. ✅ Method uses `inputHandler` (PickerInput) to write to terminal
+6. ✅ Provides convenient wrapper for subclasses to render selected items
 
 **Files Modified:**
 - `Sources/SwiftPicker/Engine/Core/BaseSelectionHandler.swift`
 
-**Testing:**
-- Verify build compiles
-- `swift build`
+**Testing:** ✅ All 114 tests passed - Selected item renderer updated to use shared formatting utility.
 
 ---
 
