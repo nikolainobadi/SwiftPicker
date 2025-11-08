@@ -171,6 +171,11 @@ private extension ColumnSelectionHandler {
             renderColumn(column, at: colX, row: 5, isActive: isActiveColumn, maxRows: rows - 8)
         }
 
+        // Render dividers between columns
+        if columnsToRender.count > 1 {
+            renderDividers(columnCount: columnsToRender.count, startRow: 4, maxRows: rows - 8)
+        }
+
         // Render navigation hints
         renderFooter(at: rows - 2)
     }
@@ -185,7 +190,8 @@ private extension ColumnSelectionHandler {
     func renderColumn(_ column: PickerColumn<Item>, at colX: Int, row: Int, isActive: Bool, maxRows: Int) {
         // Render column title
         inputHandler.moveTo(row - 1, colX)
-        let titleStyle = isActive ? column.title.underline : column.title.foreColor(250)
+        let truncatedTitle = truncate(column.title, maxWidth: columnWidth - 2)
+        let titleStyle = isActive ? truncatedTitle.underline : truncatedTitle.foreColor(250)
         inputHandler.write(titleStyle)
 
         // Render column items (limited by maxRows)
@@ -195,16 +201,19 @@ private extension ColumnSelectionHandler {
             inputHandler.moveTo(itemRow, colX)
 
             let isActiveItem = itemIndex == column.activeIndex
+            // Reserve 2 characters for the indicator ("> " or "• ")
+            let maxDisplayWidth = columnWidth - 2
+            let truncatedName = truncate(item.displayName, maxWidth: maxDisplayWidth)
 
             if isActiveItem && isActive {
                 // Active column, active item
-                inputHandler.write("> ".lightGreen + item.displayName)
+                inputHandler.write("> ".lightGreen + truncatedName)
             } else if isActiveItem {
                 // Inactive column, active item
-                inputHandler.write("• ".yellow + item.displayName.foreColor(250))
+                inputHandler.write("• ".yellow + truncatedName.foreColor(250))
             } else {
                 // Inactive item
-                inputHandler.write("  " + item.displayName.foreColor(250))
+                inputHandler.write("  " + truncatedName.foreColor(250))
             }
         }
 
@@ -212,6 +221,27 @@ private extension ColumnSelectionHandler {
         if column.items.count > maxRows {
             inputHandler.moveTo(row + maxRows, colX)
             inputHandler.write("⋮".foreColor(250))
+        }
+    }
+
+    /// Renders vertical dividers between columns.
+    /// - Parameters:
+    ///   - columnCount: The number of columns being rendered.
+    ///   - startRow: The starting row for the divider.
+    ///   - maxRows: The maximum number of rows to draw the divider.
+    func renderDividers(columnCount: Int, startRow: Int, maxRows: Int) {
+        let dividerChar = "│"
+
+        for columnIndex in 0..<(columnCount - 1) {
+            // Calculate divider position between current and next column
+            let firstColX = calculateColumnXPosition(for: columnIndex)
+            let dividerX = firstColX + columnWidth + 1
+
+            // Draw vertical line from title row to bottom of items
+            for row in startRow...(startRow + maxRows + 1) {
+                inputHandler.moveTo(row, dividerX)
+                inputHandler.write(dividerChar.foreColor(240))
+            }
         }
     }
 
@@ -261,5 +291,19 @@ private extension ColumnSelectionHandler {
         let padding = String(repeating: " ", count: max(0, spaces))
 
         return padding + text
+    }
+
+    /// Truncates text to fit within the specified width, adding ellipsis if needed.
+    /// - Parameters:
+    ///   - text: The text to truncate.
+    ///   - maxWidth: The maximum width allowed.
+    /// - Returns: The truncated text with ellipsis if it was truncated.
+    func truncate(_ text: String, maxWidth: Int) -> String {
+        guard text.count > maxWidth else { return text }
+        guard maxWidth > 1 else { return "" }
+
+        let truncatePoint = maxWidth - 1
+        let truncated = String(text.prefix(truncatePoint))
+        return truncated + "…"
     }
 }
