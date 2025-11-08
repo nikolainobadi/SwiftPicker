@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-11-08
+
+### Added
+- Column selection support with multi-column navigation using `columnSelection(columns:title:newScreen:)` method
+- `PickerColumn` struct for defining columns with title, items, and active index
+- Dynamic column navigation with `onNavigate` closure for loading child items on demand
+- Backspace key navigation to go back in column selection
+- Breadcrumb navigation display showing selected items path in column picker title
+- Selected item name display in column picker footer
+- Column dividers and text truncation for better visual organization
+- Horizontal separator line above column picker footer
+- 2-column sliding window for efficient navigation through multiple columns
+- Left and right arrow key support (←→) for horizontal column navigation
+- 15 comprehensive tests for column selection functionality
+
+### Changed
+- Enhanced README with column selection examples and navigation instructions
+- Updated CLAUDE.md documentation with column selection architecture details
+- Improved text formatting and rendering in column selection display
+
 ## [1.1.0] - 2025-10-24
 
 ### Added

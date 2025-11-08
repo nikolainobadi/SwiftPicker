@@ -28,7 +28,8 @@ The codebase is organized into four main modules:
 - **`InteractivePicker` Struct** (`API/Picker/InteractivePicker.swift`): Concrete implementation of `CommandLinePicker` with dependency injection support
   - Public init: Uses default production dependencies
   - Internal init: Accepts `TextInputHandler` and `PickerInput` for testing
-  - Column selection: `columnSelection(columns:title:newScreen:)` for multi-column navigation
+  - Column selection: `columnSelection(columns:title:newScreen:onNavigate:)` for multi-column navigation
+    - `onNavigate` closure enables dynamic loading of child items when user presses Space
 - **`PickerColumn` Struct** (`Engine/Models/PickerColumn.swift`): Public model for column data
   - Generic over `DisplayablePickerItem` types
   - Properties: `title`, `items`, `activeIndex`
@@ -53,6 +54,8 @@ The codebase is organized into four main modules:
   - `SelectionState`: Manages active selection state
   - `PickerColumn`: Generic column with title, items, and active index
   - `ColumnSelectionState`: Manages multi-column selection state (columns, active column index, title, top line)
+- **Utilities** (`Engine/Utilities/`):
+  - `PickerTextFormatter`: Text formatting and truncation helpers for column display
 - **Configuration** (`Engine/Config/`):
   - `PickerPadding`: Top and bottom padding constants
 
@@ -67,14 +70,19 @@ The codebase is organized into four main modules:
 - **`PickerInputAdapter`** (`IO/PickerInputAdapter.swift`): Real terminal implementation using ANSITerminal
 - **Input Types**:
   - `Direction` enum: `.up`, `.down`, `.left`, `.right` navigation (supports both vertical and horizontal movement)
-  - `SpecialChar` enum: `.enter`, `.space`, `.quit` actions
+  - `SpecialChar` enum: `.enter`, `.space`, `.quit`, `.backspace` actions
 
 ### Behavioral Notes
 - **Quit Behavior**: Single selection returns `nil`, multi-selection returns empty array `[]`, column selection returns `nil`
 - **Navigation**: Arrow keys handled by `readDirectionKey()`, not `readSpecialChar()`
 - **Selection State**: Multi-selection maintains toggle state until enter/quit
-- **Column Navigation**: Horizontal (left/right) switches columns, vertical (up/down) navigates within active column
+- **Column Navigation**:
+  - Horizontal (left/right) switches columns, vertical (up/down) navigates within active column
+  - Space key navigates into items (loads children via `onNavigate` closure)
+  - Backspace key navigates back to parent level in column hierarchy
 - **Column Default**: Column selection starts at the rightmost column by default
+- **Breadcrumb Navigation**: Column picker automatically displays navigation path (e.g., "Documents > Reports > 2024")
+- **Text Formatting**: Column titles and item names are automatically truncated to fit terminal width
 - **Terminal Management**: Alternative screen mode, cursor control, input buffering
 
 ### SwiftPickerTesting Module (`Sources/SwiftPickerTesting/`)

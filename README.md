@@ -239,11 +239,53 @@ if let file = picker.columnSelection(columns: fileColumns, title: "Select File")
 }
 ```
 
+#### Dynamic Column Navigation
+
+For more complex hierarchies, use the `onNavigate` closure to load child items on demand:
+
+```swift
+struct Folder: DisplayablePickerItem {
+    let name: String
+    let path: String
+
+    var displayName: String { name }
+}
+
+let rootFolders = [
+    Folder(name: "Documents", path: "/Documents"),
+    Folder(name: "Downloads", path: "/Downloads")
+]
+
+let columns = [PickerColumn(title: "Folders", items: rootFolders)]
+
+// Press Space on any folder to navigate into it
+let selection = picker.columnSelection(
+    columns: columns,
+    title: "File Browser",
+    onNavigate: { folder in
+        // Load children for the selected folder
+        let children = loadSubfolders(at: folder.path)
+        return children.isEmpty ? nil : (items: children, title: folder.name)
+    }
+)
+
+if let selectedFolder = selection {
+    print("Selected: \(selectedFolder.path)")
+}
+```
+
 **Navigation:**
 - **←→ arrows**: Switch between columns
 - **↑↓ arrows**: Navigate items within the active column
+- **Space**: Navigate into an item to load children (when using `onNavigate`)
+- **Backspace**: Go back to parent level
 - **Enter**: Select the active item
 - **Q**: Quit without selecting
+
+**Features:**
+- **Breadcrumb navigation**: Automatically displays the navigation path (e.g., "Documents > Reports > 2024")
+- **Dynamic loading**: Use the `onNavigate` closure to load child items on demand
+- **Text truncation**: Long column titles and item names are automatically truncated to fit
 
 ### Error Handling
 
