@@ -55,6 +55,46 @@ extension SelectionHandlerFactory {
         let state = makeState(info: info, newScreen: newScreen, isSingleSelection: false, inputHandler: inputHandler)
         return .init(state: state, inputHandler: inputHandler)
     }
+
+    /// Creates a column selection handler with the default input handler.
+    /// - Parameters:
+    ///   - columns: The columns to display.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    /// - Returns: A ColumnSelectionHandler instance.
+    static func makeColumnSelectionHandler<Item: DisplayablePickerItem>(
+        columns: [PickerColumn<Item>],
+        title: String,
+        newScreen: Bool
+    ) -> ColumnSelectionHandler<Item> {
+        return makeColumnSelectionHandler(columns: columns, title: title, newScreen: newScreen, inputHandler: inputHandler)
+    }
+
+    /// Creates a column selection handler with a custom input handler.
+    /// - Parameters:
+    ///   - columns: The columns to display.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    /// - Returns: A ColumnSelectionHandler instance.
+    static func makeColumnSelectionHandler<Item: DisplayablePickerItem>(
+        columns: [PickerColumn<Item>],
+        title: String,
+        newScreen: Bool,
+        inputHandler: PickerInput
+    ) -> ColumnSelectionHandler<Item> {
+        configureScreen(newScreen, inputHandler: inputHandler)
+        let topLine = inputHandler.readCursorPos().row + PickerPadding.top
+
+        let state = ColumnSelectionState(
+            columns: columns,
+            activeColumnIndex: columns.count - 1,
+            title: title,
+            topLine: topLine
+        )
+
+        return .init(state: state, inputHandler: inputHandler)
+    }
 }
 
 // MARK: - Private Methods
