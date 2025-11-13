@@ -38,6 +38,16 @@ extension ColumnSelectionHandler {
     /// Captures the user's input for column selection.
     /// - Returns: The selected item from the active column, or `nil` if the user quit.
     func captureUserInput() -> Item? {
+        // Set up signal handlers to ensure terminal cleanup on interrupt
+        SignalHandler.setupSignalHandlers { [inputHandler] in
+            inputHandler.exitAlternativeScreen()
+            inputHandler.enableNormalInput()
+        }
+
+        defer {
+            SignalHandler.removeSignalHandlers()
+        }
+
         renderColumns()
 
         while true {

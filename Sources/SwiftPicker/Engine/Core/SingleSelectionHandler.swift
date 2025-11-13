@@ -1,6 +1,6 @@
 //
 //  SingleSelectionHandler.swift
-//  
+//
 //
 //  Created by Nikolai Nobadi on 5/16/24.
 //
@@ -11,6 +11,17 @@ final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHa
     /// Captures the user's input for a single selection.
     /// - Returns: The selected item, or `nil` if no selection was made.
     func captureUserInput() -> Item? {
+        // Set up signal handlers to ensure terminal cleanup on interrupt
+        SignalHandler.setupSignalHandlers { [inputHandler] in
+            inputHandler.exitAlternativeScreen()
+            inputHandler.enableNormalInput()
+        }
+
+        defer {
+            SignalHandler.removeSignalHandlers()
+            endSelection()
+        }
+
         scrollAndRenderOptions()
         while true {
             inputHandler.clearBuffer()
@@ -25,7 +36,7 @@ final class SingleSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHa
                         continue  // No action for space or backspace in single selection
                     }
                 }
-                
+
                 handleArrowKeys()
             }
         }

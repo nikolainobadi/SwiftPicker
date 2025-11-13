@@ -11,6 +11,17 @@ final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHan
     /// Captures the user's input for multiple selections.
     /// - Returns: An array of selected items.
     func captureUserInput() -> [Item] {
+        // Set up signal handlers to ensure terminal cleanup on interrupt
+        SignalHandler.setupSignalHandlers { [inputHandler] in
+            inputHandler.exitAlternativeScreen()
+            inputHandler.enableNormalInput()
+        }
+
+        defer {
+            SignalHandler.removeSignalHandlers()
+            endSelection()
+        }
+
         scrollAndRenderOptions()
         while true {
             inputHandler.clearBuffer()
@@ -28,7 +39,7 @@ final class MultiSelectionHandler<Item: DisplayablePickerItem>: BaseSelectionHan
                         continue  // No action for backspace in multi selection
                     }
                 }
-                
+
                 handleArrowKeys()
             }
         }
