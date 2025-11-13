@@ -145,6 +145,39 @@ public extension InteractivePicker {
 
         return handler.captureUserInput()
     }
+
+    /// Displays a dual-column layout with one selectable column and one static display column.
+    /// User can navigate both columns with arrow keys but can only select items from the first column.
+    /// The second column remains static and is for display/reference only.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be selected with Enter.
+    ///   - staticDisplayItems: Items in the right column for display only (cannot be selected).
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - displayTitle: Title for the static display column.
+    ///   - title: Main title to display above both columns. Defaults to empty string.
+    ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
+    /// - Returns: The selected item from the selectable column, or `nil` if the user quits.
+    func dualColumnSelection<Item: DisplayablePickerItem>(
+        selectableItems: [Item],
+        staticDisplayItems: [Item],
+        selectableTitle: String,
+        displayTitle: String,
+        title: some PickerPrompt = "",
+        newScreen: Bool = true
+    ) -> Item? {
+        let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
+        let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
+
+        let handler = SelectionHandlerFactory.makeDualColumnSelectionHandler(
+            selectableColumn: selectableColumn,
+            displayColumn: displayColumn,
+            title: title.title,
+            newScreen: newScreen,
+            inputHandler: pickerInputHandler
+        )
+
+        return handler.captureUserInput()
+    }
 }
 
 
