@@ -219,8 +219,9 @@ private extension ColumnSelectionHandler {
         for (columnIndex, column) in columnsToRender.enumerated() {
             let colX = calculateColumnXPosition(for: columnIndex)
             let isActiveColumn = columnIndex == state.activeColumnIndex
+            let isLastColumn = columnIndex == columnsToRender.count - 1
 
-            renderColumn(column, at: colX, row: 6, isActive: isActiveColumn, maxRows: maxRows)
+            renderColumn(column, at: colX, row: 6, isActive: isActiveColumn, maxRows: maxRows, isLastColumn: isLastColumn, screenWidth: screenCols)
         }
 
         // Render dividers between columns (starting at row 5 for column titles)
@@ -244,13 +245,25 @@ private extension ColumnSelectionHandler {
     ///   - row: The starting row for rendering items.
     ///   - isActive: Whether this is the currently active column.
     ///   - maxRows: Maximum number of rows to display.
-    func renderColumn(_ column: PickerColumn<Item>, at colX: Int, row: Int, isActive: Bool, maxRows: Int) {
+    ///   - isLastColumn: Whether this is the last (rightmost) column.
+    ///   - screenWidth: The width of the screen in characters.
+    func renderColumn(_ column: PickerColumn<Item>, at colX: Int, row: Int, isActive: Bool, maxRows: Int, isLastColumn: Bool, screenWidth: Int) {
+        // Calculate the effective column width
+        // Last column uses remaining screen space, others use fixed columnWidth
+        let effectiveColumnWidth: Int
+        if isLastColumn {
+            // Use remaining screen width minus a small margin
+            effectiveColumnWidth = max(columnWidth, screenWidth - colX - 2)
+        } else {
+            effectiveColumnWidth = columnWidth
+        }
+
         // Render column title
         inputHandler.moveTo(row - 1, colX)
 
         // Add "[View Only]" suffix for non-selectable columns
         let titleText = column.isSelectable ? column.title : "\(column.title) [View Only]"
-        let truncatedTitle = truncate(titleText, maxWidth: columnWidth - 2)
+        let truncatedTitle = truncate(titleText, maxWidth: effectiveColumnWidth - 2)
 
         // Use dimmed color for non-selectable columns, normal style for selectable
         let titleStyle: String
@@ -263,7 +276,7 @@ private extension ColumnSelectionHandler {
 
         // Render separator line under title
         inputHandler.moveTo(row, colX)
-        let separatorLength = min(columnWidth - 2, max(truncatedTitle.count, 10))
+        let separatorLength = min(effectiveColumnWidth - 2, max(truncatedTitle.count, 10))
         let separator = String(repeating: "─", count: separatorLength)
         let separatorStyle = !column.isSelectable ? separator.foreColor(247) : separator.foreColor(242)
         inputHandler.write(separatorStyle)
@@ -276,17 +289,17 @@ private extension ColumnSelectionHandler {
 
             let isActiveItem = itemIndex == column.activeIndex
             // Reserve 2 characters for the indicator ("> " or "• " or "○ ")
-            let maxDisplayWidth = columnWidth - 2
+            let maxDisplayWidth = effectiveColumnWidth - 2
             let truncatedName = truncate(item.displayName, maxWidth: maxDisplayWidth)
 
             // Non-selectable columns get dimmed styling with different indicator
             if !column.isSelectable {
                 if isActiveItem && isActive {
                     // Active item in active non-selectable column - use hollow circle indicator
-                    inputHandler.write("○ ".foreColor(250) + truncatedName.foreColor(250))
+                    inputHandler.write("✧ ".foreColor(250) + truncatedName.foreColor(250))
                 } else if isActiveItem {
                     // Active item in inactive non-selectable column
-                    inputHandler.write("○ ".foreColor(247) + truncatedName.foreColor(247))
+                    inputHandler.write("✧ ".foreColor(247) + truncatedName.foreColor(247))
                 } else {
                     // Inactive item in non-selectable column
                     inputHandler.write("  " + truncatedName.foreColor(247))
