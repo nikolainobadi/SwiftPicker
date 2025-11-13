@@ -38,9 +38,9 @@ extension BaseSelectionHandler {
     /// Scrolls and renders the options in the selection list based on the terminal size.
     func scrollAndRenderOptions() {
         let (rows, cols) = inputHandler.readScreenSize()
-        // Reserve additional space for separator (1) and selected item (1)
-        let reservedFooterSpace = 2
-        let displayableOptionsCount = rows - verticalPadding - reservedFooterSpace
+        // Reserve additional space for selected item in header (1 line)
+        let reservedHeaderSpace = 1
+        let displayableOptionsCount = rows - verticalPadding - reservedHeaderSpace
 
         renderScrollableOptions(displayableOptionsCount: displayableOptionsCount, columns: cols, rows: rows)
     }
@@ -90,7 +90,9 @@ private extension BaseSelectionHandler {
         let start = max(0, state.activeLine - (displayableOptionsCount + topPadding))
         let end = min((start + displayableOptionsCount), state.options.count)
 
-        renderHeader(start: start, columns: columns)
+        // Get active option for rendering in header
+        let activeOption = state.options.first(where: { $0.line == state.activeLine })
+        renderHeader(start: start, columns: columns, activeOption: activeOption)
 
         for i in start..<end {
             let option = state.options[i]
@@ -100,16 +102,6 @@ private extension BaseSelectionHandler {
             renderOption(option: option, isActive: isActive, row: row, col: 0, screenWidth: columns)
         }
 
-        // Render separator line before selected item and footer
-        let separatorRow = rows - 4
-        renderSeparator(at: separatorRow, screenWidth: columns)
-
-        // Render selected item display
-        if let activeOption = state.options.first(where: { $0.line == state.activeLine }) {
-            let selectedItemRow = rows - 2
-            renderSelectedItem(activeOption.item, at: selectedItemRow, screenWidth: columns)
-        }
-
         renderFooter(end: end, displayableOptionsCount: displayableOptionsCount)
     }
     
@@ -117,12 +109,20 @@ private extension BaseSelectionHandler {
     /// - Parameters:
     ///   - start: The starting index of the options to display.
     ///   - columns: The number of columns in the terminal.
-    func renderHeader(start: Int, columns: Int) {
+    ///   - activeOption: The currently active option for displaying selected item.
+    func renderHeader(start: Int, columns: Int, activeOption: Option<Item>?) {
         inputHandler.clearScreen()
         inputHandler.moveToHome()
         inputHandler.write(centerText(state.topLineText, inWidth: columns))
         inputHandler.write("\n")
         inputHandler.write("\n")
+
+        // Render selected item between topLineText and title
+        if let activeOption = activeOption {
+            renderSelectedItemInline(activeOption.item, screenWidth: columns)
+            inputHandler.write("\n")
+        }
+
         inputHandler.write(state.title)
         inputHandler.write("\n")
         if start > 0 {
@@ -164,38 +164,23 @@ private extension BaseSelectionHandler {
         PickerTextFormatter.truncate(text, maxWidth: maxWidth)
     }
 
-    /// Renders the currently selected item's full name at the bottom of the screen.
+    /// Renders the currently selected item inline during header rendering.
     /// Uses PickerTextFormatter for consistent text formatting across all selection handlers.
     /// - Parameters:
     ///   - item: The item to display.
-    ///   - row: The row position for the selected item name.
     ///   - screenWidth: The width of the screen for centering.
-    func renderSelectedItem(_ item: Item, at row: Int, screenWidth: Int) {
-        inputHandler.moveTo(row, 1)
-
-        let prefix = "Selected: "
+    func renderSelectedItemInline(_ item: Item, screenWidth: Int) {
         let itemName = item.displayName
-        let displayText = prefix + itemName
 
         // Truncate if too long for screen width
         let maxWidth = screenWidth - 2
-        let finalText = displayText.count > maxWidth
-            ? prefix + PickerTextFormatter.truncate(itemName, maxWidth: maxWidth - prefix.count)
-            : displayText
+        let finalText = itemName.count > maxWidth
+            ? PickerTextFormatter.truncate(itemName, maxWidth: maxWidth)
+            : itemName
 
         // Center and display in cyan color
         let centeredText = PickerTextFormatter.centerText(finalText, inWidth: screenWidth)
         inputHandler.write(centeredText.foreColor(51))  // Cyan color
-    }
-
-    /// Renders a horizontal separator line.
-    /// - Parameters:
-    ///   - row: The row position for the separator.
-    ///   - screenWidth: The width of the screen.
-    func renderSeparator(at row: Int, screenWidth: Int) {
-        inputHandler.moveTo(row, 1)
-        let separator = String(repeating: "─", count: screenWidth - 2)
-        inputHandler.write(separator.foreColor(240))
     }
 
     /// Renders a single option in the selection list.

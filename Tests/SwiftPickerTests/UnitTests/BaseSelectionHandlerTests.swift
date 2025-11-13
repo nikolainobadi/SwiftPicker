@@ -123,21 +123,19 @@ private extension BaseSelectionHandlerTests {
 
         // Verify header text appears in output
         #expect(input.writtenText.contains(where: { $0.contains(state.topLineText) }), "missing top line text", sourceLocation: sourceLocation)
+
+        // Verify selected item display appears in output (now in header between topLineText and title)
+        let selectedItemName = state.options[activeIndex].title
+        #expect(input.writtenText.contains(where: { $0.contains("Selected: \(selectedItemName)") }), "missing selected item display", sourceLocation: sourceLocation)
+
         #expect(input.writtenText.contains(where: { $0.contains(state.title) }), "missing title", sourceLocation: sourceLocation)
 
-        // Verify options appear in output (now 18 instead of 20 due to separator + selected item taking 2 rows)
-        for i in 0..<18 {
+        // Verify options appear in output (now 19 instead of 18 since we moved selected item to header and removed separator)
+        for i in 0..<19 {
             let indicator = i == activeIndex ? selectedIndicator : unselectedIndicator
             #expect(input.writtenText.contains(where: { $0.contains(indicator) }), "missing indicator for index \(i)", sourceLocation: sourceLocation)
             #expect(input.writtenText.contains(where: { $0.contains(state.options[i].title) }), "missing option \(i)", sourceLocation: sourceLocation)
         }
-
-        // Verify separator line appears in output
-        #expect(input.writtenText.contains(where: { $0.contains("─") }), "missing separator line", sourceLocation: sourceLocation)
-
-        // Verify selected item display appears in output
-        let selectedItemName = state.options[activeIndex].title
-        #expect(input.writtenText.contains(where: { $0.contains("Selected: \(selectedItemName)") }), "missing selected item display", sourceLocation: sourceLocation)
 
         // Verify footer text appears in output
         #expect(input.writtenText.contains(where: { $0.contains(state.bottomLineText) }), "missing bottom line text", sourceLocation: sourceLocation)
