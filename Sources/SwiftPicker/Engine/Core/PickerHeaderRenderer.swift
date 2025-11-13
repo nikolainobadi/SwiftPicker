@@ -39,7 +39,12 @@ struct PickerHeaderRenderer {
             inputHandler.write("\n")
         }
 
-        inputHandler.write(title)
+        // Truncate and center title if needed
+        let maxTitleWidth = screenWidth - 2
+        let truncatedTitle = title.count > maxTitleWidth
+            ? PickerTextFormatter.truncate(title, maxWidth: maxTitleWidth)
+            : title
+        inputHandler.write(centerText(truncatedTitle, inWidth: screenWidth))
         inputHandler.write("\n")
         if showScrollUpIndicator {
             inputHandler.write("↑".lightGreen)

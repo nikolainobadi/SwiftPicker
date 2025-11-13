@@ -201,17 +201,17 @@ private extension ColumnSelectionHandler {
         let maxVisibleColumns = calculateMaxVisibleColumns(screenWidth: screenCols)
         let columnsToRender = Array(state.columns.prefix(maxVisibleColumns))
 
-        // Render each column
+        // Render each column (starting at row 6 to avoid overwriting breadcrumb title on row 4)
         for (columnIndex, column) in columnsToRender.enumerated() {
             let colX = calculateColumnXPosition(for: columnIndex)
             let isActiveColumn = columnIndex == state.activeColumnIndex
 
-            renderColumn(column, at: colX, row: 5, isActive: isActiveColumn, maxRows: rows - 8)
+            renderColumn(column, at: colX, row: 6, isActive: isActiveColumn, maxRows: rows - 9)
         }
 
-        // Render dividers between columns
+        // Render dividers between columns (starting at row 5 for column titles)
         if columnsToRender.count > 1 {
-            renderDividers(columnCount: columnsToRender.count, startRow: 4, maxRows: rows - 8)
+            renderDividers(columnCount: columnsToRender.count, startRow: 5, maxRows: rows - 9)
         }
 
         // Render separator line before footer
