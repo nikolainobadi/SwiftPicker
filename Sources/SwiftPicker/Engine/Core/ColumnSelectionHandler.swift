@@ -252,19 +252,34 @@ private extension ColumnSelectionHandler {
             inputHandler.moveTo(itemRow, colX)
 
             let isActiveItem = itemIndex == column.activeIndex
-            // Reserve 2 characters for the indicator ("> " or "• ")
+            // Reserve 2 characters for the indicator ("> " or "• " or "○ ")
             let maxDisplayWidth = columnWidth - 2
             let truncatedName = truncate(item.displayName, maxWidth: maxDisplayWidth)
 
-            if isActiveItem && isActive {
-                // Active column, active item
-                inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
-            } else if isActiveItem {
-                // Inactive column, active item
-                inputHandler.write("• ".yellow + truncatedName.foreColor(250))
+            // Non-selectable columns get dimmed styling with different indicator
+            if !column.isSelectable {
+                if isActiveItem && isActive {
+                    // Active item in active non-selectable column - use hollow circle indicator
+                    inputHandler.write("○ ".foreColor(245) + truncatedName.foreColor(245))
+                } else if isActiveItem {
+                    // Active item in inactive non-selectable column
+                    inputHandler.write("○ ".foreColor(240) + truncatedName.foreColor(240))
+                } else {
+                    // Inactive item in non-selectable column
+                    inputHandler.write("  " + truncatedName.foreColor(240))
+                }
             } else {
-                // Inactive item
-                inputHandler.write("  " + truncatedName.foreColor(250))
+                // Selectable columns use normal styling
+                if isActiveItem && isActive {
+                    // Active column, active item
+                    inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
+                } else if isActiveItem {
+                    // Inactive column, active item
+                    inputHandler.write("• ".yellow + truncatedName.foreColor(250))
+                } else {
+                    // Inactive item
+                    inputHandler.write("  " + truncatedName.foreColor(250))
+                }
             }
         }
 
