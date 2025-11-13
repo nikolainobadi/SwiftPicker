@@ -234,6 +234,86 @@ extension SelectionHandlerFactory {
 
         return .init(state: state, inputHandler: inputHandler, onNavigate: nil)
     }
+
+    /// Creates a dynamic multi-selection dual-column handler with the default input handler.
+    /// The first column supports multi-selection, and the second column dynamically updates based on the active item in the first column.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be multi-selected.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - displayTitle: Title for the dynamic display column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - onActiveItemChange: Closure called when the active item changes. Should return items to display in the second column.
+    /// - Returns: A ColumnSelectionHandler instance configured for dynamic multi-selection dual-column.
+    static func makeDynamicMultiSelectionDualColumnHandler<Item: DisplayablePickerItem>(
+        selectableItems: [Item],
+        selectableTitle: String,
+        displayTitle: String,
+        title: String,
+        newScreen: Bool,
+        onActiveItemChange: @escaping (Item) -> [Item]
+    ) -> ColumnSelectionHandler<Item> {
+        return makeDynamicMultiSelectionDualColumnHandler(
+            selectableItems: selectableItems,
+            selectableTitle: selectableTitle,
+            displayTitle: displayTitle,
+            title: title,
+            newScreen: newScreen,
+            inputHandler: inputHandler,
+            onActiveItemChange: onActiveItemChange
+        )
+    }
+
+    /// Creates a dynamic multi-selection dual-column handler with a custom input handler.
+    /// The first column supports multi-selection, and the second column dynamically updates based on the active item in the first column.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be multi-selected.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - displayTitle: Title for the dynamic display column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    ///   - onActiveItemChange: Closure called when the active item changes. Should return items to display in the second column.
+    /// - Returns: A ColumnSelectionHandler instance configured for dynamic multi-selection dual-column.
+    static func makeDynamicMultiSelectionDualColumnHandler<Item: DisplayablePickerItem>(
+        selectableItems: [Item],
+        selectableTitle: String,
+        displayTitle: String,
+        title: String,
+        newScreen: Bool,
+        inputHandler: PickerInput,
+        onActiveItemChange: @escaping (Item) -> [Item]
+    ) -> ColumnSelectionHandler<Item> {
+        // Create the first column (selectable)
+        let firstColumn = PickerColumn(
+            title: selectableTitle,
+            items: selectableItems,
+            activeIndex: 0,
+            isSelectable: true
+        )
+
+        // Initialize second column with items from the first active item
+        let initialDisplayItems = selectableItems.isEmpty ? [] : onActiveItemChange(selectableItems[0])
+        let secondColumn = PickerColumn(
+            title: displayTitle,
+            items: initialDisplayItems,
+            activeIndex: 0,
+            isSelectable: false
+        )
+
+        configureScreen(newScreen, inputHandler: inputHandler)
+        let topLine = inputHandler.readCursorPos().row + PickerPadding.top
+
+        let state = ColumnSelectionState(
+            columns: [firstColumn, secondColumn],
+            activeColumnIndex: 0,  // Start with first column active
+            title: title,
+            topLine: topLine,
+            isMultiSelection: true  // Enable multi-selection mode
+        )
+
+        return .init(state: state, inputHandler: inputHandler, onNavigate: nil, onActiveItemChange: onActiveItemChange)
+    }
 }
 
 // MARK: - Private Methods

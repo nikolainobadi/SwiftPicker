@@ -210,6 +210,37 @@ public extension InteractivePicker {
 
         return handler.captureMultiUserInput()
     }
+
+    /// Displays a dual-column layout with multi-selection in the first column and a dynamic display in the second.
+    /// The second column updates automatically based on which item is currently highlighted in the first column.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be multi-selected with Space and confirmed with Enter.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - displayTitle: Title for the dynamic display column.
+    ///   - title: Main title to display above both columns. Defaults to empty string.
+    ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
+    ///   - onActiveItemChange: Closure that returns items to display in the second column based on the currently highlighted item in the first column.
+    /// - Returns: An array of selected items from the selectable column.
+    func dynamicMultiSelectionDualColumn<Item: DisplayablePickerItem>(
+        selectableItems: [Item],
+        selectableTitle: String,
+        displayTitle: String,
+        title: some PickerPrompt = "",
+        newScreen: Bool = true,
+        onActiveItemChange: @escaping (Item) -> [Item]
+    ) -> [Item] {
+        let handler = SelectionHandlerFactory.makeDynamicMultiSelectionDualColumnHandler(
+            selectableItems: selectableItems,
+            selectableTitle: selectableTitle,
+            displayTitle: displayTitle,
+            title: title.title,
+            newScreen: newScreen,
+            inputHandler: pickerInputHandler,
+            onActiveItemChange: onActiveItemChange
+        )
+
+        return handler.captureMultiUserInput()
+    }
 }
 
 

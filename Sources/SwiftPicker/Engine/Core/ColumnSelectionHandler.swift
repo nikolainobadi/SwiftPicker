@@ -13,6 +13,7 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
     private let columnWidth: Int
     private let columnSpacing: Int
     private let onNavigate: ((Item) -> (items: [Item], title: String)?)?
+    private let onActiveItemChange: ((Item) -> [Item])?
     private let headerRenderer: PickerHeaderRenderer
 
     /// Initializes a new column selection handler.
@@ -22,12 +23,14 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
     ///   - columnWidth: The width of each column in characters. Defaults to 30.
     ///   - columnSpacing: The spacing between columns in characters. Defaults to 4.
     ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
-    init(state: ColumnSelectionState<Item>, inputHandler: PickerInput, columnWidth: Int = 30, columnSpacing: Int = 4, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) {
+    ///   - onActiveItemChange: Closure called when the active item changes in the first column. Should return items to display in the second column.
+    init(state: ColumnSelectionState<Item>, inputHandler: PickerInput, columnWidth: Int = 30, columnSpacing: Int = 4, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil, onActiveItemChange: ((Item) -> [Item])? = nil) {
         self.state = state
         self.inputHandler = inputHandler
         self.columnWidth = columnWidth
         self.columnSpacing = columnSpacing
         self.onNavigate = onNavigate
+        self.onActiveItemChange = onActiveItemChange
         self.headerRenderer = PickerHeaderRenderer(inputHandler: inputHandler)
     }
 }
@@ -228,7 +231,30 @@ private extension ColumnSelectionHandler {
         if newIndex >= 0 && newIndex < column.items.count {
             column.activeIndex = newIndex
             state.activeColumn = column
+
+            // Update second column if onActiveItemChange is set and we're in the first column
+            if let onActiveItemChange = onActiveItemChange,
+               state.activeColumnIndex == 0,
+               state.columns.count == 2,
+               let activeItem = state.activeColumn.activeItem {
+                updateSecondColumn(with: onActiveItemChange(activeItem))
+            }
         }
+    }
+
+    /// Updates the second column with new items while preserving the title.
+    /// - Parameter items: The new items to display in the second column.
+    func updateSecondColumn(with items: [Item]) {
+        guard state.navigationStack.count >= 2 else { return }
+
+        var secondColumn = state.navigationStack[1]
+        secondColumn = PickerColumn(
+            title: secondColumn.title,
+            items: items,
+            activeIndex: 0,
+            isSelectable: secondColumn.isSelectable
+        )
+        state.navigationStack[1] = secondColumn
     }
 
     /// Moves between columns.
