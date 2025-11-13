@@ -62,12 +62,13 @@ private extension PickerHeaderRenderer {
     ///   - screenWidth: The width of the screen for centering.
     func renderSelectedItem(_ item: any DisplayablePickerItem, screenWidth: Int) {
         let itemName = item.displayName
+        let textWithLabel = "Selected: \(itemName)"
 
         // Truncate if too long for screen width
         let maxWidth = screenWidth - 2
-        let finalText = itemName.count > maxWidth
-            ? PickerTextFormatter.truncate(itemName, maxWidth: maxWidth)
-            : itemName
+        let finalText = textWithLabel.count > maxWidth
+            ? PickerTextFormatter.truncate(textWithLabel, maxWidth: maxWidth)
+            : textWithLabel
 
         // Center and display in cyan color
         let centeredText = PickerTextFormatter.centerText(finalText, inWidth: screenWidth)
