@@ -21,6 +21,9 @@ public struct PickerColumn<Item: DisplayablePickerItem> {
     /// When false, the column is for display/navigation only.
     public let isSelectable: Bool
 
+    /// Set of indices for items that are selected (used in multi-selection mode).
+    var selectedIndices: Set<Int>
+
     /// Initializes a new picker column.
     /// - Parameters:
     ///   - title: The title to display at the top of the column.
@@ -32,11 +35,34 @@ public struct PickerColumn<Item: DisplayablePickerItem> {
         self.items = items
         self.activeIndex = activeIndex
         self.isSelectable = isSelectable
+        self.selectedIndices = []
     }
 
     /// The currently active item in the column, or nil if the activeIndex is out of bounds.
     public var activeItem: Item? {
         guard activeIndex >= 0, activeIndex < items.count else { return nil }
         return items[activeIndex]
+    }
+
+    /// The selected items in this column (used in multi-selection mode).
+    var selectedItems: [Item] {
+        return selectedIndices.sorted().compactMap { index in
+            guard index >= 0, index < items.count else { return nil }
+            return items[index]
+        }
+    }
+
+    /// Toggles the selection state of the item at the current active index.
+    mutating func toggleSelection() {
+        if selectedIndices.contains(activeIndex) {
+            selectedIndices.remove(activeIndex)
+        } else {
+            selectedIndices.insert(activeIndex)
+        }
+    }
+
+    /// Checks if the item at the given index is selected.
+    func isSelected(at index: Int) -> Bool {
+        return selectedIndices.contains(index)
     }
 }

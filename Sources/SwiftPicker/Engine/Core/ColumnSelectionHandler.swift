@@ -79,6 +79,51 @@ extension ColumnSelectionHandler {
             }
         }
     }
+
+    /// Captures the user's input for multi-selection column selection.
+    /// - Returns: An array of selected items from the active column.
+    func captureMultiUserInput() -> [Item] {
+        // Set up signal handlers to ensure terminal cleanup on interrupt
+        SignalHandler.setupSignalHandlers { [inputHandler] in
+            inputHandler.exitAlternativeScreen()
+            inputHandler.enableNormalInput()
+        }
+
+        defer {
+            SignalHandler.removeSignalHandlers()
+        }
+
+        renderColumns()
+
+        while true {
+            inputHandler.clearBuffer()
+            if inputHandler.keyPressed() {
+                if let specialChar = inputHandler.readSpecialChar() {
+                    switch specialChar {
+                    case .enter:
+                        // Only allow selection if the active column is selectable
+                        if state.activeColumn.isSelectable {
+                            endSelection()
+                            return state.activeColumn.selectedItems
+                        }
+                        // Otherwise, ignore the Enter key press
+                    case .quit:
+                        endSelection()
+                        return []
+                    case .space:
+                        handleSpaceKeySelection()
+                        renderColumns()
+                    case .backspace:
+                        // No action for backspace in multi-selection dual-column mode
+                        continue
+                    }
+                }
+
+                handleNavigation()
+                renderColumns()
+            }
+        }
+    }
 }
 
 
@@ -109,6 +154,16 @@ private extension ColumnSelectionHandler {
         }
 
         addChildColumn(items: result.items, title: result.title)
+    }
+
+    /// Handles space key press to toggle selection in multi-selection mode.
+    func handleSpaceKeySelection() {
+        // Only toggle selection if the active column is selectable
+        guard state.activeColumn.isSelectable else { return }
+
+        var column = state.activeColumn
+        column.toggleSelection()
+        state.activeColumn = column
     }
 
     /// Handles backspace key press to navigate back to parent level.
@@ -292,6 +347,9 @@ private extension ColumnSelectionHandler {
             let maxDisplayWidth = effectiveColumnWidth - 2
             let truncatedName = truncate(item.displayName, maxWidth: maxDisplayWidth)
 
+            // Check if this item is selected (for multi-selection mode)
+            let isItemSelected = column.isSelected(at: itemIndex)
+
             // Non-selectable columns get dimmed styling with different indicator
             if !column.isSelectable {
                 if isActiveItem && isActive {
@@ -306,15 +364,31 @@ private extension ColumnSelectionHandler {
                 }
             } else {
                 // Selectable columns use normal styling
-                if isActiveItem && isActive {
-                    // Active column, active item
-                    inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
-                } else if isActiveItem {
-                    // Inactive column, active item
-                    inputHandler.write("• ".yellow + truncatedName.foreColor(250))
+                // In multi-selection mode, show checkboxes
+                if state.isMultiSelection {
+                    if isItemSelected {
+                        // Selected item (checked)
+                        let indicator = isActiveItem && isActive ? "☑ ".lightGreen : "☑ ".green
+                        let textColor: UInt8 = isActiveItem && isActive ? 51 : 250
+                        inputHandler.write(indicator + truncatedName.foreColor(textColor))
+                    } else {
+                        // Unselected item (unchecked)
+                        let indicator = isActiveItem && isActive ? "☐ ".lightGreen : "☐ ".foreColor(240)
+                        let textColor: UInt8 = isActiveItem && isActive ? 51 : 250
+                        inputHandler.write(indicator + truncatedName.foreColor(textColor))
+                    }
                 } else {
-                    // Inactive item
-                    inputHandler.write("  " + truncatedName.foreColor(250))
+                    // Single selection mode - use normal indicators
+                    if isActiveItem && isActive {
+                        // Active column, active item
+                        inputHandler.write("> ".lightGreen + truncatedName.foreColor(51))
+                    } else if isActiveItem {
+                        // Inactive column, active item
+                        inputHandler.write("• ".yellow + truncatedName.foreColor(250))
+                    } else {
+                        // Inactive item
+                        inputHandler.write("  " + truncatedName.foreColor(250))
+                    }
                 }
             }
         }
@@ -371,27 +445,58 @@ private extension ColumnSelectionHandler {
         let col2X = col1X + columnWidth
         let col3X = col2X + columnWidth
 
-        // Column 1: Arrow key navigation
-        inputHandler.moveTo(row, col1X)
-        inputHandler.write("←→: switch columns")
-        inputHandler.moveTo(row + 1, col1X)
-        inputHandler.write("↑↓: navigate items")
+        if state.isMultiSelection {
+            // Multi-selection mode footer
+            // Column 1: Arrow key navigation
+            inputHandler.moveTo(row, col1X)
+            inputHandler.write("←→: switch columns")
+            inputHandler.moveTo(row + 1, col1X)
+            inputHandler.write("↑↓: navigate items")
 
-        // Column 2: Space and Backspace
-        inputHandler.moveTo(row, col2X)
-        inputHandler.write("Space: open")
-        inputHandler.moveTo(row + 1, col2X)
-        inputHandler.write("Backspace: go back")
+            // Column 2: Space for toggle
+            inputHandler.moveTo(row, col2X)
+            if state.activeColumn.isSelectable {
+                inputHandler.write("Space: toggle selection")
+            } else {
+                inputHandler.write("Space: (cannot select)")
+            }
+            inputHandler.moveTo(row + 1, col2X)
+            inputHandler.write("") // Leave blank
 
-        // Column 3: Enter and Quit
-        inputHandler.moveTo(row, col3X)
-        if state.activeColumn.isSelectable {
-            inputHandler.write("Enter: select")
+            // Column 3: Enter and Quit
+            inputHandler.moveTo(row, col3X)
+            if state.activeColumn.isSelectable {
+                let count = state.activeColumn.selectedIndices.count
+                inputHandler.write("Enter: confirm (\(count) selected)")
+            } else {
+                inputHandler.write("Enter: (cannot select)")
+            }
+            inputHandler.moveTo(row + 1, col3X)
+            inputHandler.write("Q: quit")
         } else {
-            inputHandler.write("Enter: (cannot select from this column)")
+            // Single selection mode footer
+            // Column 1: Arrow key navigation
+            inputHandler.moveTo(row, col1X)
+            inputHandler.write("←→: switch columns")
+            inputHandler.moveTo(row + 1, col1X)
+            inputHandler.write("↑↓: navigate items")
+
+            // Column 2: Space and Backspace
+            inputHandler.moveTo(row, col2X)
+            inputHandler.write("Space: open")
+            inputHandler.moveTo(row + 1, col2X)
+            inputHandler.write("Backspace: go back")
+
+            // Column 3: Enter and Quit
+            inputHandler.moveTo(row, col3X)
+            if state.activeColumn.isSelectable {
+                inputHandler.write("Enter: select")
+            } else {
+                inputHandler.write("Enter: (cannot select from this column)")
+            }
+            inputHandler.moveTo(row + 1, col3X)
+            inputHandler.write("Q: quit")
         }
-        inputHandler.moveTo(row + 1, col3X)
-        inputHandler.write("Q: quit")
     }
 
     /// Truncates text to fit within the specified width, adding ellipsis if needed.
