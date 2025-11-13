@@ -64,9 +64,4 @@ extension ColumnSelectionState {
     var topLineText: String {
         return "InteractivePicker (column-selection)"
     }
-
-    /// The text to display at the bottom line of the column selection.
-    var bottomLineText: String {
-        return "Use ←→ to switch columns, ↑↓ to navigate • Backspace to go back • Enter to select • Q to quit"
-    }
 }

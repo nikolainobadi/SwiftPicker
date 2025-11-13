@@ -201,8 +201,8 @@ private extension ColumnSelectionHandler {
         let maxVisibleColumns = calculateMaxVisibleColumns(screenWidth: screenCols)
         let columnsToRender = Array(state.columns.prefix(maxVisibleColumns))
 
-        // Calculate footer space (2 rows for column mode with onNavigate, 1 row otherwise)
-        let footerRows = onNavigate != nil ? 2 : 1
+        // Calculate footer space (always 2 rows for column-style footer)
+        let footerRows = 2
         let maxRows = rows - 9 - (footerRows - 1)
 
         // Render each column (starting at row 6 to avoid overwriting breadcrumb title on row 4)
@@ -334,17 +334,10 @@ private extension ColumnSelectionHandler {
         inputHandler.write(separator.foreColor(240))
     }
 
-    /// Renders the footer with navigation instructions.
+    /// Renders the footer with navigation instructions in 3 columns.
     /// - Parameter row: The row position for the footer.
     func renderFooter(at row: Int) {
-        if onNavigate != nil {
-            // Column navigation mode with dynamic children - render in 3 columns
-            renderColumnFooter(at: row)
-        } else {
-            // Standard mode - render single line
-            inputHandler.moveTo(row, 1)
-            inputHandler.write(state.bottomLineText)
-        }
+        renderColumnFooter(at: row)
     }
 
     /// Renders the footer with navigation instructions organized in 3 columns.
@@ -372,7 +365,7 @@ private extension ColumnSelectionHandler {
         if state.activeColumn.isSelectable {
             inputHandler.write("Enter: select")
         } else {
-            inputHandler.write("(cannot select)")
+            inputHandler.write("Enter: (cannot select from this column)")
         }
         inputHandler.moveTo(row + 1, col3X)
         inputHandler.write("Q: quit")
