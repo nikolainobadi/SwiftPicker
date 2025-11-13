@@ -455,7 +455,6 @@ extension ColumnSelectionTests {
     @Test("Navigates back one level when backspace pressed")
     func navigatesBackOneLevelWhenBackspacePressed() {
         let parentItem = "Parent"
-        let childItem = "Child 0"
         let parentColumn = makeColumn(items: [parentItem])
         let input = MockInput()
 
