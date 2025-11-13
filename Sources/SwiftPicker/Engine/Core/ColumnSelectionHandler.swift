@@ -239,16 +239,23 @@ private extension ColumnSelectionHandler {
         // Use dimmed color for non-selectable columns, normal style for selectable
         let titleStyle: String
         if !column.isSelectable {
-            titleStyle = truncatedTitle.foreColor(240)  // Dimmed gray
+            titleStyle = truncatedTitle.foreColor(247)  // Brighter gray for non-selectable
         } else {
             titleStyle = isActive ? truncatedTitle.underline : truncatedTitle.foreColor(250)
         }
         inputHandler.write(titleStyle)
 
-        // Render column items (limited by maxRows)
+        // Render separator line under title
+        inputHandler.moveTo(row, colX)
+        let separatorLength = min(columnWidth - 2, max(truncatedTitle.count, 10))
+        let separator = String(repeating: "─", count: separatorLength)
+        let separatorStyle = !column.isSelectable ? separator.foreColor(247) : separator.foreColor(242)
+        inputHandler.write(separatorStyle)
+
+        // Render column items (starting one row below separator to make room)
         let itemsToShow = min(column.items.count, maxRows)
         for (itemIndex, item) in column.items.prefix(itemsToShow).enumerated() {
-            let itemRow = row + itemIndex
+            let itemRow = row + 1 + itemIndex
             inputHandler.moveTo(itemRow, colX)
 
             let isActiveItem = itemIndex == column.activeIndex
@@ -260,13 +267,13 @@ private extension ColumnSelectionHandler {
             if !column.isSelectable {
                 if isActiveItem && isActive {
                     // Active item in active non-selectable column - use hollow circle indicator
-                    inputHandler.write("○ ".foreColor(245) + truncatedName.foreColor(245))
+                    inputHandler.write("○ ".foreColor(250) + truncatedName.foreColor(250))
                 } else if isActiveItem {
                     // Active item in inactive non-selectable column
-                    inputHandler.write("○ ".foreColor(240) + truncatedName.foreColor(240))
+                    inputHandler.write("○ ".foreColor(247) + truncatedName.foreColor(247))
                 } else {
                     // Inactive item in non-selectable column
-                    inputHandler.write("  " + truncatedName.foreColor(240))
+                    inputHandler.write("  " + truncatedName.foreColor(247))
                 }
             } else {
                 // Selectable columns use normal styling
@@ -285,7 +292,7 @@ private extension ColumnSelectionHandler {
 
         // Show scroll indicators if there are more items
         if column.items.count > maxRows {
-            inputHandler.moveTo(row + maxRows, colX)
+            inputHandler.moveTo(row + 1 + maxRows, colX)
             inputHandler.write("⋮".foreColor(250))
         }
     }
