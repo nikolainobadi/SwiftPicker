@@ -576,6 +576,190 @@ extension ColumnSelectionTests {
 }
 
 
+// MARK: - Column Selectability Tests
+extension ColumnSelectionTests {
+    @Test("Ignores Enter key press on non-selectable column")
+    func ignoresEnterKeyPressOnNonSelectableColumn() {
+        let items = Self.makeItems(count: 3)
+        let columns = [PickerColumn(title: "View Only", items: items, activeIndex: 0, isSelectable: false)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)
+        input.enqueueSpecialChar(specialChar: .quit)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result == nil)  // Should quit, not select
+    }
+
+    @Test("Allows Enter key press on selectable column")
+    func allowsEnterKeyPressOnSelectableColumn() {
+        let items = Self.makeItems(count: 3)
+        let columns = [PickerColumn(title: "Selectable", items: items, activeIndex: 0, isSelectable: true)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(items.contains(result!))
+    }
+
+    @Test("Default columns are selectable for backward compatibility")
+    func defaultColumnsAreSelectableForBackwardCompatibility() {
+        let items = Self.makeItems(count: 3)
+        // Using old init without isSelectable parameter
+        let columns = [makeColumn(items: items)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(items.contains(result!))
+    }
+
+    @Test("Allows selection when switching from non-selectable to selectable column")
+    func allowsSelectionWhenSwitchingFromNonSelectableToSelectableColumn() {
+        let selectableItems = ["A", "B", "C"]
+        let nonSelectableItems = ["X", "Y", "Z"]
+        let columns = [
+            PickerColumn(title: "Selectable", items: selectableItems, activeIndex: 0, isSelectable: true),
+            PickerColumn(title: "View Only", items: nonSelectableItems, activeIndex: 0, isSelectable: false)
+        ]
+        let input = MockInput(directionKey: .left)
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: nil)  // Trigger direction key (left)
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result != nil)
+        #expect(selectableItems.contains(result!))
+    }
+
+    @Test("Prevents selection when switching from selectable to non-selectable column")
+    func preventsSelectionWhenSwitchingFromSelectableToNonSelectableColumn() {
+        let selectableItems = ["A", "B", "C"]
+        let nonSelectableItems = ["X", "Y", "Z"]
+        let columns = [
+            PickerColumn(title: "Selectable", items: selectableItems, activeIndex: 0, isSelectable: true),
+            PickerColumn(title: "View Only", items: nonSelectableItems, activeIndex: 0, isSelectable: false)
+        ]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)  // Try to select from non-selectable (starts at rightmost)
+        input.enqueueSpecialChar(specialChar: .quit)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        #expect(result == nil)  // Should quit, not select
+    }
+
+    @Test("Supports mixed selectability across multiple columns")
+    func supportsMixedSelectabilityAcrossMultipleColumns() {
+        let columns = [
+            PickerColumn(title: "First", items: ["A"], activeIndex: 0, isSelectable: true),
+            PickerColumn(title: "Second", items: ["B"], activeIndex: 0, isSelectable: false),
+            PickerColumn(title: "Third", items: ["C"], activeIndex: 0, isSelectable: true)
+        ]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .enter)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        // Should select from third column (rightmost, selectable)
+        #expect(result == "C")
+    }
+
+    @Test("Non-selectable columns still support navigation")
+    func nonSelectableColumnsStillSupportNavigation() {
+        let items = Self.makeItems(count: 5)
+        let columns = [PickerColumn(title: "View Only", items: items, activeIndex: 0, isSelectable: false)]
+        let input = MockInput(directionKey: .down)
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: nil)  // Navigate down
+        input.enqueueSpecialChar(specialChar: nil)  // Navigate down again
+        input.enqueueSpecialChar(specialChar: .enter)  // Try to select (should fail)
+        input.enqueueSpecialChar(specialChar: .quit)
+
+        let handler = makeSUT(columns: columns, input: input)
+        let result = handler.captureUserInput()
+
+        // Should quit (cannot select from non-selectable column)
+        #expect(result == nil)
+    }
+
+    @Test("Non-selectable columns work with space navigation")
+    func nonSelectableColumnsWorkWithSpaceNavigation() {
+        let parentItem = "Parent"
+        let columns = [PickerColumn(title: "Categories", items: [parentItem], activeIndex: 0, isSelectable: false)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate into children
+        input.enqueueDirectionKey(directionKey: .left)  // Move to parent column
+        input.enqueueSpecialChar(specialChar: nil)
+        input.enqueueSpecialChar(specialChar: .enter)  // Try to select (should fail)
+        input.enqueueSpecialChar(specialChar: .quit)
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == parentItem {
+                return (items: ["Child 0", "Child 1"], title: "Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: columns, input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        // Cannot select from non-selectable parent column
+        #expect(result == nil)
+    }
+
+    @Test("Can select from child column when parent is non-selectable")
+    func canSelectFromChildColumnWhenParentIsNonSelectable() {
+        let parentItem = "Parent"
+        let childItem = "Child 0"
+        let columns = [PickerColumn(title: "Categories", items: [parentItem], activeIndex: 0, isSelectable: false)]
+        let input = MockInput()
+
+        input.pressKey = true
+        input.enqueueSpecialChar(specialChar: .space)  // Navigate into children
+        input.enqueueSpecialChar(specialChar: .enter)  // Select from child column
+
+        let onNavigate: (String) -> (items: [String], title: String)? = { item in
+            if item == parentItem {
+                // Child column is selectable (default behavior)
+                return (items: ["Child 0", "Child 1"], title: "Children")
+            }
+            return nil
+        }
+
+        let handler = makeSUT(columns: columns, input: input, onNavigate: onNavigate)
+        let result = handler.captureUserInput()
+
+        #expect(result == childItem)
+    }
+}
+
+
 // MARK: - SUT
 private extension ColumnSelectionTests {
     func makeSUT(

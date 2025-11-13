@@ -44,8 +44,12 @@ extension ColumnSelectionHandler {
                 if let specialChar = inputHandler.readSpecialChar() {
                     switch specialChar {
                     case .enter:
-                        endSelection()
-                        return state.activeColumn.activeItem
+                        // Only allow selection if the active column is selectable
+                        if state.activeColumn.isSelectable {
+                            endSelection()
+                            return state.activeColumn.activeItem
+                        }
+                        // Otherwise, ignore the Enter key press
                     case .quit:
                         endSelection()
                         return nil
@@ -227,8 +231,18 @@ private extension ColumnSelectionHandler {
     func renderColumn(_ column: PickerColumn<Item>, at colX: Int, row: Int, isActive: Bool, maxRows: Int) {
         // Render column title
         inputHandler.moveTo(row - 1, colX)
-        let truncatedTitle = truncate(column.title, maxWidth: columnWidth - 2)
-        let titleStyle = isActive ? truncatedTitle.underline : truncatedTitle.foreColor(250)
+
+        // Add "[View Only]" suffix for non-selectable columns
+        let titleText = column.isSelectable ? column.title : "\(column.title) [View Only]"
+        let truncatedTitle = truncate(titleText, maxWidth: columnWidth - 2)
+
+        // Use dimmed color for non-selectable columns, normal style for selectable
+        let titleStyle: String
+        if !column.isSelectable {
+            titleStyle = truncatedTitle.foreColor(240)  // Dimmed gray
+        } else {
+            titleStyle = isActive ? truncatedTitle.underline : truncatedTitle.foreColor(250)
+        }
         inputHandler.write(titleStyle)
 
         // Render column items (limited by maxRows)
@@ -296,9 +310,19 @@ private extension ColumnSelectionHandler {
     /// - Parameter row: The row position for the footer.
     func renderFooter(at row: Int) {
         inputHandler.moveTo(row, 1)
-        let footerText = onNavigate != nil
-            ? "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Enter to select • Q to quit"
-            : state.bottomLineText
+
+        let footerText: String
+        if onNavigate != nil {
+            // Column navigation mode with dynamic children
+            if state.activeColumn.isSelectable {
+                footerText = "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Enter to select • Q to quit"
+            } else {
+                footerText = "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Q to quit (cannot select from this column)"
+            }
+        } else {
+            footerText = state.bottomLineText
+        }
+
         inputHandler.write(footerText)
     }
 
