@@ -201,24 +201,30 @@ private extension ColumnSelectionHandler {
         let maxVisibleColumns = calculateMaxVisibleColumns(screenWidth: screenCols)
         let columnsToRender = Array(state.columns.prefix(maxVisibleColumns))
 
+        // Calculate footer space (2 rows for column mode with onNavigate, 1 row otherwise)
+        let footerRows = onNavigate != nil ? 2 : 1
+        let maxRows = rows - 9 - (footerRows - 1)
+
         // Render each column (starting at row 6 to avoid overwriting breadcrumb title on row 4)
         for (columnIndex, column) in columnsToRender.enumerated() {
             let colX = calculateColumnXPosition(for: columnIndex)
             let isActiveColumn = columnIndex == state.activeColumnIndex
 
-            renderColumn(column, at: colX, row: 6, isActive: isActiveColumn, maxRows: rows - 9)
+            renderColumn(column, at: colX, row: 6, isActive: isActiveColumn, maxRows: maxRows)
         }
 
         // Render dividers between columns (starting at row 5 for column titles)
         if columnsToRender.count > 1 {
-            renderDividers(columnCount: columnsToRender.count, startRow: 5, maxRows: rows - 9)
+            renderDividers(columnCount: columnsToRender.count, startRow: 5, maxRows: maxRows)
         }
 
         // Render separator line before footer
-        renderSeparator(at: rows - 4, screenWidth: screenCols)
+        let separatorRow = rows - 3 - footerRows
+        renderSeparator(at: separatorRow, screenWidth: screenCols)
 
-        // Render navigation hints
-        renderFooter(at: rows - 3)
+        // Render navigation hints (footer uses 1 or 2 rows depending on mode)
+        let footerStartRow = separatorRow + 1
+        renderFooter(at: footerStartRow)
     }
 
     /// Renders a single column.
@@ -331,21 +337,45 @@ private extension ColumnSelectionHandler {
     /// Renders the footer with navigation instructions.
     /// - Parameter row: The row position for the footer.
     func renderFooter(at row: Int) {
-        inputHandler.moveTo(row, 1)
-
-        let footerText: String
         if onNavigate != nil {
-            // Column navigation mode with dynamic children
-            if state.activeColumn.isSelectable {
-                footerText = "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Enter to select • Q to quit"
-            } else {
-                footerText = "Use ←→ to switch columns, ↑↓ to navigate • Space to open • Backspace to go back • Q to quit (cannot select from this column)"
-            }
+            // Column navigation mode with dynamic children - render in 3 columns
+            renderColumnFooter(at: row)
         } else {
-            footerText = state.bottomLineText
+            // Standard mode - render single line
+            inputHandler.moveTo(row, 1)
+            inputHandler.write(state.bottomLineText)
         }
+    }
 
-        inputHandler.write(footerText)
+    /// Renders the footer with navigation instructions organized in 3 columns.
+    /// - Parameter row: The row position for the footer.
+    func renderColumnFooter(at row: Int) {
+        let columnWidth = 30
+        let col1X = 1
+        let col2X = col1X + columnWidth
+        let col3X = col2X + columnWidth
+
+        // Column 1: Arrow key navigation
+        inputHandler.moveTo(row, col1X)
+        inputHandler.write("←→: switch columns")
+        inputHandler.moveTo(row + 1, col1X)
+        inputHandler.write("↑↓: navigate items")
+
+        // Column 2: Space and Backspace
+        inputHandler.moveTo(row, col2X)
+        inputHandler.write("Space: open")
+        inputHandler.moveTo(row + 1, col2X)
+        inputHandler.write("Backspace: go back")
+
+        // Column 3: Enter and Quit
+        inputHandler.moveTo(row, col3X)
+        if state.activeColumn.isSelectable {
+            inputHandler.write("Enter: select")
+        } else {
+            inputHandler.write("(cannot select)")
+        }
+        inputHandler.moveTo(row + 1, col3X)
+        inputHandler.write("Q: quit")
     }
 
     /// Truncates text to fit within the specified width, adding ellipsis if needed.
