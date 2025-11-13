@@ -12,10 +12,13 @@ import ANSITerminal
 class BaseSelectionHandler<Item: DisplayablePickerItem> {
     /// The input handler for reading user input and controlling the terminal.
     let inputHandler: PickerInput
-    
+
     /// The current state of the selection process.
     let state: SelectionState<Item>
-    
+
+    /// The header renderer for consistent header rendering.
+    private let headerRenderer: PickerHeaderRenderer
+
     /// Initializes a new instance of BaseSelectionHandler.
     /// - Parameters:
     ///   - state: The current state of the selection process.
@@ -23,6 +26,7 @@ class BaseSelectionHandler<Item: DisplayablePickerItem> {
     init(state: SelectionState<Item>, inputHandler: PickerInput) {
         self.state = state
         self.inputHandler = inputHandler
+        self.headerRenderer = PickerHeaderRenderer(inputHandler: inputHandler)
     }
 }
 
@@ -111,23 +115,13 @@ private extension BaseSelectionHandler {
     ///   - columns: The number of columns in the terminal.
     ///   - activeOption: The currently active option for displaying selected item.
     func renderHeader(start: Int, columns: Int, activeOption: Option<Item>?) {
-        inputHandler.clearScreen()
-        inputHandler.moveToHome()
-        inputHandler.write(centerText(state.topLineText, inWidth: columns))
-        inputHandler.write("\n")
-        inputHandler.write("\n")
-
-        // Render selected item between topLineText and title
-        if let activeOption = activeOption {
-            renderSelectedItemInline(activeOption.item, screenWidth: columns)
-            inputHandler.write("\n")
-        }
-
-        inputHandler.write(state.title)
-        inputHandler.write("\n")
-        if start > 0 {
-            inputHandler.write("↑".lightGreen)
-        }
+        headerRenderer.renderHeader(
+            topLineText: state.topLineText,
+            title: state.title,
+            selectedItem: activeOption?.item,
+            screenWidth: columns,
+            showScrollUpIndicator: start > 0
+        )
     }
     
     /// Renders the footer of the selection list.
@@ -162,25 +156,6 @@ private extension BaseSelectionHandler {
     /// - Returns: The truncated text with ellipsis if it was truncated.
     func truncate(_ text: String, maxWidth: Int) -> String {
         PickerTextFormatter.truncate(text, maxWidth: maxWidth)
-    }
-
-    /// Renders the currently selected item inline during header rendering.
-    /// Uses PickerTextFormatter for consistent text formatting across all selection handlers.
-    /// - Parameters:
-    ///   - item: The item to display.
-    ///   - screenWidth: The width of the screen for centering.
-    func renderSelectedItemInline(_ item: Item, screenWidth: Int) {
-        let itemName = item.displayName
-
-        // Truncate if too long for screen width
-        let maxWidth = screenWidth - 2
-        let finalText = itemName.count > maxWidth
-            ? PickerTextFormatter.truncate(itemName, maxWidth: maxWidth)
-            : itemName
-
-        // Center and display in cyan color
-        let centeredText = PickerTextFormatter.centerText(finalText, inWidth: screenWidth)
-        inputHandler.write(centeredText.foreColor(51))  // Cyan color
     }
 
     /// Renders a single option in the selection list.

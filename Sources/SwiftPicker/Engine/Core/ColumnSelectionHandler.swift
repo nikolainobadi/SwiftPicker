@@ -13,6 +13,7 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
     private let columnWidth: Int
     private let columnSpacing: Int
     private let onNavigate: ((Item) -> (items: [Item], title: String)?)?
+    private let headerRenderer: PickerHeaderRenderer
 
     /// Initializes a new column selection handler.
     /// - Parameters:
@@ -27,6 +28,7 @@ final class ColumnSelectionHandler<Item: DisplayablePickerItem> {
         self.columnWidth = columnWidth
         self.columnSpacing = columnSpacing
         self.onNavigate = onNavigate
+        self.headerRenderer = PickerHeaderRenderer(inputHandler: inputHandler)
     }
 }
 
@@ -183,16 +185,17 @@ private extension ColumnSelectionHandler {
 private extension ColumnSelectionHandler {
     /// Renders all columns to the terminal.
     func renderColumns() {
-        inputHandler.clearScreen()
-        inputHandler.moveToHome()
-
         let (rows, screenCols) = inputHandler.readScreenSize()
 
-        // Render title
-        inputHandler.write(centerText(state.topLineText, inWidth: screenCols))
-        inputHandler.write("\n\n")
-        inputHandler.write(state.title)
-        inputHandler.write("\n\n")
+        // Render header with selected item
+        headerRenderer.renderHeader(
+            topLineText: state.topLineText,
+            title: state.title,
+            selectedItem: state.activeColumn.activeItem,
+            screenWidth: screenCols,
+            showScrollUpIndicator: false
+        )
+        inputHandler.write("\n")
 
         // Calculate visible columns based on screen size
         let maxVisibleColumns = calculateMaxVisibleColumns(screenWidth: screenCols)
@@ -216,9 +219,6 @@ private extension ColumnSelectionHandler {
 
         // Render navigation hints
         renderFooter(at: rows - 3)
-
-        // Render currently selected item name
-        renderSelectedItemName(at: rows - 1, screenWidth: screenCols)
     }
 
     /// Renders a single column.
@@ -346,37 +346,6 @@ private extension ColumnSelectionHandler {
         }
 
         inputHandler.write(footerText)
-    }
-
-    /// Renders the currently selected item's full name.
-    /// - Parameters:
-    ///   - row: The row position for the selected item name.
-    ///   - screenWidth: The width of the screen for centering.
-    func renderSelectedItemName(at row: Int, screenWidth: Int) {
-        guard let selectedItem = state.activeColumn.activeItem else { return }
-
-        inputHandler.moveTo(row, 1)
-
-        let itemName = selectedItem.displayName
-
-        // Truncate if too long for screen width
-        let maxWidth = screenWidth - 2
-        let finalText = itemName.count > maxWidth
-            ? truncate(itemName, maxWidth: maxWidth)
-            : itemName
-
-        // Center and display in cyan color
-        let centeredText = centerText(finalText, inWidth: screenWidth)
-        inputHandler.write(centeredText.foreColor(51))  // Cyan color
-    }
-
-    /// Centers text within the specified width.
-    /// - Parameters:
-    ///   - text: The text to center.
-    ///   - width: The width within which to center the text.
-    /// - Returns: The centered text with padding.
-    func centerText(_ text: String, inWidth width: Int) -> String {
-        PickerTextFormatter.centerText(text, inWidth: width)
     }
 
     /// Truncates text to fit within the specified width, adding ellipsis if needed.
