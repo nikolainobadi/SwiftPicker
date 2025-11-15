@@ -205,3 +205,18 @@ swift package update
 - **macOS 10.14+** minimum deployment target
 - **Swift 5.9+** toolchain requirement
 - **Terminal environment** required for ANSI escape sequence support
+
+## Public API Expectations
+- Clear, well-documented public interfaces
+- Semantic versioning for breaking changes
+- Comprehensive examples in documentation
+
+## Package Testing
+- Behavior-driven unit tests (Swift Testing preferred)
+- Use `makeSUT` pattern for test organization
+- Track memory leaks with `trackForMemoryLeaks`
+- Type-safe assertions (`#expect`, `#require`)
+- Use `waitUntil` for async/reactive testing
+
+## Imports
+@~/.claude/guidelines/iOS_Unit_Testing_Guide.md
