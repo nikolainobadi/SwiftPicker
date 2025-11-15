@@ -467,17 +467,164 @@ extension MockSwiftPickerTests {
 }
 
 
+// MARK: - Column Selection Tests
+extension MockSwiftPickerTests {
+    @Test("Column selection returns item at configured index")
+    func columnSelectionReturnsItemAtConfiguredIndex() {
+        let items = ["Apple", "Banana", "Cherry"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([1])))
+
+        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+
+        #expect(result == "Banana")
+    }
+
+    @Test("Column selection returns nil when index is nil")
+    func columnSelectionReturnsNilWhenIndexIsNil() {
+        let items = ["Apple", "Banana"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+
+        #expect(result == nil)
+    }
+
+    @Test("Column selection returns nil when index is out of bounds")
+    func columnSelectionReturnsNilWhenIndexIsOutOfBounds() {
+        let items = ["Apple", "Banana"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([10])))
+
+        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+
+        #expect(result == nil)
+    }
+
+    @Test("Dual column selection returns item at configured index")
+    func dualColumnSelectionReturnsItemAtConfiguredIndex() {
+        let selectableItems = ["First", "Second", "Third"]
+        let displayItems = ["Info1", "Info2", "Info3"]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([2])))
+
+        let result = sut.dualColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result == "Third")
+    }
+
+    @Test("Dual column selection returns nil when cancelled")
+    func dualColumnSelectionReturnsNilWhenCancelled() {
+        let selectableItems = ["First", "Second"]
+        let displayItems = ["Info1", "Info2"]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        let result = sut.dualColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result == nil)
+    }
+
+    @Test("Multi selection dual column returns items at configured indices")
+    func multiSelectionDualColumnReturnsItemsAtConfiguredIndices() {
+        let selectableItems = ["Red", "Green", "Blue", "Yellow"]
+        let displayItems = ["Info1", "Info2", "Info3", "Info4"]
+        let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 2]])))
+
+        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Colors", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result.count == 2)
+        #expect(result.contains("Red"))
+        #expect(result.contains("Blue"))
+    }
+
+    @Test("Multi selection dual column returns empty array when cancelled")
+    func multiSelectionDualColumnReturnsEmptyArrayWhenCancelled() {
+        let selectableItems = ["First", "Second"]
+        let displayItems = ["Info1", "Info2"]
+        let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[]])))
+
+        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result.isEmpty)
+    }
+
+    @Test("Dynamic multi selection dual column returns items at configured indices")
+    func dynamicMultiSelectionDualColumnReturnsItemsAtConfiguredIndices() {
+        let selectableItems = ["A", "B", "C", "D"]
+        let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[1, 3]])))
+
+        let result = sut.dynamicMultiSelectionDualColumn(selectableItems: selectableItems, selectableTitle: "Letters", displayTitle: "Details", title: "Choose:", newScreen: true, onActiveItemChange: { _ in [] })
+
+        #expect(result.count == 2)
+        #expect(result.contains("B"))
+        #expect(result.contains("D"))
+    }
+
+    @Test("Column selection uses dictionary for prompt matching")
+    func columnSelectionUsesDictionaryForPromptMatching() {
+        let items = ["Alpha", "Beta", "Gamma"]
+        let columns = [PickerColumn(title: "Greek", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .dictionary(["Pick Greek:": 2])))
+
+        let result = sut.columnSelection(columns: columns, title: "Pick Greek:", newScreen: true, onNavigate: nil)
+
+        #expect(result == "Gamma")
+    }
+
+    @Test("Column selection returns default index when dictionary has no match")
+    func columnSelectionReturnsDefaultIndexWhenDictionaryHasNoMatch() {
+        let items = ["First", "Second", "Third"]
+        let columns = [PickerColumn(title: "Items", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(defaultIndex: 1, singleColumnSelectionType: .dictionary(["Other:": 0])))
+
+        let result = sut.columnSelection(columns: columns, title: "Unknown:", newScreen: true, onNavigate: nil)
+
+        #expect(result == "Second")
+    }
+
+    @Test("Multi column selection uses ordered responses")
+    func multiColumnSelectionUsesOrderedResponses() {
+        let selectableItems = ["X", "Y", "Z"]
+        let displayItems = ["1", "2", "3"]
+        let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0], [1], [2]])))
+
+        let result1 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result2 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result3 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+
+        #expect(result1 == ["X"])
+        #expect(result2 == ["Y"])
+        #expect(result3 == ["Z"])
+    }
+
+    @Test("Filters out invalid indices from multi column selection")
+    func filtersOutInvalidIndicesFromMultiColumnSelection() {
+        let selectableItems = ["First", "Second"]
+        let displayItems = ["Info1", "Info2"]
+        let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 10, 1]])))
+
+        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result.count == 2)
+        #expect(result.contains("First"))
+        #expect(result.contains("Second"))
+    }
+}
+
+
 // MARK: - SUT
 private extension MockSwiftPickerTests {
     func makeSUT(
         inputResult: MockInputResult = .init(),
         permissionResult: MockPermissionResult = .init(),
-        selectionResult: MockSelectionResult = .init()
+        selectionResult: MockSelectionResult = .init(),
+        columnSelectionResult: MockColumnSelectionResult = .init()
     ) -> MockSwiftPicker {
         return .init(
             inputResult: inputResult,
             permissionResult: permissionResult,
-            selectionResult: selectionResult
+            selectionResult: selectionResult,
+            columnSelectionResult: columnSelectionResult
         )
     }
 }

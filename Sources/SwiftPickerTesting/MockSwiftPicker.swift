@@ -117,6 +117,7 @@ public class MockSwiftPicker {
     private var inputResult: MockInputResult
     private var permissionResult: MockPermissionResult
     private var selectionResult: MockSelectionResult
+    private var columnSelectionResult: MockColumnSelectionResult
 
     /// Creates a new `MockSwiftPicker` instance with configurable response behaviors.
     ///
@@ -124,6 +125,7 @@ public class MockSwiftPicker {
     ///   - inputResult: Configuration for text input responses. Defaults to empty ordered responses.
     ///   - permissionResult: Configuration for permission responses. Defaults to granting all permissions.
     ///   - selectionResult: Configuration for selection responses. Defaults to selecting index 0.
+    ///   - columnSelectionResult: Configuration for column selection responses. Defaults to selecting index 0.
     ///
     /// ## Example
     /// ```swift
@@ -140,17 +142,24 @@ public class MockSwiftPicker {
     ///         defaultIndex: 0,
     ///         singleSelectionType: .ordered([1, 2]),
     ///         multiSelectionType: .ordered([[0, 1]])
+    ///     ),
+    ///     columnSelectionResult: .init(
+    ///         defaultIndex: 0,
+    ///         singleColumnSelectionType: .ordered([1]),
+    ///         multiColumnSelectionType: .ordered([[0, 1]])
     ///     )
     /// )
     /// ```
     public init(
         inputResult: MockInputResult = .init(),
         permissionResult: MockPermissionResult = .init(),
-        selectionResult: MockSelectionResult = .init()
+        selectionResult: MockSelectionResult = .init(),
+        columnSelectionResult: MockColumnSelectionResult = .init()
     ) {
         self.inputResult = inputResult
         self.permissionResult = permissionResult
         self.selectionResult = selectionResult
+        self.columnSelectionResult = columnSelectionResult
     }
 }
 
@@ -400,6 +409,80 @@ extension MockSwiftPicker: CommandLineSelection {
 }
 
 
+// MARK: - CommandLineColumnSelection
+extension MockSwiftPicker: CommandLineColumnSelection {
+    /// Returns a pre-configured column selection result.
+    /// - Parameters:
+    ///   - columns: Array of columns (used to get items from selected index).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    ///   - onNavigate: Ignored in mock implementation.
+    /// - Returns: The item at the configured index from the first column, or `nil` if cancelled or invalid.
+    public func columnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item? {
+        guard let index = getColumnSelectionIndex(prompt: title) else {
+            return nil
+        }
+
+        guard let firstColumn = columns.first, firstColumn.items.indices.contains(index) else {
+            return nil
+        }
+
+        return firstColumn.items[index]
+    }
+
+    /// Returns a pre-configured dual column selection result.
+    /// - Parameters:
+    ///   - selectableItems: Items that can be selected.
+    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - selectableTitle: Title for the selectable column (ignored).
+    ///   - displayTitle: Title for the display column (ignored).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    /// - Returns: The item at the configured index from selectable items, or `nil` if cancelled or invalid.
+    public func dualColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
+        guard let index = getColumnSelectionIndex(prompt: title) else {
+            return nil
+        }
+
+        guard selectableItems.indices.contains(index) else {
+            return nil
+        }
+
+        return selectableItems[index]
+    }
+
+    /// Returns a pre-configured multi-selection dual column result.
+    /// - Parameters:
+    ///   - selectableItems: Items that can be selected.
+    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - selectableTitle: Title for the selectable column (ignored).
+    ///   - displayTitle: Title for the display column (ignored).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    /// - Returns: The items at the configured indices from selectable items.
+    public func multiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
+        let indices = getMultiColumnSelectionIndices(prompt: title)
+
+        return indices.compactMap { selectableItems.indices.contains($0) ? selectableItems[$0] : nil }
+    }
+
+    /// Returns a pre-configured dynamic multi-selection dual column result.
+    /// - Parameters:
+    ///   - selectableItems: Items that can be selected.
+    ///   - selectableTitle: Title for the selectable column (ignored).
+    ///   - displayTitle: Title for the display column (ignored).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    ///   - onActiveItemChange: Ignored in mock implementation.
+    /// - Returns: The items at the configured indices from selectable items.
+    public func dynamicMultiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
+        let indices = getMultiColumnSelectionIndices(prompt: title)
+
+        return indices.compactMap { selectableItems.indices.contains($0) ? selectableItems[$0] : nil }
+    }
+}
+
+
 // MARK: - Helpers
 private extension MockSwiftPicker {
     func getSelectionIndex(prompt: PickerPrompt) -> Int? {
@@ -429,6 +512,40 @@ private extension MockSwiftPicker {
             let response = responses.removeFirst()
 
             selectionResult.multiSelectionType = .ordered(responses)
+
+            return response
+        case .dictionary(let dict):
+            return dict[prompt.title] ?? []
+        }
+    }
+
+    func getColumnSelectionIndex(prompt: PickerPrompt) -> Int? {
+        switch columnSelectionResult.singleColumnSelectionType {
+        case .ordered(var responses):
+            if responses.isEmpty {
+                return columnSelectionResult.defaultIndex
+            }
+
+            let response = responses.removeFirst()
+
+            columnSelectionResult.singleColumnSelectionType = .ordered(responses)
+
+            return response
+        case .dictionary(let dict):
+            return dict[prompt.title] ?? columnSelectionResult.defaultIndex
+        }
+    }
+
+    func getMultiColumnSelectionIndices(prompt: PickerPrompt) -> [Int] {
+        switch columnSelectionResult.multiColumnSelectionType {
+        case .ordered(var responses):
+            if responses.isEmpty {
+                return []
+            }
+
+            let response = responses.removeFirst()
+
+            columnSelectionResult.multiColumnSelectionType = .ordered(responses)
 
             return response
         case .dictionary(let dict):
