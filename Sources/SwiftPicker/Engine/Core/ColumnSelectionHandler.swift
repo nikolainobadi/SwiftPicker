@@ -230,6 +230,22 @@ private extension ColumnSelectionHandler {
 
         if newIndex >= 0 && newIndex < column.items.count {
             column.activeIndex = newIndex
+
+            // Adjust scroll offset to keep active item visible
+            let (rows, _) = inputHandler.readScreenSize()
+            let maxRows = rows - 9 - 1  // Same calculation as in renderColumns()
+            let visibleStart = column.scrollOffset
+            let visibleEnd = min(visibleStart + maxRows, column.items.count)
+
+            // If moving down and active item is below visible window, scroll down
+            if newIndex >= visibleEnd {
+                column.scrollOffset = max(0, newIndex - maxRows + 1)
+            }
+            // If moving up and active item is above visible window, scroll up
+            else if newIndex < visibleStart {
+                column.scrollOffset = newIndex
+            }
+
             state.activeColumn = column
 
             // Update second column if onActiveItemChange is set and we're in the first column
@@ -362,10 +378,22 @@ private extension ColumnSelectionHandler {
         let separatorStyle = !column.isSelectable ? separator.foreColor(247) : separator.foreColor(242)
         inputHandler.write(separatorStyle)
 
+        // Calculate visible window based on scroll offset
+        let startIndex = column.scrollOffset
+        let endIndex = min(startIndex + maxRows, column.items.count)
+
+        // Show scroll up indicator if there are items above
+        if column.items.count > maxRows && startIndex > 0 {
+            inputHandler.moveTo(row, colX + separatorLength + 1)
+            inputHandler.write(" ↑".lightGreen)
+        }
+
         // Render column items (starting one row below separator to make room)
-        let itemsToShow = min(column.items.count, maxRows)
-        for (itemIndex, item) in column.items.prefix(itemsToShow).enumerated() {
-            let itemRow = row + 1 + itemIndex
+        let visibleItems = Array(column.items[startIndex..<endIndex])
+
+        for (visibleIndex, item) in visibleItems.enumerated() {
+            let itemIndex = startIndex + visibleIndex
+            let itemRow = row + 1 + visibleIndex
             inputHandler.moveTo(itemRow, colX)
 
             let isActiveItem = itemIndex == column.activeIndex
@@ -421,8 +449,13 @@ private extension ColumnSelectionHandler {
 
         // Show scroll indicators if there are more items
         if column.items.count > maxRows {
-            inputHandler.moveTo(row + 1 + maxRows, colX)
-            inputHandler.write("⋮".foreColor(250))
+            let scrollIndicatorRow = row + 1 + maxRows
+            inputHandler.moveTo(scrollIndicatorRow, colX)
+
+            // Show ↓ if there are more items below
+            if endIndex < column.items.count {
+                inputHandler.write("↓".lightGreen)
+            }
         }
     }
 

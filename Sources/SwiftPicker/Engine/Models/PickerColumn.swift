@@ -24,6 +24,10 @@ public struct PickerColumn<Item: DisplayablePickerItem> {
     /// Set of indices for items that are selected (used in multi-selection mode).
     var selectedIndices: Set<Int>
 
+    /// The scroll offset for this column (tracks the first visible item index).
+    /// Used to implement scrolling when there are more items than can fit on screen.
+    var scrollOffset: Int
+
     /// Initializes a new picker column.
     /// - Parameters:
     ///   - title: The title to display at the top of the column.
@@ -36,6 +40,7 @@ public struct PickerColumn<Item: DisplayablePickerItem> {
         self.activeIndex = activeIndex
         self.isSelectable = isSelectable
         self.selectedIndices = []
+        self.scrollOffset = 0
     }
 
     /// The currently active item in the column, or nil if the activeIndex is out of bounds.
