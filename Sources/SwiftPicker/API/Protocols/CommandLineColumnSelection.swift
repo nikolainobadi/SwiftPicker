@@ -13,6 +13,9 @@ public protocol CommandLineColumnSelection {
     /// Displays a dual-column layout with one selectable column and one static display column.
     func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item?
 
+    /// Displays a dual-column layout with one selectable column and one static display column and requires a selection.
+    func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item
+
     /// Displays a dual-column layout with multi-selection in the first column and a static display in the second.
     func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item]
 

@@ -524,6 +524,39 @@ extension MockSwiftPickerTests {
         #expect(result == nil)
     }
 
+    @Test("Required dual column selection returns item when selected")
+    func requiredDualColumnSelectionReturnsItemWhenSelected() throws {
+        let selectableItems = ["First", "Second", "Third"]
+        let displayItems = ["Info1", "Info2", "Info3"]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([1])))
+
+        let result = try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+
+        #expect(result == "Second")
+    }
+
+    @Test("Required dual column selection throws when cancelled")
+    func requiredDualColumnSelectionThrowsWhenCancelled() throws {
+        let selectableItems = ["First", "Second"]
+        let displayItems = ["Info1", "Info2"]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        #expect(throws: SwiftPickerError.self) {
+            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        }
+    }
+
+    @Test("Required dual column selection throws selection cancelled error")
+    func requiredDualColumnSelectionThrowsSelectionCancelledError() throws {
+        let selectableItems = ["First", "Second"]
+        let displayItems = ["Info1", "Info2"]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        #expect(throws: SwiftPickerError.selectionCancelled) {
+            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        }
+    }
+
     @Test("Multi selection dual column returns items at configured indices")
     func multiSelectionDualColumnReturnsItemsAtConfiguredIndices() {
         let selectableItems = ["Red", "Green", "Blue", "Yellow"]

@@ -451,6 +451,24 @@ extension MockSwiftPicker: CommandLineColumnSelection {
         return selectableItems[index]
     }
 
+    /// Returns a pre-configured dual column selection result, throwing an error if cancelled.
+    /// - Parameters:
+    ///   - selectableItems: Items that can be selected.
+    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - selectableTitle: Title for the selectable column (ignored).
+    ///   - displayTitle: Title for the display column (ignored).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    /// - Throws: `SwiftPickerError.selectionCancelled` if selection is cancelled or invalid.
+    /// - Returns: The item at the configured index from selectable items.
+    public func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item {
+        guard let item = singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title, newScreen: newScreen) else {
+            throw SwiftPickerError.selectionCancelled
+        }
+
+        return item
+    }
+
     /// Returns a pre-configured multi-selection dual column result.
     /// - Parameters:
     ///   - selectableItems: Items that can be selected.
