@@ -502,6 +502,39 @@ extension MockSwiftPickerTests {
         #expect(result == nil)
     }
 
+    @Test("Required column selection returns item when selected")
+    func requiredColumnSelectionReturnsItemWhenSelected() throws {
+        let items = ["Apple", "Banana", "Cherry"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([2])))
+
+        let result = try sut.requiredDualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+
+        #expect(result == "Cherry")
+    }
+
+    @Test("Required column selection throws when cancelled")
+    func requiredColumnSelectionThrowsWhenCancelled() throws {
+        let items = ["Apple", "Banana"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        #expect(throws: SwiftPickerError.self) {
+            try sut.requiredDualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+        }
+    }
+
+    @Test("Required column selection throws selection cancelled error")
+    func requiredColumnSelectionThrowsSelectionCancelledError() throws {
+        let items = ["Apple", "Banana"]
+        let columns = [PickerColumn(title: "Fruits", items: items)]
+        let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
+
+        #expect(throws: SwiftPickerError.selectionCancelled) {
+            try sut.requiredDualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+        }
+    }
+
     @Test("Dual column selection returns item at configured index")
     func dualColumnSelectionReturnsItemAtConfiguredIndex() {
         let selectableItems = ["First", "Second", "Third"]

@@ -132,6 +132,13 @@ public extension InteractivePicker {
         return handler.captureUserInput()
     }
 
+    func requiredDualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) throws -> Item {
+        guard let selection = dualColumnSelection(columns: columns, title: title, newScreen: newScreen, onNavigate: onNavigate) else {
+            throw SwiftPickerError.selectionCancelled
+        }
+        return selection
+    }
+
     func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
         let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
         let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
@@ -198,6 +205,20 @@ public extension InteractivePicker {
     /// - Returns: The selected item from the active column, or `nil` if the user quits.
     func dualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: some PickerPrompt = "", newScreen: Bool = true, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) -> Item? {
         return dualColumnSelection(columns: columns, title: title as PickerPrompt, newScreen: newScreen, onNavigate: onNavigate)
+    }
+
+    /// Displays multiple columns for navigation and selection with default parameters and requires a selection.
+    /// Supports horizontal navigation between columns (←→) and vertical navigation within columns (↑↓).
+    /// Press Space to navigate into an item (loads children), Enter to select, Q to quit.
+    /// - Parameters:
+    ///   - columns: Array of columns to display. Each column contains a title and list of items.
+    ///   - title: The title to display above the columns. Defaults to empty string.
+    ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
+    ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
+    /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not make a selection.
+    /// - Returns: The selected item from the active column.
+    func requiredDualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: some PickerPrompt = "", newScreen: Bool = true, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) throws -> Item {
+        return try requiredDualColumnSelection(columns: columns, title: title as PickerPrompt, newScreen: newScreen, onNavigate: onNavigate)
     }
 
     /// Displays a dual-column layout with one selectable column and one static display column with default parameters.

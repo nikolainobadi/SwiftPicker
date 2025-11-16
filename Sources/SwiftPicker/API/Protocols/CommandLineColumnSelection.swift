@@ -10,6 +10,9 @@ public protocol CommandLineColumnSelection {
     /// Displays multiple columns for navigation and selection.
     func dualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item?
 
+    /// Displays multiple columns for navigation and selection and requires a selection.
+    func requiredDualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) throws -> Item
+
     /// Displays a dual-column layout with one selectable column and one static display column.
     func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item?
 

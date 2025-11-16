@@ -430,6 +430,22 @@ extension MockSwiftPicker: CommandLineColumnSelection {
         return firstColumn.items[index]
     }
 
+    /// Returns a pre-configured column selection result, throwing an error if cancelled.
+    /// - Parameters:
+    ///   - columns: Array of columns (used to get items from selected index).
+    ///   - title: The prompt title (used for dictionary lookup).
+    ///   - newScreen: Ignored in mock implementation.
+    ///   - onNavigate: Ignored in mock implementation.
+    /// - Throws: `SwiftPickerError.selectionCancelled` if selection is cancelled or invalid.
+    /// - Returns: The item at the configured index from the first column.
+    public func requiredDualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) throws -> Item {
+        guard let item = dualColumnSelection(columns: columns, title: title, newScreen: newScreen, onNavigate: onNavigate) else {
+            throw SwiftPickerError.selectionCancelled
+        }
+
+        return item
+    }
+
     /// Returns a pre-configured dual column selection result.
     /// - Parameters:
     ///   - selectableItems: Items that can be selected.
