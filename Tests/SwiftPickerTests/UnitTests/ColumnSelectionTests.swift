@@ -268,7 +268,7 @@ extension ColumnSelectionTests {
         mockPickerInputHandler.pressKey = true
         mockPickerInputHandler.enqueueSpecialChar(specialChar: .enter)
 
-        let result: String? = picker.columnSelection(columns: columns, title: "Test")
+        let result: String? = picker.dualColumnSelection(columns: columns, title: "Test")
 
         #expect(result != nil)
     }

@@ -254,7 +254,7 @@ extension DualColumnSelectionTests {
         mockPickerInputHandler.pressKey = true
         mockPickerInputHandler.enqueueSpecialChar(specialChar: .enter)
 
-        let result: String? = picker.dualColumnSelection(
+        let result: String? = picker.singleSelectStaticDetailColumnSelection(
             selectableItems: selectableItems,
             staticDisplayItems: displayItems,
             selectableTitle: "Options",

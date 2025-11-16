@@ -418,7 +418,7 @@ extension MockSwiftPicker: CommandLineColumnSelection {
     ///   - newScreen: Ignored in mock implementation.
     ///   - onNavigate: Ignored in mock implementation.
     /// - Returns: The item at the configured index from the first column, or `nil` if cancelled or invalid.
-    public func columnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item? {
+    public func dualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item? {
         guard let index = getColumnSelectionIndex(prompt: title) else {
             return nil
         }
@@ -439,7 +439,7 @@ extension MockSwiftPicker: CommandLineColumnSelection {
     ///   - title: The prompt title (used for dictionary lookup).
     ///   - newScreen: Ignored in mock implementation.
     /// - Returns: The item at the configured index from selectable items, or `nil` if cancelled or invalid.
-    public func dualColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
+    public func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
         guard let index = getColumnSelectionIndex(prompt: title) else {
             return nil
         }
@@ -460,7 +460,7 @@ extension MockSwiftPicker: CommandLineColumnSelection {
     ///   - title: The prompt title (used for dictionary lookup).
     ///   - newScreen: Ignored in mock implementation.
     /// - Returns: The items at the configured indices from selectable items.
-    public func multiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
+    public func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
         let indices = getMultiColumnSelectionIndices(prompt: title)
 
         return indices.compactMap { selectableItems.indices.contains($0) ? selectableItems[$0] : nil }
@@ -475,7 +475,7 @@ extension MockSwiftPicker: CommandLineColumnSelection {
     ///   - newScreen: Ignored in mock implementation.
     ///   - onActiveItemChange: Ignored in mock implementation.
     /// - Returns: The items at the configured indices from selectable items.
-    public func dynamicMultiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
+    public func multiSelectDynamicDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
         let indices = getMultiColumnSelectionIndices(prompt: title)
 
         return indices.compactMap { selectableItems.indices.contains($0) ? selectableItems[$0] : nil }

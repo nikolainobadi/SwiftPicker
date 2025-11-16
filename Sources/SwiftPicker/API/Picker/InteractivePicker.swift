@@ -120,7 +120,7 @@ public extension InteractivePicker {
 
 // MARK: - CommandLineColumnSelection
 public extension InteractivePicker {
-    func columnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item? {
+    func dualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: PickerPrompt, newScreen: Bool, onNavigate: ((Item) -> (items: [Item], title: String)?)?) -> Item? {
         let handler = SelectionHandlerFactory.makeColumnSelectionHandler(
             columns: columns,
             title: title.title,
@@ -132,7 +132,7 @@ public extension InteractivePicker {
         return handler.captureUserInput()
     }
 
-    func dualColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
+    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
         let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
         let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
 
@@ -147,7 +147,7 @@ public extension InteractivePicker {
         return handler.captureUserInput()
     }
 
-    func multiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
+    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
         let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
         let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
 
@@ -162,7 +162,7 @@ public extension InteractivePicker {
         return handler.captureMultiUserInput()
     }
 
-    func dynamicMultiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
+    func multiSelectDynamicDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
         let handler = SelectionHandlerFactory.makeDynamicMultiSelectionDualColumnHandler(
             selectableItems: selectableItems,
             selectableTitle: selectableTitle,
@@ -189,8 +189,8 @@ public extension InteractivePicker {
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     ///   - onNavigate: Closure called when user presses Space on an item. Should return children items and column title, or nil if item has no children.
     /// - Returns: The selected item from the active column, or `nil` if the user quits.
-    func columnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: some PickerPrompt = "", newScreen: Bool = true, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) -> Item? {
-        return columnSelection(columns: columns, title: title as PickerPrompt, newScreen: newScreen, onNavigate: onNavigate)
+    func dualColumnSelection<Item: DisplayablePickerItem>(columns: [PickerColumn<Item>], title: some PickerPrompt = "", newScreen: Bool = true, onNavigate: ((Item) -> (items: [Item], title: String)?)? = nil) -> Item? {
+        return dualColumnSelection(columns: columns, title: title as PickerPrompt, newScreen: newScreen, onNavigate: onNavigate)
     }
 
     /// Displays a dual-column layout with one selectable column and one static display column with default parameters.
@@ -204,8 +204,8 @@ public extension InteractivePicker {
     ///   - title: Main title to display above both columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     /// - Returns: The selected item from the selectable column, or `nil` if the user quits.
-    func dualColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> Item? {
-        return dualColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
+    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> Item? {
+        return singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
     }
 
     /// Displays a dual-column layout with multi-selection in the first column and a static display in the second with default parameters.
@@ -218,8 +218,8 @@ public extension InteractivePicker {
     ///   - title: Main title to display above both columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     /// - Returns: An array of selected items from the selectable column.
-    func multiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> [Item] {
-        return multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
+    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> [Item] {
+        return multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
     }
 
     /// Displays a dual-column layout with multi-selection in the first column and a dynamic display in the second with default parameters.
@@ -232,8 +232,8 @@ public extension InteractivePicker {
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     ///   - onActiveItemChange: Closure that returns items to display in the second column based on the currently highlighted item in the first column.
     ///   - Returns: An array of selected items from the selectable column.
-    func dynamicMultiSelectionDualColumn<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
-        return dynamicMultiSelectionDualColumn(selectableItems: selectableItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen, onActiveItemChange: onActiveItemChange)
+    func multiSelectDynamicDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true, onActiveItemChange: @escaping (Item) -> [Item]) -> [Item] {
+        return multiSelectDynamicDetailColumnSelection(selectableItems: selectableItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen, onActiveItemChange: onActiveItemChange)
     }
 }
 

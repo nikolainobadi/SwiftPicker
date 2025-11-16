@@ -475,7 +475,7 @@ extension MockSwiftPickerTests {
         let columns = [PickerColumn(title: "Fruits", items: items)]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([1])))
 
-        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+        let result = sut.dualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
 
         #expect(result == "Banana")
     }
@@ -486,7 +486,7 @@ extension MockSwiftPickerTests {
         let columns = [PickerColumn(title: "Fruits", items: items)]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
 
-        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+        let result = sut.dualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
 
         #expect(result == nil)
     }
@@ -497,7 +497,7 @@ extension MockSwiftPickerTests {
         let columns = [PickerColumn(title: "Fruits", items: items)]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([10])))
 
-        let result = sut.columnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
+        let result = sut.dualColumnSelection(columns: columns, title: "Choose:", newScreen: true, onNavigate: nil)
 
         #expect(result == nil)
     }
@@ -508,7 +508,7 @@ extension MockSwiftPickerTests {
         let displayItems = ["Info1", "Info2", "Info3"]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([2])))
 
-        let result = sut.dualColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result == "Third")
     }
@@ -519,7 +519,7 @@ extension MockSwiftPickerTests {
         let displayItems = ["Info1", "Info2"]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
 
-        let result = sut.dualColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result == nil)
     }
@@ -530,7 +530,7 @@ extension MockSwiftPickerTests {
         let displayItems = ["Info1", "Info2", "Info3", "Info4"]
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 2]])))
 
-        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Colors", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Colors", displayTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.count == 2)
         #expect(result.contains("Red"))
@@ -543,7 +543,7 @@ extension MockSwiftPickerTests {
         let displayItems = ["Info1", "Info2"]
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[]])))
 
-        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.isEmpty)
     }
@@ -553,7 +553,7 @@ extension MockSwiftPickerTests {
         let selectableItems = ["A", "B", "C", "D"]
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[1, 3]])))
 
-        let result = sut.dynamicMultiSelectionDualColumn(selectableItems: selectableItems, selectableTitle: "Letters", displayTitle: "Details", title: "Choose:", newScreen: true, onActiveItemChange: { _ in [] })
+        let result = sut.multiSelectDynamicDetailColumnSelection(selectableItems: selectableItems, selectableTitle: "Letters", displayTitle: "Details", title: "Choose:", newScreen: true, onActiveItemChange: { _ in [] })
 
         #expect(result.count == 2)
         #expect(result.contains("B"))
@@ -566,7 +566,7 @@ extension MockSwiftPickerTests {
         let columns = [PickerColumn(title: "Greek", items: items)]
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .dictionary(["Pick Greek:": 2])))
 
-        let result = sut.columnSelection(columns: columns, title: "Pick Greek:", newScreen: true, onNavigate: nil)
+        let result = sut.dualColumnSelection(columns: columns, title: "Pick Greek:", newScreen: true, onNavigate: nil)
 
         #expect(result == "Gamma")
     }
@@ -577,7 +577,7 @@ extension MockSwiftPickerTests {
         let columns = [PickerColumn(title: "Items", items: items)]
         let sut = makeSUT(columnSelectionResult: .init(defaultIndex: 1, singleColumnSelectionType: .dictionary(["Other:": 0])))
 
-        let result = sut.columnSelection(columns: columns, title: "Unknown:", newScreen: true, onNavigate: nil)
+        let result = sut.dualColumnSelection(columns: columns, title: "Unknown:", newScreen: true, onNavigate: nil)
 
         #expect(result == "Second")
     }
@@ -588,9 +588,9 @@ extension MockSwiftPickerTests {
         let displayItems = ["1", "2", "3"]
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0], [1], [2]])))
 
-        let result1 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
-        let result2 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
-        let result3 = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result1 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result2 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result3 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
 
         #expect(result1 == ["X"])
         #expect(result2 == ["Y"])
@@ -603,7 +603,7 @@ extension MockSwiftPickerTests {
         let displayItems = ["Info1", "Info2"]
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 10, 1]])))
 
-        let result = sut.multiSelectionDualColumn(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.count == 2)
         #expect(result.contains("First"))
