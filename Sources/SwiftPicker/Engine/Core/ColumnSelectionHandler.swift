@@ -234,16 +234,29 @@ private extension ColumnSelectionHandler {
             // Adjust scroll offset to keep active item visible
             let (rows, _) = inputHandler.readScreenSize()
             let maxRows = rows - 13  // Same calculation as in renderColumns()
-            let visibleStart = column.scrollOffset
-            let visibleEnd = min(visibleStart + maxRows, column.items.count)
 
-            // If moving down and active item is below visible window, scroll down
-            if newIndex >= visibleEnd {
-                column.scrollOffset = max(0, newIndex - maxRows + 1)
-            }
-            // If moving up and active item is above visible window, scroll up
-            else if newIndex < visibleStart {
-                column.scrollOffset = newIndex
+            // Ensure active item is visible within the viewport
+            // Only adjust scrollOffset if there are more items than can fit on screen
+            if column.items.count > maxRows {
+                let currentScrollOffset = column.scrollOffset
+
+                // Calculate the range of visible indices
+                let visibleRangeEnd = currentScrollOffset + maxRows
+
+                // If moving down and active item would be below visible window, scroll down
+                // Position active item near the bottom of the visible window
+                if newIndex >= visibleRangeEnd {
+                    column.scrollOffset = newIndex - maxRows + 1
+                }
+                // If moving up and active item would be above visible window, scroll up
+                // Position active item at the top of the visible window
+                else if newIndex < currentScrollOffset {
+                    column.scrollOffset = newIndex
+                }
+
+                // Ensure scrollOffset doesn't exceed bounds
+                let maxScrollOffset = max(0, column.items.count - maxRows)
+                column.scrollOffset = max(0, min(column.scrollOffset, maxScrollOffset))
             }
 
             state.activeColumn = column
