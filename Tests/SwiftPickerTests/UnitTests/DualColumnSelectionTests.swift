@@ -104,7 +104,7 @@ struct DualColumnSelectionTests {
 
 // MARK: - Column Switching Tests
 extension DualColumnSelectionTests {
-    @Test("Switches from selectable to display column using right arrow", .disabled())
+    @Test("Switches from selectable to display column using right arrow")
     func switchesFromSelectableToDisplayColumnUsingRightArrow() {
         let selectableItems = ["Option A", "Option B"]
         let displayItems = ["Info 1", "Info 2"]
@@ -122,7 +122,7 @@ extension DualColumnSelectionTests {
         #expect(result == nil)
     }
 
-    @Test("Prevents navigation beyond column boundaries", .disabled())
+    @Test("Prevents navigation beyond column boundaries")
     func preventsNavigationBeyondColumnBoundaries() {
         let selectableItems = ["Option A"]
         let displayItems = ["Info 1"]
