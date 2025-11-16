@@ -233,7 +233,7 @@ private extension ColumnSelectionHandler {
 
             // Adjust scroll offset to keep active item visible
             let (rows, _) = inputHandler.readScreenSize()
-            let maxRows = rows - 9 - 1  // Same calculation as in renderColumns()
+            let maxRows = rows - 13  // Same calculation as in renderColumns()
             let visibleStart = column.scrollOffset
             let visibleEnd = min(visibleStart + maxRows, column.items.count)
 
@@ -310,7 +310,7 @@ private extension ColumnSelectionHandler {
 
         // Calculate footer space (always 2 rows for column-style footer)
         let footerRows = 2
-        let maxRows = rows - 9 - (footerRows - 1)
+        let maxRows = rows - 13
 
         // Render each column (starting at row 6 to avoid overwriting breadcrumb title on row 4)
         for (columnIndex, column) in columnsToRender.enumerated() {
@@ -472,8 +472,8 @@ private extension ColumnSelectionHandler {
             let firstColX = calculateColumnXPosition(for: columnIndex)
             let dividerX = firstColX + columnWidth + 1
 
-            // Draw vertical line from title row to bottom of items
-            for row in startRow...(startRow + maxRows + 1) {
+            // Draw vertical line from title row to bottom of items (including scroll indicator row)
+            for row in startRow...(startRow + maxRows + 2) {
                 inputHandler.moveTo(row, dividerX)
                 inputHandler.write(dividerChar.foreColor(240))
             }
