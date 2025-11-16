@@ -446,16 +446,16 @@ extension MockSwiftPicker: CommandLineColumnSelection {
         return item
     }
 
-    /// Returns a pre-configured dual column selection result.
+    /// Returns a pre-configured static detail column selection result.
     /// - Parameters:
     ///   - selectableItems: Items that can be selected.
-    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - instructions: Static instructions for display only (ignored).
     ///   - selectableTitle: Title for the selectable column (ignored).
-    ///   - displayTitle: Title for the display column (ignored).
+    ///   - instructionsTitle: Title for the instructions column (ignored).
     ///   - title: The prompt title (used for dictionary lookup).
     ///   - newScreen: Ignored in mock implementation.
     /// - Returns: The item at the configured index from selectable items, or `nil` if cancelled or invalid.
-    public func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
+    public func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
         guard let index = getColumnSelectionIndex(prompt: title) else {
             return nil
         }
@@ -467,34 +467,34 @@ extension MockSwiftPicker: CommandLineColumnSelection {
         return selectableItems[index]
     }
 
-    /// Returns a pre-configured dual column selection result, throwing an error if cancelled.
+    /// Returns a pre-configured static detail column selection result, throwing an error if cancelled.
     /// - Parameters:
     ///   - selectableItems: Items that can be selected.
-    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - instructions: Static instructions for display only (ignored).
     ///   - selectableTitle: Title for the selectable column (ignored).
-    ///   - displayTitle: Title for the display column (ignored).
+    ///   - instructionsTitle: Title for the instructions column (ignored).
     ///   - title: The prompt title (used for dictionary lookup).
     ///   - newScreen: Ignored in mock implementation.
     /// - Throws: `SwiftPickerError.selectionCancelled` if selection is cancelled or invalid.
     /// - Returns: The item at the configured index from selectable items.
-    public func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item {
-        guard let item = singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title, newScreen: newScreen) else {
+    public func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item {
+        guard let item = singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, newScreen: newScreen) else {
             throw SwiftPickerError.selectionCancelled
         }
 
         return item
     }
 
-    /// Returns a pre-configured multi-selection dual column result.
+    /// Returns a pre-configured multi-selection static detail column result.
     /// - Parameters:
     ///   - selectableItems: Items that can be selected.
-    ///   - staticDisplayItems: Items for display only (ignored).
+    ///   - instructions: Static instructions for display only (ignored).
     ///   - selectableTitle: Title for the selectable column (ignored).
-    ///   - displayTitle: Title for the display column (ignored).
+    ///   - instructionsTitle: Title for the instructions column (ignored).
     ///   - title: The prompt title (used for dictionary lookup).
     ///   - newScreen: Ignored in mock implementation.
     /// - Returns: The items at the configured indices from selectable items.
-    public func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
+    public func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
         let indices = getMultiColumnSelectionIndices(prompt: title)
 
         return indices.compactMap { selectableItems.indices.contains($0) ? selectableItems[$0] : nil }

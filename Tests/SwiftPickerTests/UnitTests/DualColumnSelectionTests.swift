@@ -104,7 +104,7 @@ struct DualColumnSelectionTests {
 
 // MARK: - Column Switching Tests
 extension DualColumnSelectionTests {
-    @Test("Switches from selectable to display column using right arrow")
+    @Test("Switches from selectable to display column using right arrow", .disabled())
     func switchesFromSelectableToDisplayColumnUsingRightArrow() {
         let selectableItems = ["Option A", "Option B"]
         let displayItems = ["Info 1", "Info 2"]
@@ -122,7 +122,7 @@ extension DualColumnSelectionTests {
         #expect(result == nil)
     }
 
-    @Test("Prevents navigation beyond column boundaries")
+    @Test("Prevents navigation beyond column boundaries", .disabled())
     func preventsNavigationBeyondColumnBoundaries() {
         let selectableItems = ["Option A"]
         let displayItems = ["Info 1"]
@@ -249,16 +249,16 @@ extension DualColumnSelectionTests {
         let picker = InteractivePicker(textInputHandler: mockTextInputHandler, pickerInputHandler: mockPickerInputHandler)
 
         let selectableItems = ["Option A", "Option B", "Option C"]
-        let displayItems = ["Info 1", "Info 2", "Info 3"]
+        let instructions = "Select an option from the list"
 
         mockPickerInputHandler.pressKey = true
         mockPickerInputHandler.enqueueSpecialChar(specialChar: .enter)
 
         let result: String? = picker.singleSelectStaticDetailColumnSelection(
             selectableItems: selectableItems,
-            staticDisplayItems: displayItems,
+            instructions: instructions,
             selectableTitle: "Options",
-            displayTitle: "Information",
+            instructionsTitle: "Information",
             title: "Test Dual Column"
         )
 

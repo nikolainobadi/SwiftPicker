@@ -538,10 +538,10 @@ extension MockSwiftPickerTests {
     @Test("Dual column selection returns item at configured index")
     func dualColumnSelectionReturnsItemAtConfiguredIndex() {
         let selectableItems = ["First", "Second", "Third"]
-        let displayItems = ["Info1", "Info2", "Info3"]
+        let instructions = "Select an item from the list"
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([2])))
 
-        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result == "Third")
     }
@@ -549,10 +549,10 @@ extension MockSwiftPickerTests {
     @Test("Dual column selection returns nil when cancelled")
     func dualColumnSelectionReturnsNilWhenCancelled() {
         let selectableItems = ["First", "Second"]
-        let displayItems = ["Info1", "Info2"]
+        let instructions = "Select an item from the list"
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
 
-        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result == nil)
     }
@@ -560,10 +560,10 @@ extension MockSwiftPickerTests {
     @Test("Required dual column selection returns item when selected")
     func requiredDualColumnSelectionReturnsItemWhenSelected() throws {
         let selectableItems = ["First", "Second", "Third"]
-        let displayItems = ["Info1", "Info2", "Info3"]
+        let instructions = "Select an item from the list"
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([1])))
 
-        let result = try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result == "Second")
     }
@@ -571,32 +571,32 @@ extension MockSwiftPickerTests {
     @Test("Required dual column selection throws when cancelled")
     func requiredDualColumnSelectionThrowsWhenCancelled() throws {
         let selectableItems = ["First", "Second"]
-        let displayItems = ["Info1", "Info2"]
+        let instructions = "Select an item from the list"
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
 
         #expect(throws: SwiftPickerError.self) {
-            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
         }
     }
 
     @Test("Required dual column selection throws selection cancelled error")
     func requiredDualColumnSelectionThrowsSelectionCancelledError() throws {
         let selectableItems = ["First", "Second"]
-        let displayItems = ["Info1", "Info2"]
+        let instructions = "Select an item from the list"
         let sut = makeSUT(columnSelectionResult: .init(singleColumnSelectionType: .ordered([nil])))
 
         #expect(throws: SwiftPickerError.selectionCancelled) {
-            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+            try sut.requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
         }
     }
 
     @Test("Multi selection dual column returns items at configured indices")
     func multiSelectionDualColumnReturnsItemsAtConfiguredIndices() {
         let selectableItems = ["Red", "Green", "Blue", "Yellow"]
-        let displayItems = ["Info1", "Info2", "Info3", "Info4"]
+        let instructions = "Select multiple colors"
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 2]])))
 
-        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Colors", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Colors", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.count == 2)
         #expect(result.contains("Red"))
@@ -606,10 +606,10 @@ extension MockSwiftPickerTests {
     @Test("Multi selection dual column returns empty array when cancelled")
     func multiSelectionDualColumnReturnsEmptyArrayWhenCancelled() {
         let selectableItems = ["First", "Second"]
-        let displayItems = ["Info1", "Info2"]
+        let instructions = "Select items from the list"
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[]])))
 
-        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.isEmpty)
     }
@@ -651,12 +651,12 @@ extension MockSwiftPickerTests {
     @Test("Multi column selection uses ordered responses")
     func multiColumnSelectionUsesOrderedResponses() {
         let selectableItems = ["X", "Y", "Z"]
-        let displayItems = ["1", "2", "3"]
+        let instructions = "Instructions for selection"
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0], [1], [2]])))
 
-        let result1 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
-        let result2 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
-        let result3 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Letters", displayTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result1 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Letters", instructionsTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result2 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Letters", instructionsTitle: "Numbers", title: "Choose:", newScreen: true)
+        let result3 = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Letters", instructionsTitle: "Numbers", title: "Choose:", newScreen: true)
 
         #expect(result1 == ["X"])
         #expect(result2 == ["Y"])
@@ -666,10 +666,10 @@ extension MockSwiftPickerTests {
     @Test("Filters out invalid indices from multi column selection")
     func filtersOutInvalidIndicesFromMultiColumnSelection() {
         let selectableItems = ["First", "Second"]
-        let displayItems = ["Info1", "Info2"]
+        let instructions = "Select items from the list"
         let sut = makeSUT(columnSelectionResult: .init(multiColumnSelectionType: .ordered([[0, 10, 1]])))
 
-        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: displayItems, selectableTitle: "Items", displayTitle: "Info", title: "Choose:", newScreen: true)
+        let result = sut.multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: "Items", instructionsTitle: "Info", title: "Choose:", newScreen: true)
 
         #expect(result.count == 2)
         #expect(result.contains("First"))

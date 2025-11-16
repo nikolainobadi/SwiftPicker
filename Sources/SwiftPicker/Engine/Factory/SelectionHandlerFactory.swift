@@ -314,6 +314,74 @@ extension SelectionHandlerFactory {
 
         return .init(state: state, inputHandler: inputHandler, onNavigate: nil, onActiveItemChange: onActiveItemChange)
     }
+
+    /// Creates a static detail selection handler with the default input handler.
+    /// The first column is selectable (Enter to select), the second column displays static instructions.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be selected.
+    ///   - instructions: Static instructions displayed in the right column.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - instructionsTitle: Title for the instructions column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    /// - Returns: A StaticDetailSelectionHandler instance configured for single selection.
+    static func makeStaticDetailSelectionHandler<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: String, newScreen: Bool) -> StaticDetailSelectionHandler<Item> {
+        return makeStaticDetailSelectionHandler(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, newScreen: newScreen, inputHandler: inputHandler)
+    }
+
+    /// Creates a static detail selection handler with a custom input handler.
+    /// The first column is selectable (Enter to select), the second column displays static instructions.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be selected.
+    ///   - instructions: Static instructions displayed in the right column.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - instructionsTitle: Title for the instructions column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    /// - Returns: A StaticDetailSelectionHandler instance configured for single selection.
+    static func makeStaticDetailSelectionHandler<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: String, newScreen: Bool, inputHandler: PickerInput) -> StaticDetailSelectionHandler<Item> {
+        configureScreen(newScreen, inputHandler: inputHandler)
+        let topLine = inputHandler.readCursorPos().row + PickerPadding.top
+
+        let state = StaticDetailColumnState(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, topLine: topLine, isMultiSelection: false)
+
+        return .init(state: state, inputHandler: inputHandler)
+    }
+
+    /// Creates a multi-selection static detail handler with the default input handler.
+    /// The first column supports multi-selection (Space to toggle, Enter to confirm), the second column displays static instructions.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be multi-selected.
+    ///   - instructions: Static instructions displayed in the right column.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - instructionsTitle: Title for the instructions column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    /// - Returns: A StaticDetailSelectionHandler instance configured for multi-selection.
+    static func makeMultiSelectionStaticDetailHandler<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: String, newScreen: Bool) -> StaticDetailSelectionHandler<Item> {
+        return makeMultiSelectionStaticDetailHandler(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, newScreen: newScreen, inputHandler: inputHandler)
+    }
+
+    /// Creates a multi-selection static detail handler with a custom input handler.
+    /// The first column supports multi-selection (Space to toggle, Enter to confirm), the second column displays static instructions.
+    /// - Parameters:
+    ///   - selectableItems: Items in the left column that can be multi-selected.
+    ///   - instructions: Static instructions displayed in the right column.
+    ///   - selectableTitle: Title for the selectable column.
+    ///   - instructionsTitle: Title for the instructions column.
+    ///   - title: The title to display above the columns.
+    ///   - newScreen: A Boolean value indicating whether to show a new screen.
+    ///   - inputHandler: Custom input handler to use instead of the default.
+    /// - Returns: A StaticDetailSelectionHandler instance configured for multi-selection.
+    static func makeMultiSelectionStaticDetailHandler<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: String, newScreen: Bool, inputHandler: PickerInput) -> StaticDetailSelectionHandler<Item> {
+        configureScreen(newScreen, inputHandler: inputHandler)
+        let topLine = inputHandler.readCursorPos().row + PickerPadding.top
+
+        let state = StaticDetailColumnState(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, topLine: topLine, isMultiSelection: true)
+
+        return .init(state: state, inputHandler: inputHandler)
+    }
 }
 
 // MARK: - Private Methods

@@ -139,13 +139,12 @@ public extension InteractivePicker {
         return selection
     }
 
-    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
-        let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
-        let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
-
-        let handler = SelectionHandlerFactory.makeDualColumnSelectionHandler(
-            selectableColumn: selectableColumn,
-            displayColumn: displayColumn,
+    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) -> Item? {
+        let handler = SelectionHandlerFactory.makeStaticDetailSelectionHandler(
+            selectableItems: selectableItems,
+            instructions: instructions,
+            selectableTitle: selectableTitle,
+            instructionsTitle: instructionsTitle,
             title: title.title,
             newScreen: newScreen,
             inputHandler: pickerInputHandler
@@ -154,20 +153,19 @@ public extension InteractivePicker {
         return handler.captureUserInput()
     }
 
-    func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item {
-        guard let selection = singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title, newScreen: newScreen) else {
+    func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) throws -> Item {
+        guard let selection = singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title, newScreen: newScreen) else {
             throw SwiftPickerError.selectionCancelled
         }
         return selection
     }
 
-    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
-        let selectableColumn = PickerColumn(title: selectableTitle, items: selectableItems)
-        let displayColumn = PickerColumn(title: displayTitle, items: staticDisplayItems)
-
-        let handler = SelectionHandlerFactory.makeMultiSelectionDualColumnHandler(
-            selectableColumn: selectableColumn,
-            displayColumn: displayColumn,
+    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: PickerPrompt, newScreen: Bool) -> [Item] {
+        let handler = SelectionHandlerFactory.makeMultiSelectionStaticDetailHandler(
+            selectableItems: selectableItems,
+            instructions: instructions,
+            selectableTitle: selectableTitle,
+            instructionsTitle: instructionsTitle,
             title: title.title,
             newScreen: newScreen,
             inputHandler: pickerInputHandler
@@ -221,49 +219,49 @@ public extension InteractivePicker {
         return try requiredDualColumnSelection(columns: columns, title: title as PickerPrompt, newScreen: newScreen, onNavigate: onNavigate)
     }
 
-    /// Displays a dual-column layout with one selectable column and one static display column with default parameters.
+    /// Displays a dual-column layout with one selectable column and static instructions in the second column with default parameters.
     /// User can navigate both columns with arrow keys but can only select items from the first column.
-    /// The second column remains static and is for display/reference only.
+    /// The second column displays static instructions and is for display/reference only.
     /// - Parameters:
     ///   - selectableItems: Items in the left column that can be selected with Enter.
-    ///   - staticDisplayItems: Items in the right column for display only (cannot be selected).
+    ///   - instructions: Static instructions displayed in the right column (supports multiline with \n).
     ///   - selectableTitle: Title for the selectable column.
-    ///   - displayTitle: Title for the static display column.
+    ///   - instructionsTitle: Title for the instructions column.
     ///   - title: Main title to display above both columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     /// - Returns: The selected item from the selectable column, or `nil` if the user quits.
-    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> Item? {
-        return singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
+    func singleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> Item? {
+        return singleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title as PickerPrompt, newScreen: newScreen)
     }
 
-    /// Displays a dual-column layout with one selectable column and one static display column with default parameters and requires a selection.
+    /// Displays a dual-column layout with one selectable column and static instructions in the second column with default parameters and requires a selection.
     /// User can navigate both columns with arrow keys but can only select items from the first column.
-    /// The second column remains static and is for display/reference only.
+    /// The second column displays static instructions and is for display/reference only.
     /// - Parameters:
     ///   - selectableItems: Items in the left column that can be selected with Enter.
-    ///   - staticDisplayItems: Items in the right column for display only (cannot be selected).
+    ///   - instructions: Static instructions displayed in the right column (supports multiline with \n).
     ///   - selectableTitle: Title for the selectable column.
-    ///   - displayTitle: Title for the static display column.
+    ///   - instructionsTitle: Title for the instructions column.
     ///   - title: Main title to display above both columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     /// - Throws: `SwiftPickerError.selectionCancelled` if the user does not make a selection.
     /// - Returns: The selected item from the selectable column.
-    func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) throws -> Item {
-        return try requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
+    func requiredSingleSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) throws -> Item {
+        return try requiredSingleSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title as PickerPrompt, newScreen: newScreen)
     }
 
-    /// Displays a dual-column layout with multi-selection in the first column and a static display in the second with default parameters.
-    /// User can toggle multiple items in the left column with Space, and the right column remains static for reference.
+    /// Displays a dual-column layout with multi-selection in the first column and static instructions in the second with default parameters.
+    /// User can toggle multiple items in the left column with Space, and the right column displays static instructions for reference.
     /// - Parameters:
     ///   - selectableItems: Items in the left column that can be multi-selected with Space and confirmed with Enter.
-    ///   - staticDisplayItems: Items in the right column for display only (cannot be selected).
+    ///   - instructions: Static instructions displayed in the right column (supports multiline with \n).
     ///   - selectableTitle: Title for the selectable column.
-    ///   - displayTitle: Title for the static display column.
+    ///   - instructionsTitle: Title for the instructions column.
     ///   - title: Main title to display above both columns. Defaults to empty string.
     ///   - newScreen: Whether to use alternative screen mode. Defaults to true.
     /// - Returns: An array of selected items from the selectable column.
-    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], staticDisplayItems: [Item], selectableTitle: String, displayTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> [Item] {
-        return multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, staticDisplayItems: staticDisplayItems, selectableTitle: selectableTitle, displayTitle: displayTitle, title: title as PickerPrompt, newScreen: newScreen)
+    func multiSelectStaticDetailColumnSelection<Item: DisplayablePickerItem>(selectableItems: [Item], instructions: String, selectableTitle: String, instructionsTitle: String, title: some PickerPrompt = "", newScreen: Bool = true) -> [Item] {
+        return multiSelectStaticDetailColumnSelection(selectableItems: selectableItems, instructions: instructions, selectableTitle: selectableTitle, instructionsTitle: instructionsTitle, title: title as PickerPrompt, newScreen: newScreen)
     }
 
     /// Displays a dual-column layout with multi-selection in the first column and a dynamic display in the second with default parameters.
